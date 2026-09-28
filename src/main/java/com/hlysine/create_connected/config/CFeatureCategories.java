@@ -60,7 +60,7 @@ public class CFeatureCategories extends SyncConfigBase {
         synchronizedToggles = new HashMap<>();
         for (String key : nbt.getAllKeys()) {
             FeatureCategory category = FeatureCategory.byName(key);
-            synchronizedToggles.put(category, nbt.getBoolean(key));
+            synchronizedToggles.put(category, nbt.getBooleanOr(key, false));
         }
         FeatureToggle.refreshItemVisibility();
     }

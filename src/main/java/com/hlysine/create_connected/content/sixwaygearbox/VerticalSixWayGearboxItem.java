@@ -2,7 +2,7 @@ package com.hlysine.create_connected.content.sixwaygearbox;
 
 import com.hlysine.create_connected.registries.CCBlocks;
 import com.simibubi.create.content.kinetics.base.IRotate;
-import net.createmod.catnip.data.Iterate;
+import net.createmod.catnip.api.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -20,13 +20,10 @@ import java.util.Map;
 public class VerticalSixWayGearboxItem extends BlockItem {
 
     public VerticalSixWayGearboxItem(Properties builder) {
-        super(CCBlocks.SIX_WAY_GEARBOX.get(), builder);
+        super(CCBlocks.SIX_WAY_GEARBOX.get(), builder.overrideDescription("item.create_connected.vertical_six_way_gearbox"));
     }
 
-    @Override
-    public @NotNull String getDescriptionId() {
-        return "item.create_connected.vertical_six_way_gearbox";
-    }
+
 
     @Override
     public void registerBlocks(@NotNull Map<Block, Item> map, @NotNull Item self) {

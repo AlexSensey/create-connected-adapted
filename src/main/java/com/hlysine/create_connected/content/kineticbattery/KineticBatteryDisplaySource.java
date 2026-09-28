@@ -7,7 +7,7 @@ import com.simibubi.create.content.redstone.displayLink.source.PercentOrProgress
 import com.simibubi.create.content.trains.display.FlapDisplayBlockEntity;
 import com.simibubi.create.foundation.gui.ModularGuiLineBuilder;
 import com.simibubi.create.foundation.utility.CreateLang;
-import net.createmod.catnip.lang.LangBuilder;
+import net.createmod.catnip.api.lang.LangBuilder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
@@ -36,7 +36,7 @@ public class KineticBatteryDisplaySource extends PercentOrProgressBarDisplaySour
 
     @Override
     protected MutableComponent formatNumeric(DisplayLinkContext context, Float currentLevel) {
-        if (context.sourceConfig().getInt("Mode") == 1)
+        if (context.sourceConfig().getIntOr("Mode", 0) == 1)
             return super.formatNumeric(context, currentLevel);
         LangBuilder builder = ConnectedLang.number(Math.round(currentLevel * KineticBatteryBlockEntity.getMaxBatteryLevel() / 3600 / 20));
         if (context.getTargetBlockEntity() instanceof FlapDisplayBlockEntity)
@@ -48,7 +48,7 @@ public class KineticBatteryDisplaySource extends PercentOrProgressBarDisplaySour
     @Override
     protected boolean progressBarActive(DisplayLinkContext context) {
         return context.sourceConfig()
-                .getInt("Mode") == 2;
+                .getIntOr("Mode", 0) == 2;
     }
 
     @Override

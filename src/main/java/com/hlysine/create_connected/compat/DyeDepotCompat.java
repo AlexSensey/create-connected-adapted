@@ -1,6 +1,6 @@
 package com.hlysine.create_connected.compat;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 
 public class DyeDepotCompat {
@@ -8,6 +8,6 @@ public class DyeDepotCompat {
         if (color.getId() >= 16 && Mods.DYE_DEPOT.isLoaded()) {
             return Mods.DYE_DEPOT.id();
         }
-        return ResourceLocation.DEFAULT_NAMESPACE;
+        return Identifier.DEFAULT_NAMESPACE;
     }
 }

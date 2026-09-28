@@ -10,7 +10,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 
 public class CCSoundEvents {
 
-    public static final Map<ResourceLocation, SoundEntry> ALL = new HashMap<>();
+    public static final Map<Identifier, SoundEntry> ALL = new HashMap<>();
 
     public static final SoundEntry ELEVATOR_MUSIC = create("elevator_music").noSubtitle()
             .category(SoundSource.RECORDS)
@@ -48,7 +48,7 @@ public class CCSoundEvents {
         return create(CreateConnected.asResource(name));
     }
 
-    public static SoundEntryBuilder create(ResourceLocation id) {
+    public static SoundEntryBuilder create(Identifier id) {
         return new SoundEntryBuilder(id);
     }
 
@@ -77,12 +77,12 @@ public class CCSoundEvents {
     public static void playItemPickup(Player player) {
         player.level()
                 .playSound(null, player.blockPosition(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, .2f,
-                        1f + player.level().random.nextFloat());
+                        1f + player.level().getRandom().nextFloat());
     }
 
 //	@SubscribeEvent
 //	public static void cancelSubtitlesOfCompoundedSounds(PlaySoundEvent event) {
-//		ResourceLocation soundLocation = event.getSound().getSoundLocation();
+//		Identifier soundLocation = event.getSound().getSoundLocation();
 //		if (!soundLocation.getNamespace().equals(CreateConnected.ID))
 //			return;
 //		if (soundLocation.getPath().contains("_compounded_")
@@ -128,14 +128,14 @@ public class CCSoundEvents {
 
     public static class SoundEntryBuilder {
 
-        protected ResourceLocation id;
+        protected Identifier id;
         protected String subtitle = "unregistered";
         protected SoundSource category = SoundSource.BLOCKS;
         protected List<ConfiguredSoundEvent> wrappedEvents;
-        protected List<ResourceLocation> variants;
+        protected List<Identifier> variants;
         protected int attenuationDistance;
 
-        public SoundEntryBuilder(ResourceLocation id) {
+        public SoundEntryBuilder(Identifier id) {
             wrappedEvents = new ArrayList<>();
             variants = new ArrayList<>();
             this.id = id;
@@ -165,7 +165,7 @@ public class CCSoundEvents {
             return addVariant(CreateConnected.asResource(name));
         }
 
-        public SoundEntryBuilder addVariant(ResourceLocation id) {
+        public SoundEntryBuilder addVariant(Identifier id) {
             variants.add(id);
             return this;
         }
@@ -199,12 +199,12 @@ public class CCSoundEvents {
 
     public static abstract class SoundEntry {
 
-        protected ResourceLocation id;
+        protected Identifier id;
         protected String subtitle;
         protected SoundSource category;
         protected int attenuationDistance;
 
-        public SoundEntry(ResourceLocation id, String subtitle, SoundSource category, int attenuationDistance) {
+        public SoundEntry(Identifier id, String subtitle, SoundSource category, int attenuationDistance) {
             this.id = id;
             this.subtitle = subtitle;
             this.category = category;
@@ -225,7 +225,7 @@ public class CCSoundEvents {
             return id.getNamespace() + ".subtitle." + id.getPath();
         }
 
-        public ResourceLocation getId() {
+        public Identifier getId() {
             return id;
         }
 
@@ -285,7 +285,7 @@ public class CCSoundEvents {
         private List<ConfiguredSoundEvent> wrappedEvents;
         private List<CompiledSoundEvent> compiledEvents;
 
-        public WrappedSoundEntry(ResourceLocation id, String subtitle,
+        public WrappedSoundEntry(Identifier id, String subtitle,
                                  List<ConfiguredSoundEvent> wrappedEvents, SoundSource category, int attenuationDistance) {
             super(id, subtitle, category, attenuationDistance);
             this.wrappedEvents = wrappedEvents;
@@ -296,7 +296,7 @@ public class CCSoundEvents {
         public void prepare() {
             for (int i = 0; i < wrappedEvents.size(); i++) {
                 ConfiguredSoundEvent wrapped = wrappedEvents.get(i);
-                ResourceLocation location = getIdOf(i);
+                Identifier location = getIdOf(i);
                 DeferredHolder<SoundEvent, SoundEvent> event = DeferredHolder.create(Registries.SOUND_EVENT, location);
                 compiledEvents.add(new CompiledSoundEvent(event, wrapped.volume(), wrapped.pitch()));
             }
@@ -305,7 +305,7 @@ public class CCSoundEvents {
         @Override
         public void register(RegisterEvent.RegisterHelper<SoundEvent> helper) {
             for (CompiledSoundEvent compiledEvent : compiledEvents) {
-                ResourceLocation location = compiledEvent.event().getId();
+                Identifier location = compiledEvent.event().getId();
                 helper.register(location, SoundEvent.createVariableRangeEvent(location));
             }
         }
@@ -320,8 +320,8 @@ public class CCSoundEvents {
             return compiledEvents.getFirst().event().get();
         }
 
-        protected ResourceLocation getIdOf(int i) {
-            return ResourceLocation.fromNamespaceAndPath(id.getNamespace(), i == 0 ? id.getPath() : id.getPath() + "_compounded_" + i);
+        protected Identifier getIdOf(int i) {
+            return Identifier.fromNamespaceAndPath(id.getNamespace(), i == 0 ? id.getPath() : id.getPath() + "_compounded_" + i);
         }
 
         @Override
@@ -333,7 +333,7 @@ public class CCSoundEvents {
                 JsonObject s = new JsonObject();
                 s.addProperty("name", event.event()
                         .get()
-                        .getLocation()
+                        .location()
                         .toString());
                 s.addProperty("type", "event");
                 if (attenuationDistance != 0)
@@ -369,11 +369,11 @@ public class CCSoundEvents {
 
     private static class CustomSoundEntry extends SoundEntry {
 
-        protected List<ResourceLocation> variants;
+        protected List<Identifier> variants;
         protected DeferredHolder<SoundEvent, SoundEvent> event;
         protected Holder<SoundEvent> directEvent;
 
-        public CustomSoundEntry(ResourceLocation id, List<ResourceLocation> variants, String subtitle,
+        public CustomSoundEntry(Identifier id, List<Identifier> variants, String subtitle,
                                 SoundSource category, int attenuationDistance) {
             super(id, subtitle, category, attenuationDistance);
             this.variants = variants;
@@ -386,7 +386,7 @@ public class CCSoundEvents {
 
         @Override
         public void register(RegisterEvent.RegisterHelper<SoundEvent> helper) {
-            ResourceLocation location = event.getId();
+            Identifier location = event.getId();
             helper.register(location, SoundEvent.createVariableRangeEvent(location));
         }
 
@@ -415,7 +415,7 @@ public class CCSoundEvents {
                 s.addProperty("attenuation_distance", attenuationDistance);
             list.add(s);
 
-            for (ResourceLocation variant : variants) {
+            for (Identifier variant : variants) {
                 s = new JsonObject();
                 s.addProperty("name", variant.toString());
                 s.addProperty("type", "file");

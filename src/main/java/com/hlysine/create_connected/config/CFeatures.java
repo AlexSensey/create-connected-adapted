@@ -1,7 +1,7 @@
 package com.hlysine.create_connected.config;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,20 +15,20 @@ public class CFeatures extends SyncConfigBase {
         return "features";
     }
 
-    final Map<ResourceLocation, ModConfigSpec.ConfigValue<Boolean>> toggles = new HashMap<>();
+    final Map<Identifier, ModConfigSpec.ConfigValue<Boolean>> toggles = new HashMap<>();
 
-    Map<ResourceLocation, Boolean> synchronizedToggles;
+    Map<Identifier, Boolean> synchronizedToggles;
 
     @Override
     public void registerAll(ModConfigSpec.Builder builder) {
         FeatureToggle.TOGGLEABLE_FEATURES.forEach((r) -> toggles.put(r, builder.define(r.getPath(), true)));
     }
 
-    public boolean hasToggle(ResourceLocation key) {
+    public boolean hasToggle(Identifier key) {
         return (synchronizedToggles != null && synchronizedToggles.containsKey(key)) || toggles.containsKey(key);
     }
 
-    public boolean isEnabled(ResourceLocation key) {
+    public boolean isEnabled(Identifier key) {
         if (this.synchronizedToggles != null) {
             Boolean synced = synchronizedToggles.get(key);
             if (synced != null) return synced;
@@ -55,8 +55,8 @@ public class CFeatures extends SyncConfigBase {
     protected void readSyncConfig(CompoundTag nbt) {
         synchronizedToggles = new HashMap<>();
         for (String key : nbt.getAllKeys()) {
-            ResourceLocation location = ResourceLocation.parse(key);
-            synchronizedToggles.put(location, nbt.getBoolean(key));
+            Identifier location = Identifier.parse(key);
+            synchronizedToggles.put(location, nbt.getBooleanOr(key, false));
         }
         FeatureToggle.refreshItemVisibility();
     }

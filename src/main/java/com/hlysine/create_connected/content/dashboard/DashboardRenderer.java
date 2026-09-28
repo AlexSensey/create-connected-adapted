@@ -6,9 +6,13 @@ import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRender
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.createmod.catnip.impl.client.render.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.SignRenderer;
+import net.minecraft.client.renderer.blockentity.AbstractSignRenderer;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.FormattedCharSequence;
@@ -16,7 +20,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.entity.SignText;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -26,23 +29,48 @@ public class DashboardRenderer extends SafeBlockEntityRenderer<DashboardBlockEnt
     //taken from sign renderer
     private static final int OUTLINE_RENDER_DISTANCE = Mth.square(16);
 
-    private final BlockEntityRendererProvider.Context context;
 
     public DashboardRenderer(final BlockEntityRendererProvider.Context context) {
-        this.context = context;
+
     }
 
     @Override
-    public void renderSafe(final DashboardBlockEntity be, final float pPartialTick, final PoseStack ps, final MultiBufferSource buffer, int packedLight, final int packedOverlay) {
-        final Font font = this.context.getFont();
+    public void renderSafe(DashboardBlockEntity be, float partialTick, PoseStack ps, MultiBufferSource buffer,
+                           int packedLight, int packedOverlay) {
+        // 26.2 renders through submit below.
+    }
 
-        final int lineHeight = be.getTextLineHeight();
-        final int maxWidth = be.getMaxTextLineWidth();
-        final int midpoint = SignText.LINES * lineHeight / 2;
+    @Override
+    public BlockEntityRenderState createRenderState() {
+        return new DashboardRenderState();
+    }
 
-        final BlockState state = be.getBlockState();
-        final Direction facing = state.getValue(DashboardBlock.FACING);
+    @Override
+    public void extractRenderState(DashboardBlockEntity be, BlockEntityRenderState state, float partialTick,
+                                   Vec3 cameraPos, ModelFeatureRenderer.CrumblingOverlay overlay) {
+        BlockEntityRenderState.extractBase(be, state, overlay);
+        DashboardRenderState dashboard = (DashboardRenderState) state;
+        Font font = Minecraft.getInstance().font;
+        dashboard.facing = be.getBlockState().getValue(DashboardBlock.FACING);
+        dashboard.lineHeight = be.getTextLineHeight();
+        dashboard.lines = be.text.getRenderMessages(Minecraft.getInstance().isTextFilteringEnabled(), line -> {
+            List<FormattedCharSequence> lines = font.split(line, be.getMaxTextLineWidth());
+            return lines.isEmpty() ? FormattedCharSequence.EMPTY : lines.get(0);
+        }).clone();
+        dashboard.darkColor = AbstractSignRenderer.getDarkColor(be.text);
+        dashboard.color = be.text.hasGlowingText() ? be.text.getColor().getTextColor() : dashboard.darkColor;
+        dashboard.outline = be.text.hasGlowingText() && isOutlineVisible(be.getBlockPos(), dashboard.color);
+        dashboard.textLight = be.text.hasGlowingText() ? 15728880 : state.lightCoords;
+    }
 
+    @Override
+    public void submit(BlockEntityRenderState state, PoseStack ps, SubmitNodeCollector collector,
+                       CameraRenderState camera) {
+        DashboardRenderState dashboard = (DashboardRenderState) state;
+        Font font = Minecraft.getInstance().font;
+        Direction facing = dashboard.facing;
+        int lineHeight = dashboard.lineHeight;
+        int midpoint = SignText.LINES * lineHeight / 2;
         ps.pushPose();
 
         ps.translate(0.5, 0.5, 0.5);
@@ -56,30 +84,11 @@ public class DashboardRenderer extends SafeBlockEntityRenderer<DashboardBlockEnt
         float scale = 0.015625f * 0.52f;
         ps.scale(scale, -scale, scale);
 
-        FormattedCharSequence[] sequences = be.text.getRenderMessages(Minecraft.getInstance().isTextFilteringEnabled(), (line) -> {
-            List<FormattedCharSequence> list = font.split(line, maxWidth);
-            return list.isEmpty() ? FormattedCharSequence.EMPTY : list.get(0);
-        });
-
-        final int textColor;
-        final boolean glowing;
-        if (be.text.hasGlowingText()) {
-            textColor = be.text.getColor().getTextColor();
-            glowing = isOutlineVisible(be.getBlockPos(), textColor);
-            packedLight = 15728880;
-        } else {
-            textColor = SignRenderer.getDarkColor(be.text);
-            glowing = false;
-        }
-
         for (int i = 0; i < SignText.LINES; ++i) {
-            FormattedCharSequence sequence = sequences[i];
-            float f = (float) (-font.width(sequence) / 2);
-            if (glowing) {
-                font.drawInBatch8xOutline(sequence, f, (float) (i * lineHeight - midpoint), textColor, i, ps.last().pose(), buffer, packedLight);
-            } else {
-                font.drawInBatch(sequence, f, (float) (i * lineHeight - midpoint), textColor, false, ps.last().pose(), buffer, Font.DisplayMode.POLYGON_OFFSET, 0, packedLight);
-            }
+            FormattedCharSequence line = dashboard.lines[i];
+            float x = -font.width(line) / 2;
+            collector.submitText(ps, x, i * lineHeight - midpoint, line, false, Font.DisplayMode.POLYGON_OFFSET,
+                    dashboard.textLight, dashboard.color, 0, dashboard.outline ? dashboard.darkColor : 0);
         }
 
         ps.popPose();
@@ -100,5 +109,15 @@ public class DashboardRenderer extends SafeBlockEntityRenderer<DashboardBlockEnt
             }
         }
     }
+    private static class DashboardRenderState extends BlockEntityRenderState {
+        Direction facing;
+        FormattedCharSequence[] lines;
+        int lineHeight;
+        int color;
+        int darkColor;
+        int textLight;
+        boolean outline;
+    }
+
 }
 

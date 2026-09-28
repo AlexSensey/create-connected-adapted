@@ -62,7 +62,7 @@ public class FreewheelClutchBlock extends DirectionalKineticBlock implements IBE
 
     @SuppressWarnings("deprecation")
     @Override
-    public int getAnalogOutputSignal(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos) {
+    public int getAnalogOutputSignal(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, net.minecraft.core.Direction side) {
         return pState.getValue(UNCOUPLED) ? 0 : 15;
     }
 

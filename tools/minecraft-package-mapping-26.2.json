@@ -1,0 +1,18 @@
+{
+  "net.minecraft.client.renderer.RenderType": "net.minecraft.client.renderer.rendertype.RenderType",
+  "net.minecraft.client.model.dragon.DragonHeadModel": "net.minecraft.client.model.object.skull.DragonHeadModel",
+  "net.minecraft.advancements.critereon.StatePropertiesPredicate": "net.minecraft.advancements.predicates.StatePropertiesPredicate",
+  "net.minecraft.advancements.CriteriaTriggers": "net.minecraft.advancements.triggers.CriteriaTriggers",
+  "net.minecraft.advancements.CriterionTrigger": "net.minecraft.advancements.triggers.CriterionTrigger",
+  "net.minecraft.advancements.critereon.ContextAwarePredicate": "net.minecraft.advancements.predicates.ContextAwarePredicate",
+  "net.minecraft.advancements.critereon.SimpleCriterionTrigger": "net.minecraft.advancements.triggers.SimpleCriterionTrigger",
+  "net.minecraft.advancements.critereon.EntityPredicate": "net.minecraft.advancements.predicates.entity.EntityPredicate",
+  "net.minecraft.advancements.critereon.ItemPredicate": "net.minecraft.advancements.predicates.ItemPredicate",
+  "net.minecraft.client.renderer.MultiBufferSource": "net.createmod.catnip.impl.client.render.MultiBufferSource",
+  "net.minecraft.client.renderer.block.model.BakedQuad": "net.minecraft.client.resources.model.geometry.BakedQuad",
+  "net.minecraft.client.model.SkullModel": "net.minecraft.client.model.object.skull.SkullModel",
+  "net.minecraft.client.model.SkullModelBase": "net.minecraft.client.model.object.skull.SkullModelBase",
+  "net.minecraft.world.level.BlockAndTintGetter": "net.minecraft.client.renderer.block.BlockAndTintGetter",
+  "net.neoforged.neoforge.client.model.data.ModelData": "net.neoforged.neoforge.model.data.ModelData",
+  "net.neoforged.neoforge.client.model.data.ModelProperty": "net.neoforged.neoforge.model.data.ModelProperty"
+}

@@ -1,5 +1,6 @@
 package com.hlysine.create_connected.content.itemsilo;
 
+import com.hlysine.create_connected.StorageSerialization;
 import com.hlysine.create_connected.registries.CCMountedStorageTypes;
 import com.mojang.serialization.MapCodec;
 import com.simibubi.create.api.contraption.storage.item.MountedItemStorageType;
@@ -50,7 +51,7 @@ public class ItemSiloMountedStorage extends WrapperMountedItemStorage<ItemStackH
 
     public static ItemSiloMountedStorage fromLegacy(HolderLookup.Provider registries, CompoundTag nbt) {
         ItemStackHandler handler = new ItemStackHandler();
-        handler.deserializeNBT(registries, nbt);
+        StorageSerialization.read(handler, registries, nbt);
         return new ItemSiloMountedStorage(handler);
     }
 }

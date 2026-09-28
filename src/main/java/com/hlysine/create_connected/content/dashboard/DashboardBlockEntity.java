@@ -5,8 +5,9 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.createmod.catnip.annotations.ClientOnly;
-import net.createmod.catnip.data.Iterate;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.createmod.catnip.api.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -119,7 +120,7 @@ public class DashboardBlockEntity extends SmartBlockEntity {
         return list;
     }
 
-    @ClientOnly
+    @OnlyIn(Dist.CLIENT)
     private boolean displayStatus() {
         BlockPos seatPos = getSeatPos();
         if (seatPos == null)
@@ -138,15 +139,15 @@ public class DashboardBlockEntity extends SmartBlockEntity {
         if (list == null || list.isEmpty()) return false;
 
         Component status = list.get((cycleTimer / CYCLE_INTERVAL) % list.size());
-        player.displayClientMessage(status, true);
+        player.sendOverlayMessage(status);
         cycleTimer += LAZY_TICK_RATE;
         return true;
     }
 
     static void displayOpenStatus(Player player, boolean open) {
-        ConnectedLang
+        player.sendOverlayMessage(ConnectedLang
                 .translate(open ? "dashboard.activate_hud" : "dashboard.deactivate_hud")
-                .sendStatus(player);
+                .component());
     }
 
     @Override
@@ -161,7 +162,7 @@ public class DashboardBlockEntity extends SmartBlockEntity {
                     if (!getBlockState().getValue(DashboardBlock.OPEN))
                         displayOpenStatus(player, false); // avoid flickering on wrench by displaying the open status instead of empty
                     else
-                        player.displayClientMessage(Component.empty(), true);
+                        player.sendOverlayMessage(Component.empty());
                 }
             }
             wasDisplaying = success;
@@ -181,7 +182,7 @@ public class DashboardBlockEntity extends SmartBlockEntity {
         super.read(tag, registries, clientPacket);
         DynamicOps<Tag> ops = registries.createSerializationContext(NbtOps.INSTANCE);
         if (tag.contains("text")) {
-            DataResult<SignText> result = SignText.DIRECT_CODEC.parse(ops, tag.getCompound("text"));
+            DataResult<SignText> result = SignText.DIRECT_CODEC.parse(ops, tag.getCompoundOrEmpty("text"));
             result.result().ifPresent((signText) -> this.text = signText);
         }
     }

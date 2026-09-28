@@ -81,10 +81,10 @@ public class InventoryAccessPortBlock extends DirectedDirectionalBlock implement
     }
 
     @Override
-    public void neighborChanged(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Block block, @NotNull BlockPos fromPos,
+    public void neighborChanged(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Block block, net.minecraft.world.level.redstone.Orientation fromPos,
                                 boolean isMoving) {
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
         if (!level.getBlockTicks().willTickThisTick(pos, this))
             level.scheduleTick(pos, this, 1);
@@ -101,12 +101,12 @@ public class InventoryAccessPortBlock extends DirectedDirectionalBlock implement
     }
 
     @Override
-    public int getAnalogOutputSignal(@NotNull BlockState blockState, @NotNull Level worldIn, @NotNull BlockPos pos) {
+    public int getAnalogOutputSignal(@NotNull BlockState blockState, @NotNull Level worldIn, @NotNull BlockPos pos, net.minecraft.core.Direction side) {
         if (!blockState.getValue(ATTACHED)) return 0;
         BlockPos targetPos = pos.relative(DirectedDirectionalBlock.getTargetDirection(blockState));
         BlockState targetState = worldIn.getBlockState(targetPos);
         if (targetState.is(this)) return 0;
-        return targetState.hasAnalogOutputSignal() ? targetState.getAnalogOutputSignal(worldIn, targetPos) : 0;
+        return targetState.hasAnalogOutputSignal() ? targetState.getAnalogOutputSignal(worldIn, targetPos, side) : 0;
     }
 
     @Override

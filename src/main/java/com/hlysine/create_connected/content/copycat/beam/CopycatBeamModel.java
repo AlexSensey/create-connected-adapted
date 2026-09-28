@@ -3,9 +3,9 @@ package com.hlysine.create_connected.content.copycat.beam;
 import com.simibubi.create.content.decoration.copycat.CopycatModel;
 import com.simibubi.create.foundation.model.BakedModelHelper;
 import com.simibubi.create.foundation.model.BakedQuadHelper;
-import net.createmod.catnip.data.Iterate;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.createmod.catnip.api.data.Iterate;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,7 +14,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class CopycatBeamModel extends CopycatModel {
 
         List<BakedQuad> quads = new ArrayList<>();
 
-        Vec3 normal = Vec3.atLowerCornerOf(Direction.fromAxisAndDirection(axis, AxisDirection.POSITIVE).getNormal());
+        Vec3 normal = Vec3.atLowerCornerOf(Direction.fromAxisAndDirection(axis, AxisDirection.POSITIVE).getUnitVec3i());
         Vec3 rowNormal = axis.isVertical() ? new Vec3(1, 0, 0) : new Vec3(0, 1, 0);
         Vec3 columnNormal = axis.isVertical() || axis == Axis.X ? new Vec3(0, 0, 1) : new Vec3(1, 0, 0);
         AABB bb = CUBE_AABB.contract((1 - normal.x) * 12 / 16, (1 - normal.y) * 12 / 16, (1 - normal.z) * 12 / 16);
@@ -70,9 +70,9 @@ public class CopycatBeamModel extends CopycatModel {
                     BakedQuad quad = templateQuads.get(i);
                     Direction direction = quad.getDirection();
 
-                    if (rowShiftNormal.equals(direction.getNormal()))
+                    if (rowShiftNormal.equals(direction.getUnitVec3i()))
                         continue;
-                    if (columnShiftNormal.equals(direction.getNormal()))
+                    if (columnShiftNormal.equals(direction.getUnitVec3i()))
                         continue;
 
                     quads.add(BakedQuadHelper.cloneWithCustomGeometry(quad,

@@ -53,13 +53,9 @@ public abstract class AbstractBEShaftBlock<T extends KineticBlockEntity> extends
     }
 
     @Override
-    public @NotNull BlockState updateShape(@NotNull BlockState state,
-                                           @NotNull Direction direction,
-                                           @NotNull BlockState neighbourState,
-                                           @NotNull LevelAccessor world,
-                                           @NotNull BlockPos pos,
-                                           @NotNull BlockPos neighbourPos) {
-        updateWater(world, state, pos);
+    public @NotNull BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader world, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pos, Direction direction, BlockPos neighbourPos, BlockState neighbourState, net.minecraft.util.RandomSource random) {
+        if (state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED))
+            ticks.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(world));
         return state;
     }
 

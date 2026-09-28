@@ -7,7 +7,7 @@ import com.tterrag.registrate.builders.Builder;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import net.createmod.catnip.platform.CatnipServices;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.HashMap;
@@ -17,30 +17,30 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public class FeatureToggle {
-    public static final Set<ResourceLocation> TOGGLEABLE_FEATURES = new HashSet<>();
-    public static final Map<ResourceLocation, ResourceLocation> DEPENDENT_FEATURES = new HashMap<>();
-    public static final Map<ResourceLocation, Set<FeatureCategory>> FEATURE_CATEGORIES = new HashMap<>();
-    public static final Map<ResourceLocation, Supplier<Boolean>> FEATURE_CONDITIONS = new HashMap<>();
+    public static final Set<Identifier> TOGGLEABLE_FEATURES = new HashSet<>();
+    public static final Map<Identifier, Identifier> DEPENDENT_FEATURES = new HashMap<>();
+    public static final Map<Identifier, Set<FeatureCategory>> FEATURE_CATEGORIES = new HashMap<>();
+    public static final Map<Identifier, Supplier<Boolean>> FEATURE_CONDITIONS = new HashMap<>();
 
-    public static void register(ResourceLocation key) {
+    public static void register(Identifier key) {
         TOGGLEABLE_FEATURES.add(key);
     }
 
-    public static void register(ResourceLocation key, FeatureCategory... categories) {
+    public static void register(Identifier key, FeatureCategory... categories) {
         register(key);
         FEATURE_CATEGORIES.put(key, Set.of(categories));
     }
 
-    public static void registerDependent(ResourceLocation key, ResourceLocation dependency) {
+    public static void registerDependent(Identifier key, Identifier dependency) {
         DEPENDENT_FEATURES.put(key, dependency);
     }
 
-    public static void registerDependent(ResourceLocation key, ResourceLocation dependency, FeatureCategory... categories) {
+    public static void registerDependent(Identifier key, Identifier dependency, FeatureCategory... categories) {
         registerDependent(key, dependency);
         FEATURE_CATEGORIES.put(key, Set.of(categories));
     }
 
-    public static void addCondition(ResourceLocation key, Supplier<Boolean> condition) {
+    public static void addCondition(Identifier key, Supplier<Boolean> condition) {
         FEATURE_CONDITIONS.put(key, condition);
     }
 
@@ -49,7 +49,7 @@ public class FeatureToggle {
      */
     public static <R, T extends R, P, S extends Builder<R, T, P, S>> NonNullUnaryOperator<S> register() {
         return b -> {
-            register(ResourceLocation.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()));
+            register(Identifier.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()));
             return b;
         };
     }
@@ -59,7 +59,7 @@ public class FeatureToggle {
      */
     public static <R, T extends R, P, S extends Builder<R, T, P, S>> NonNullUnaryOperator<S> register(FeatureCategory... categories) {
         return b -> {
-            register(ResourceLocation.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), categories);
+            register(Identifier.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), categories);
             return b;
         };
     }
@@ -68,9 +68,9 @@ public class FeatureToggle {
      * Register this object to be dependent on another feature.
      * This object cannot be toggled directly, and will only be enabled if the dependency is enabled.
      */
-    public static <R, T extends R, P, S extends Builder<R, T, P, S>> NonNullUnaryOperator<S> registerDependent(ResourceLocation dependency) {
+    public static <R, T extends R, P, S extends Builder<R, T, P, S>> NonNullUnaryOperator<S> registerDependent(Identifier dependency) {
         return b -> {
-            registerDependent(ResourceLocation.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), dependency);
+            registerDependent(Identifier.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), dependency);
             return b;
         };
     }
@@ -79,9 +79,9 @@ public class FeatureToggle {
      * Register this object to be dependent on another feature.
      * This object cannot be toggled directly, and will only be enabled if the dependency is enabled.
      */
-    public static <R, T extends R, P, S extends Builder<R, T, P, S>> NonNullUnaryOperator<S> registerDependent(ResourceLocation dependency, FeatureCategory... categories) {
+    public static <R, T extends R, P, S extends Builder<R, T, P, S>> NonNullUnaryOperator<S> registerDependent(Identifier dependency, FeatureCategory... categories) {
         return b -> {
-            registerDependent(ResourceLocation.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), dependency, categories);
+            registerDependent(Identifier.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), dependency, categories);
             return b;
         };
     }
@@ -92,7 +92,7 @@ public class FeatureToggle {
      */
     public static <R, T extends R, P, S extends Builder<R, T, P, S>> NonNullUnaryOperator<S> registerDependent(BlockEntry<?> dependency) {
         return b -> {
-            registerDependent(ResourceLocation.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), dependency.getId());
+            registerDependent(Identifier.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), dependency.getId());
             return b;
         };
     }
@@ -103,7 +103,7 @@ public class FeatureToggle {
      */
     public static <R, T extends R, P, S extends Builder<R, T, P, S>> NonNullUnaryOperator<S> registerDependent(BlockEntry<?> dependency, FeatureCategory... categories) {
         return b -> {
-            registerDependent(ResourceLocation.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), dependency.getId(), categories);
+            registerDependent(Identifier.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), dependency.getId(), categories);
             return b;
         };
     }
@@ -113,7 +113,7 @@ public class FeatureToggle {
      */
     public static <R, T extends R, P, S extends Builder<R, T, P, S>> NonNullUnaryOperator<S> addCondition(Supplier<Boolean> condition) {
         return b -> {
-            addCondition(ResourceLocation.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), condition);
+            addCondition(Identifier.fromNamespaceAndPath(b.getOwner().getModid(), b.getName()), condition);
             return b;
         };
     }
@@ -128,12 +128,12 @@ public class FeatureToggle {
 
     /**
      * Check whether a feature is enabled.
-     * If the provided {@link ResourceLocation} is not registered with this feature toggle, it is assumed to be enabled.
+     * If the provided {@link Identifier} is not registered with this feature toggle, it is assumed to be enabled.
      *
-     * @param key The {@link ResourceLocation} of the feature.
+     * @param key The {@link Identifier} of the feature.
      * @return Whether the feature is enabled.
      */
-    public static boolean isEnabled(ResourceLocation key) {
+    public static boolean isEnabled(Identifier key) {
         if (FEATURE_CATEGORIES.containsKey(key)) {
             Set<FeatureCategory> categories = FEATURE_CATEGORIES.get(key);
             for (FeatureCategory category : categories) {
@@ -146,7 +146,7 @@ public class FeatureToggle {
         if (getToggles().hasToggle(key)) {
             return getToggles().isEnabled(key);
         } else {
-            ResourceLocation dependency = DEPENDENT_FEATURES.get(key);
+            Identifier dependency = DEPENDENT_FEATURES.get(key);
             if (dependency != null) return isEnabled(dependency);
         }
         return true;

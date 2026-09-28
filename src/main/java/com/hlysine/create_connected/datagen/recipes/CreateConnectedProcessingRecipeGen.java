@@ -1,36 +1,34 @@
 package com.hlysine.create_connected.datagen.recipes;
 
-import com.simibubi.create.api.data.recipe.ProcessingRecipeGen;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-
-import java.util.ArrayList;
-import java.util.List;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 
 public final class CreateConnectedProcessingRecipeGen {
-    public static void registerAllProcessing(DataGenerator gen, PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-        final List<ProcessingRecipeGen<?, ?, ?>> GENERATORS = new ArrayList<>();
+    public static void registerAllProcessing(DataGenerator gen, PackOutput output,
+                                             CompletableFuture<HolderLookup.Provider> registries) {
+        add(gen, output, registries, "standard", CCStandardRecipes::new);
+        add(gen, output, registries, "sequenced assembly", SequencedAssemblyGen::new);
+        add(gen, output, registries, "cutting", CuttingRecipeGen::new);
+        add(gen, output, registries, "filling", FillingRecipeGen::new);
+        add(gen, output, registries, "item application", ItemApplicationRecipeGen::new);
+    }
 
-        GENERATORS.add(new CuttingRecipeGen(output, registries));
-        GENERATORS.add(new FillingRecipeGen(output, registries));
-        GENERATORS.add(new ItemApplicationRecipeGen(output, registries));
-
-        gen.addProvider(true, new DataProvider() {
-
+    private static void add(DataGenerator gen, PackOutput output, CompletableFuture<HolderLookup.Provider> registries,
+                            String name, BiFunction<HolderLookup.Provider, RecipeOutput, RecipeProvider> factory) {
+        gen.addProvider(true, new RecipeProvider.Runner(output, registries) {
             @Override
-            public String getName() {
-                return "Create: Connected's Processing Recipes";
+            protected RecipeProvider createRecipeProvider(HolderLookup.Provider lookup, RecipeOutput recipes) {
+                return factory.apply(lookup, recipes);
             }
 
             @Override
-            public CompletableFuture<?> run(CachedOutput dc) {
-                return CompletableFuture.allOf(GENERATORS.stream()
-                        .map(gen -> gen.run(dc))
-                        .toArray(CompletableFuture[]::new));
+            public String getName() {
+                return "Create: Connected " + name + " recipes";
             }
         });
     }

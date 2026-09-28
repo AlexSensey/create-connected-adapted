@@ -142,7 +142,7 @@ public class SequencedPulseGeneratorBlockEntity extends SmartBlockEntity {
 
         if (isIdle())
             return;
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
 
         executeInstruction(true, 0);
@@ -197,11 +197,11 @@ public class SequencedPulseGeneratorBlockEntity extends SmartBlockEntity {
 
     @Override
     protected void read(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
-        currentInstruction = tag.getInt("InstructionIndex");
-        previousInput = tag.getInt("PrevInput");
-        currentInput = tag.getInt("CurrentInput");
-        currentSignal = tag.getInt("CurrentSignal");
-        ListTag list = tag.getList("Instructions", Tag.TAG_COMPOUND);
+        currentInstruction = tag.getIntOr("InstructionIndex", 0);
+        previousInput = tag.getIntOr("PrevInput", 0);
+        currentInput = tag.getIntOr("CurrentInput", 0);
+        currentSignal = tag.getIntOr("CurrentSignal", 0);
+        ListTag list = tag.getListOrEmpty("Instructions");
         instructions = Instruction.deserializeAll(list);
         super.read(tag, registries, clientPacket);
     }

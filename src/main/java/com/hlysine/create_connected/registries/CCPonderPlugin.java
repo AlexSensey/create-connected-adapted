@@ -7,14 +7,12 @@ import com.simibubi.create.infrastructure.ponder.AllCreatePonderTags;
 import com.simibubi.create.infrastructure.ponder.scenes.ChuteScenes;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import com.tterrag.registrate.util.entry.RegistryEntry;
-import net.createmod.ponder.api.level.PonderLevel;
-import net.createmod.ponder.api.registration.*;
-import net.minecraft.resources.ResourceLocation;
+import net.createmod.ponder.api.client.level.PonderLevel;
+import net.createmod.ponder.api.client.registration.*;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@ParametersAreNonnullByDefault
 public class CCPonderPlugin implements PonderPlugin {
     @Override
     public @NotNull String getModId() {
@@ -22,12 +20,12 @@ public class CCPonderPlugin implements PonderPlugin {
     }
 
     @Override
-    public void registerScenes(PonderSceneRegistrationHelper<ResourceLocation> helper) {
+    public void registerScenes(PonderSceneRegistrationHelper<Identifier> helper) {
         register(helper);
     }
 
     @Override
-    public void registerTags(PonderTagRegistrationHelper<ResourceLocation> helper) {
+    public void registerTags(PonderTagRegistrationHelper<Identifier> helper) {
         register(helper);
     }
 
@@ -46,7 +44,7 @@ public class CCPonderPlugin implements PonderPlugin {
         PonderPlugin.super.indexExclusions(helper);
     }
 
-    public static void register(PonderSceneRegistrationHelper<ResourceLocation> helper) {
+    public static void register(PonderSceneRegistrationHelper<Identifier> helper) {
         PonderSceneRegistrationHelper<ItemProviderEntry<?, ?>> SCENE_HELPER = helper.withKeyFunction(RegistryEntry::getId);
 
         SCENE_HELPER.forComponents(CCBlocks.ENCASED_CHAIN_COGWHEEL)
@@ -83,7 +81,7 @@ public class CCPonderPlugin implements PonderPlugin {
                 .addStoryBoard("dashboard", DashboardScenes::dashboard, AllCreatePonderTags.DISPLAY_TARGETS);
     }
 
-    public static void register(PonderTagRegistrationHelper<ResourceLocation> helper) {
+    public static void register(PonderTagRegistrationHelper<Identifier> helper) {
         PonderTagRegistrationHelper<RegistryEntry<?, ?>> TAG_HELPER = helper.withKeyFunction(RegistryEntry::getId);
 
         TAG_HELPER.addToTag(AllCreatePonderTags.KINETIC_SOURCES)

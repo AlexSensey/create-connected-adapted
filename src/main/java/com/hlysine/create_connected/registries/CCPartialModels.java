@@ -1,7 +1,7 @@
 package com.hlysine.create_connected.registries;
 
 import com.hlysine.create_connected.CreateConnected;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
+import dev.engine_room.create_flywheel.lib.model.baked.PartialModel;
 
 public class CCPartialModels {
     public static final PartialModel CRANK_WHEEL_HANDLE = block("crank_wheel/handle");

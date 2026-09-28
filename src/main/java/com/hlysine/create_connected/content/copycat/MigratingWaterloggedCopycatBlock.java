@@ -37,8 +37,8 @@ public abstract class MigratingWaterloggedCopycatBlock extends WaterloggedCopyca
     }
 
     @Override
-    public @NotNull BlockState updateShape(@NotNull BlockState pState, @NotNull Direction pDirection, @NotNull BlockState pNeighborState, @NotNull LevelAccessor pLevel, @NotNull BlockPos pCurrentPos, @NotNull BlockPos pNeighborPos) {
-        return migrateOnUpdate(pLevel.isClientSide(), super.updateShape(pState, pDirection, pNeighborState, pLevel, pCurrentPos, pNeighborPos));
+    public @NotNull BlockState updateShape(BlockState pState, net.minecraft.world.level.LevelReader pLevel, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pCurrentPos, Direction pDirection, BlockPos pNeighborPos, BlockState pNeighborState, net.minecraft.util.RandomSource random) {
+        return migrateOnUpdate(pLevel.isClientSide(), super.updateShape(pState, pLevel, ticks, pCurrentPos, pDirection, pNeighborPos, pNeighborState, random));
     }
 
     protected static BlockState migrateOnUpdate(boolean isClient, BlockState state) {

@@ -1,5 +1,6 @@
 package com.hlysine.create_connected.content.fluidvessel;
 
+import com.hlysine.create_connected.StorageSerialization;
 import com.hlysine.create_connected.registries.CCBlockEntityTypes;
 import com.hlysine.create_connected.CreateConnected;
 import com.simibubi.create.api.connectivity.ConnectivityHandler;
@@ -8,13 +9,12 @@ import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.foundation.blockEntity.IMultiBlockEntityContainer;
 import com.simibubi.create.foundation.fluid.SmartFluidTank;
 import com.simibubi.create.infrastructure.config.AllConfigs;
-import net.createmod.catnip.animation.LerpedFloat;
-import net.createmod.catnip.nbt.NBTHelper;
+import net.createmod.catnip.api.animation.LerpedFloat;
+import net.createmod.catnip.api.nbt.NBTHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -30,7 +30,7 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static com.hlysine.create_connected.content.fluidvessel.FluidVesselBlock.*;
@@ -46,6 +46,7 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
 
     // For rendering purposes only
     private LerpedFloat fluidLevel;
+    private SingleTankTransfer vesselTransfer;
 
     public FluidVesselBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -57,21 +58,21 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
     @SubscribeEvent
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
-                Capabilities.FluidHandler.BLOCK,
+                Capabilities.Fluid.BLOCK,
                 CCBlockEntityTypes.FLUID_VESSEL.get(),
                 (be, context) -> {
                     if (be.fluidCapability == null)
                         be.refreshCapability();
-                    return be.fluidCapability;
+                    return be.getFluidResourceCapability();
                 }
         );
         event.registerBlockEntity(
-                Capabilities.FluidHandler.BLOCK,
+                Capabilities.Fluid.BLOCK,
                 CCBlockEntityTypes.CREATIVE_FLUID_VESSEL.get(),
                 (be, context) -> {
                     if (be.fluidCapability == null)
                         be.refreshCapability();
-                    return be.fluidCapability;
+                    return be.getFluidResourceCapability();
                 }
         );
     }
@@ -84,7 +85,7 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
     @Override
     protected void updateConnectivity() {
         updateConnectivity = false;
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
         if (!isController())
             return;
@@ -153,7 +154,7 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
             }
         }
 
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             setChanged();
             sendData();
         }
@@ -179,7 +180,7 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
 
     @Override
     public void removeController(boolean keepFluids) {
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
         updateConnectivity = true;
         if (!keepFluids)
@@ -339,7 +340,7 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
 
     @Override
     public void setController(BlockPos controller) {
-        if (level.isClientSide && !isVirtual())
+        if (level.isClientSide() && !isVirtual())
             return;
         if (controller.equals(this.controller))
             return;
@@ -347,6 +348,25 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
         refreshCapability();
         setChanged();
         sendData();
+    }
+
+    @Override
+    protected net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource> getFluidResourceCapability() {
+        if (vesselTransfer == null)
+            vesselTransfer = new SingleTankTransfer(this::handlerForCapability, this::captureFluidSnapshot);
+        return vesselTransfer;
+    }
+
+    private Runnable captureFluidSnapshot() {
+        FluidVesselBlockEntity controllerBE = getControllerBE();
+        FluidVesselBlockEntity target = controllerBE == null ? this : controllerBE;
+        FluidStack contents = target.tankInventory.getFluid().copy();
+        BoilerData vesselBoiler = (BoilerData) target.boiler;
+        int suppliedWater = vesselBoiler.gatheredSupply;
+        return () -> {
+            target.tankInventory.setFluid(contents.copy());
+            vesselBoiler.gatheredSupply = suppliedWater;
+        };
     }
 
     protected void refreshCapability() {
@@ -394,7 +414,7 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
         if (controllerBE.boiler.addToGoggleTooltip(tooltip, isPlayerSneaking, controllerBE.getTotalTankSize()))
             return true;
         return containedFluidTooltip(tooltip, isPlayerSneaking,
-                level.getCapability(Capabilities.FluidHandler.BLOCK, controllerBE.getBlockPos(), null));
+                controllerBE.handlerForCapability());
     }
 
     @Override
@@ -407,7 +427,7 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
         int prevLum = luminosity;
 
         updateConnectivity = compound.contains("Uninitialized");
-        luminosity = compound.getInt("Luminosity");
+        luminosity = compound.getIntOr("Luminosity", 0);
 
         lastKnownPos = null;
         if (compound.contains("LastKnownPos"))
@@ -418,18 +438,18 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
             controller = NBTHelper.readBlockPos(compound, "Controller");
 
         if (isController()) {
-            window = compound.getBoolean("Window");
+            window = compound.getBooleanOr("Window", false);
             windowType = NBTHelper.readEnum(compound, "WindowType", WindowType.class);
-            width = compound.getInt("Size");
-            height = compound.getInt("Height");
+            width = compound.getIntOr("Size", 0);
+            height = compound.getIntOr("Height", 0);
             tankInventory.setCapacity(getTotalTankSize() * getCapacityMultiplier());
 
-            tankInventory.readFromNBT(registries, compound.getCompound("TankContent"));
+            tankInventory.setFluid(StorageSerialization.readFluid(registries, compound.getCompoundOrEmpty("TankContent")));
             if (tankInventory.getSpace() < 0)
                 tankInventory.drain(-tankInventory.getSpace(), FluidAction.EXECUTE);
         }
 
-        boiler.read(compound.getCompound("Boiler"), width * width * height);
+        boiler.read(compound.getCompoundOrEmpty("Boiler"), width * width * height);
 
         if (compound.contains("ForceFluidLevel") || fluidLevel == null)
             fluidLevel = LerpedFloat.linear()
@@ -471,13 +491,13 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
             compound.putBoolean("Uninitialized", true);
         compound.put("Boiler", boiler.write());
         if (lastKnownPos != null)
-            compound.put("LastKnownPos", NbtUtils.writeBlockPos(lastKnownPos));
+            compound.put("LastKnownPos", writeStoredPosition(lastKnownPos));
         if (!isController())
-            compound.put("Controller", NbtUtils.writeBlockPos(controller));
+            compound.put("Controller", writeStoredPosition(controller));
         if (isController()) {
             compound.putBoolean("Window", window);
             NBTHelper.writeEnum(compound, "WindowType", windowType);
-            compound.put("TankContent", tankInventory.writeToNBT(registries, new CompoundTag()));
+            StorageSerialization.writeFluid(registries, compound, "TankContent", tankInventory.getFluid());
             compound.putInt("Size", width);
             compound.putInt("Height", height);
         }
@@ -619,6 +639,14 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
 
     public int getLuminosity() {
         return luminosity;
+    }
+
+    private static CompoundTag writeStoredPosition(BlockPos pos) {
+        CompoundTag tag = new CompoundTag();
+        tag.putInt("X", pos.getX());
+        tag.putInt("Y", pos.getY());
+        tag.putInt("Z", pos.getZ());
+        return tag;
     }
 
 }

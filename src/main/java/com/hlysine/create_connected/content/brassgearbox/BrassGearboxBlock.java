@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -69,9 +68,9 @@ public class BrassGearboxBlock extends RotatedPillarKineticBlock implements IBE<
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         if (state.getValue(AXIS).isVertical())
-            return super.getCloneItemStack(state, target, level, pos, player);
+            return super.getCloneItemStack(level, pos, state, includeData, player);
         return new ItemStack(CCItems.VERTICAL_BRASS_GEARBOX.get());
     }
 

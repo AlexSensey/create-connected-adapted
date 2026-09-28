@@ -3,6 +3,7 @@ package com.hlysine.create_connected.content.fluidvessel;
 import com.hlysine.create_connected.registries.CCBlockEntityTypes;
 import com.hlysine.create_connected.ConnectedLang;
 import com.simibubi.create.api.connectivity.ConnectivityHandler;
+import com.simibubi.create.content.fluids.tank.FluidTankBlock;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.fluids.tank.CreativeFluidTankBlockEntity;
 import com.simibubi.create.content.fluids.transfer.GenericItemEmptying;
@@ -12,6 +13,7 @@ import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.blockEntity.ComparatorUtil;
 import com.simibubi.create.foundation.fluid.FluidHelper;
 import com.simibubi.create.foundation.fluid.FluidHelper.FluidExchange;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -24,7 +26,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -158,30 +159,29 @@ public class FluidVesselBlock extends Block implements IWrenchable, IBE<FluidVes
     }
 
     @Override
-    public BlockState updateShape(BlockState pState, Direction pDirection, BlockState pNeighborState,
-                                  LevelAccessor pLevel, BlockPos pCurrentPos, BlockPos pNeighborPos) {
+    public BlockState updateShape(BlockState pState, net.minecraft.world.level.LevelReader pLevel, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pCurrentPos, Direction pDirection, BlockPos pNeighborPos, BlockState pNeighborState, net.minecraft.util.RandomSource random) {
         if (pDirection == Direction.DOWN && pNeighborState.getBlock() != this)
             withBlockEntityDo(pLevel, pCurrentPos, FluidVesselBlockEntity::updateBoilerTemperature);
         return pState;
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        boolean onClient = level.isClientSide;
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        boolean onClient = level.isClientSide();
 
         if (stack.isEmpty())
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         if (!player.isCreative() && !creative)
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
         FluidExchange exchange = null;
         FluidVesselBlockEntity be = ConnectivityHandler.partAt(getBlockEntityType(), level, pos);
         if (be == null)
-            return ItemInteractionResult.FAIL;
+            return InteractionResult.FAIL;
 
-        IFluidHandler vesselCapability = level.getCapability(Capabilities.FluidHandler.BLOCK, be.getBlockPos(), null);
+        IFluidHandler vesselCapability = be.handlerForCapability();
         if (vesselCapability == null)
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         FluidStack prevFluidInVessel = vesselCapability.getFluidInTank(0)
                 .copy();
 
@@ -193,8 +193,8 @@ public class FluidVesselBlock extends Block implements IWrenchable, IBE<FluidVes
         if (exchange == null) {
             if (GenericItemEmptying.canItemBeEmptied(level, stack)
                     || GenericItemFilling.canItemBeFilled(level, stack))
-                return ItemInteractionResult.SUCCESS;
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                return InteractionResult.SUCCESS;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
 
         SoundEvent soundevent = null;
@@ -231,7 +231,7 @@ public class FluidVesselBlock extends Block implements IWrenchable, IBE<FluidVes
                     .clamp(1 - (1f * fluidInVessel.getAmount() / (FluidVesselBlockEntity.getCapacityMultiplier() * 16)), 0, 1);
             pitch /= 1.5f;
             pitch += .5f;
-            pitch += (level.random.nextFloat() - .5f) / 4f;
+            pitch += (level.getRandom().nextFloat() - .5f) / 4f;
             level.playSound(null, pos, soundevent, SoundSource.BLOCKS, .5f, pitch);
         }
 
@@ -258,7 +258,7 @@ public class FluidVesselBlock extends Block implements IWrenchable, IBE<FluidVes
                                 .scale(1 / 20f);
                         vec = vec.add(motion);
                         level.addParticle(blockParticleData, vec.x, vec.y, vec.z, motion.x, motion.y, motion.z);
-                        return ItemInteractionResult.SUCCESS;
+                        return InteractionResult.SUCCESS;
                     }
 
                     controllerBE.sendDataImmediately();
@@ -267,18 +267,17 @@ public class FluidVesselBlock extends Block implements IWrenchable, IBE<FluidVes
             }
         }
 
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (state.hasBlockEntity() && (state.getBlock() != newState.getBlock() || !newState.hasBlockEntity())) {
-            BlockEntity be = world.getBlockEntity(pos);
-            if (!(be instanceof FluidVesselBlockEntity vesselBE))
-                return;
-            world.removeBlockEntity(pos);
-            ConnectivityHandler.splitMulti(vesselBE);
-        }
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean isMoving) {
+        // FluidTankBlockEntity.preRemoveSideEffects (inherited by vessels) saves
+        // the removed entity before the level discards it. Split only afterwards.
+        var removed = FluidTankBlock.consumePreparedRemoval(world, pos);
+        if (removed instanceof FluidVesselBlockEntity vessel)
+            ConnectivityHandler.splitMulti(vessel);
+        super.affectNeighborsAfterRemoval(state, world, pos, isMoving);
     }
 
     @Override
@@ -371,7 +370,7 @@ public class FluidVesselBlock extends Block implements IWrenchable, IBE<FluidVes
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
+    public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos, net.minecraft.core.Direction side) {
         return getBlockEntityOptional(worldIn, pos).map(FluidVesselBlockEntity::getControllerBE)
                 .map(be -> ComparatorUtil.fractionToRedstoneLevel(be.getFillState()))
                 .orElse(0);

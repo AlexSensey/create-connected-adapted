@@ -7,9 +7,9 @@ import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityVisual;
 import com.simibubi.create.content.kinetics.base.RotatingInstance;
 import com.simibubi.create.foundation.render.AllInstanceTypes;
-import dev.engine_room.flywheel.api.instance.Instance;
-import dev.engine_room.flywheel.api.visualization.VisualizationContext;
-import dev.engine_room.flywheel.lib.model.Models;
+import dev.engine_room.create_flywheel.api.instance.Instance;
+import dev.engine_room.create_flywheel.api.visualization.VisualizationContext;
+import dev.engine_room.create_flywheel.lib.model.Models;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 

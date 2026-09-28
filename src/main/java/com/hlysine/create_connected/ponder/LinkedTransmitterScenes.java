@@ -1,16 +1,17 @@
 package com.hlysine.create_connected.ponder;
 
+import com.hlysine.create_connected.StorageSerialization;
 import com.hlysine.create_connected.registries.CCBlocks;
 import com.hlysine.create_connected.registries.CCItems;
 import com.hlysine.create_connected.content.linkedtransmitter.LinkedTransmitterBlockEntity;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.redstone.link.RedstoneLinkBlockEntity;
 import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
-import net.createmod.catnip.math.Pointing;
-import net.createmod.ponder.api.PonderPalette;
-import net.createmod.ponder.api.scene.SceneBuilder;
-import net.createmod.ponder.api.scene.SceneBuildingUtil;
-import net.createmod.ponder.api.scene.Selection;
+import net.createmod.catnip.api.math.Pointing;
+import net.createmod.ponder.api.client.PonderPalette;
+import net.createmod.ponder.api.client.scene.SceneBuilder;
+import net.createmod.ponder.api.client.scene.SceneBuildingUtil;
+import net.createmod.ponder.api.client.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -129,30 +130,30 @@ public class LinkedTransmitterScenes {
         scene.idle(7);
         scene.overlay().showControls(backSlot, Pointing.DOWN, 30).withItem(sapling);
         scene.world().modifyBlockEntityNBT(leverSelect, LinkedTransmitterBlockEntity.class,
-                nbt -> nbt.put("FrequencyLast", iron.saveOptional(scene.world().getHolderLookupProvider())));
+                nbt -> StorageSerialization.writeItem(scene.world().getHolderLookupProvider(), nbt, "FrequencyLast", iron));
         scene.idle(7);
         scene.world().modifyBlockEntityNBT(leverSelect, LinkedTransmitterBlockEntity.class,
-                nbt -> nbt.put("FrequencyFirst", sapling.saveOptional(scene.world().getHolderLookupProvider())));
+                nbt -> StorageSerialization.writeItem(scene.world().getHolderLookupProvider(), nbt, "FrequencyFirst", sapling));
         scene.idle(20);
 
         scene.overlay().showControls(bottom2Slot, Pointing.UP, 30).withItem(iron);
         scene.idle(7);
         scene.overlay().showControls(top2Slot, Pointing.DOWN, 30).withItem(sapling);
         scene.world().modifyBlockEntityNBT(linkRightSelect, RedstoneLinkBlockEntity.class,
-                nbt -> nbt.put("FrequencyLast", iron.saveOptional(scene.world().getHolderLookupProvider())));
+                nbt -> StorageSerialization.writeItem(scene.world().getHolderLookupProvider(), nbt, "FrequencyLast", iron));
         scene.idle(7);
         scene.world().modifyBlockEntityNBT(linkRightSelect, RedstoneLinkBlockEntity.class,
-                nbt -> nbt.put("FrequencyFirst", sapling.saveOptional(scene.world().getHolderLookupProvider())));
+                nbt -> StorageSerialization.writeItem(scene.world().getHolderLookupProvider(), nbt, "FrequencyFirst", sapling));
         scene.idle(20);
 
         scene.overlay().showControls(bottom3Slot, Pointing.UP, 30).withItem(gold);
         scene.idle(7);
         scene.overlay().showControls(top3Slot, Pointing.DOWN, 30).withItem(sapling);
         scene.world().modifyBlockEntityNBT(linkLeftSelect, RedstoneLinkBlockEntity.class,
-                nbt -> nbt.put("FrequencyLast", gold.saveOptional(scene.world().getHolderLookupProvider())));
+                nbt -> StorageSerialization.writeItem(scene.world().getHolderLookupProvider(), nbt, "FrequencyLast", gold));
         scene.idle(7);
         scene.world().modifyBlockEntityNBT(linkLeftSelect, RedstoneLinkBlockEntity.class,
-                nbt -> nbt.put("FrequencyFirst", sapling.saveOptional(scene.world().getHolderLookupProvider())));
+                nbt -> StorageSerialization.writeItem(scene.world().getHolderLookupProvider(), nbt, "FrequencyFirst", sapling));
         scene.idle(20);
 
         scene.world().toggleRedstonePower(leverSelect);

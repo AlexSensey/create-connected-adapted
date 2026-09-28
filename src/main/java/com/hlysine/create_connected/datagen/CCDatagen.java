@@ -7,16 +7,13 @@ import com.hlysine.create_connected.registries.CCPonderPlugin;
 import com.hlysine.create_connected.registries.CCSoundEvents;
 import com.hlysine.create_connected.CreateConnected;
 import com.hlysine.create_connected.datagen.advancements.CCAdvancements;
-import com.hlysine.create_connected.datagen.recipes.CCStandardRecipes;
 import com.hlysine.create_connected.datagen.recipes.CreateConnectedProcessingRecipeGen;
-import com.hlysine.create_connected.datagen.recipes.SequencedAssemblyGen;
 import com.simibubi.create.foundation.utility.FilesHelper;
 import com.tterrag.registrate.providers.ProviderType;
-import net.createmod.ponder.foundation.PonderIndex;
+import net.createmod.ponder.api.client.PonderIndex;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.Map.Entry;
@@ -24,29 +21,35 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 public class CCDatagen {
-    public static void gatherDataHighPriority(GatherDataEvent event) {
-        if (event.getMods().contains(CreateConnected.MODID))
-            addExtraRegistrateData();
+    private static boolean extraDataRegistered;
+
+    public static void gatherClientHighPriority(GatherDataEvent.Client event) {
+        registerExtraData(event);
     }
 
-    public static void gatherData(GatherDataEvent event) {
-        if (!event.getMods().contains(CreateConnected.MODID)) return;
+    public static void gatherServerHighPriority(GatherDataEvent.Server event) {
+        registerExtraData(event);
+    }
 
+    private static void registerExtraData(GatherDataEvent event) {
+        if (!event.getModContainer().getModId().equals(CreateConnected.MODID) || extraDataRegistered) return;
+        addExtraRegistrateData();
+        extraDataRegistered = true;
+    }
+
+    public static void gatherClientData(GatherDataEvent.Client event) {
+        if (!event.getModContainer().getModId().equals(CreateConnected.MODID)) return;
+        event.addProvider(CCSoundEvents.provider(event.getGenerator()));
+    }
+
+    public static void gatherServerData(GatherDataEvent.Server event) {
+        if (!event.getModContainer().getModId().equals(CreateConnected.MODID)) return;
         DataGenerator generator = event.getGenerator();
         PackOutput output = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
-        ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-
-        generator.addProvider(true, CCSoundEvents.provider(generator));
-
-        generator.addProvider(event.includeServer(), new CCAdvancements(output, lookupProvider));
-        generator.addProvider(event.includeServer(), new CCStandardRecipes(output, lookupProvider));
-        generator.addProvider(event.includeServer(), new SequencedAssemblyGen(output, lookupProvider));
-        generator.addProvider(event.includeServer(), CCJukeboxSongs.provider(output, lookupProvider, existingFileHelper));
-
-        if (event.includeServer()) {
-            CreateConnectedProcessingRecipeGen.registerAllProcessing(generator, output, lookupProvider);
-        }
+        event.addProvider(new CCAdvancements(output, lookupProvider));
+        event.addProvider(CCJukeboxSongs.provider(output, lookupProvider));
+        CreateConnectedProcessingRecipeGen.registerAllProcessing(generator, output, lookupProvider);
     }
 
     private static void addExtraRegistrateData() {

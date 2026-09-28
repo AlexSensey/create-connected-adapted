@@ -20,8 +20,8 @@ public class ContraptionMixin {
     )
     private void stopJukeboxOnMove(Level level, BlockPos pos, Pair<StructureTemplate.StructureBlockInfo, BlockEntity> pair, CallbackInfo ci) {
         if (pair.getValue() instanceof JukeboxBlockEntity be) {
-            if (be.jukeboxSongPlayer.isPlaying())
-                be.jukeboxSongPlayer.stop(level, be.getBlockState());
+            if (be.getSongPlayer().isPlaying())
+                be.getSongPlayer().stop(level, be.getBlockState());
         }
     }
 }

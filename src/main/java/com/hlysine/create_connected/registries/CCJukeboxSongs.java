@@ -7,10 +7,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.JukeboxSong;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.JsonCodecProvider;
 
 import java.util.HashMap;
@@ -45,19 +43,19 @@ public class CCJukeboxSongs {
         return "item." + CreateConnected.MODID + ".music_disc_" + key + ".desc";
     }
 
-    public static JukeboxSongProvider provider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
-        return new JukeboxSongProvider(output, lookupProvider, existingFileHelper);
+    public static JukeboxSongProvider provider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        return new JukeboxSongProvider(output, lookupProvider);
     }
 
     public static class JukeboxSongProvider extends JsonCodecProvider<JukeboxSong> {
-        public JukeboxSongProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
-            super(output, PackOutput.Target.DATA_PACK, "jukebox_song", PackType.SERVER_DATA, JukeboxSong.DIRECT_CODEC, lookupProvider, CreateConnected.MODID, existingFileHelper);
+        public JukeboxSongProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+            super(output, PackOutput.Target.DATA_PACK, "jukebox_song", JukeboxSong.DIRECT_CODEC, lookupProvider, CreateConnected.MODID);
         }
 
         @Override
         protected void gather() {
             for (Map.Entry<ResourceKey<JukeboxSong>, JukeboxSong> entry : JUKEBOX_SONGS.entrySet()) {
-                unconditional(entry.getKey().location(), entry.getValue());
+                unconditional(entry.getKey().identifier(), entry.getValue());
             }
         }
     }

@@ -26,6 +26,12 @@ public class LinkedAnalogLeverBlockEntity extends AnalogLeverBlockEntity {
     }
 
     @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        LinkedTransmitterRemoval.prepare(this, containsBase);
+        super.preRemoveSideEffects(pos, state);
+    }
+
+    @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         createLink();
         behaviours.add(link);
@@ -57,7 +63,7 @@ public class LinkedAnalogLeverBlockEntity extends AnalogLeverBlockEntity {
         int prevTick = lastChange();
         super.tick();
         if (prevTick > 0 && lastChange() == 0) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 transmit();
                 level.setBlock(worldPosition, getBlockState().setValue(BlockStateProperties.POWERED, getState() > 0), Block.UPDATE_ALL);
             }

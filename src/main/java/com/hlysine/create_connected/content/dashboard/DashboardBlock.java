@@ -8,14 +8,12 @@ import com.simibubi.create.content.equipment.clipboard.ClipboardEntry;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.block.ProperWaterloggedBlock;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.item.ItemStack;
@@ -42,11 +40,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class DashboardBlock extends HorizontalDirectionalBlock implements IWrenchable, ProperWaterloggedBlock, IBE<DashboardBlockEntity> {
 
     public static final BooleanProperty OPEN = BooleanProperty.create("open");
@@ -67,17 +62,17 @@ public class DashboardBlock extends HorizontalDirectionalBlock implements IWrenc
 
 
     @Override
-    protected ItemInteractionResult useItemOn(final ItemStack stack, final BlockState blockState, final Level level, final BlockPos blockPos, final Player player, final InteractionHand interactionHand, final BlockHitResult blockHitResult) {
+    protected InteractionResult useItemOn(final ItemStack stack, final BlockState blockState, final Level level, final BlockPos blockPos, final Player player, final InteractionHand interactionHand, final BlockHitResult blockHitResult) {
         final ItemStack heldItem = player.getItemInHand(interactionHand);
 
         if (stack.isEmpty()) {
             this.withBlockEntityDo(level, blockPos, DashboardBlockEntity::clearText);
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         if (stack.getItem() == Items.NAME_TAG && stack.has(DataComponents.CUSTOM_NAME) || AllBlocks.CLIPBOARD.isIn(stack)) {
             if (level.isClientSide())
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             Component customName = stack.get(DataComponents.CUSTOM_NAME);
             if (AllBlocks.CLIPBOARD.isIn(stack)) {
                 this.withBlockEntityDo(level, blockPos, be -> {
@@ -92,15 +87,15 @@ public class DashboardBlock extends HorizontalDirectionalBlock implements IWrenc
                     }
                     be.setText(text);
                 });
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
             if (customName != null) {
                 this.withBlockEntityDo(level, blockPos, be -> {
                     be.setLine(0, customName);
                 });
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
 
         if (heldItem.getItem() instanceof final SignApplicator signApplicator && !(heldItem.getItem() instanceof HoneycombItem)) {
@@ -111,15 +106,15 @@ public class DashboardBlock extends HorizontalDirectionalBlock implements IWrenc
                 dummySign.setText(be.text, true);
                 dummySign.setWaxed(true);
 
-                if (signApplicator.canApplyToSign(be.text, player) && signApplicator.tryApplyToSign(be.getLevel(), dummySign, true, player)) {
+                if (signApplicator.canApplyToSign(be.text, heldItem, player) && signApplicator.tryApplyToSign(be.getLevel(), dummySign, true, heldItem, player)) {
                     be.setText(dummySign.getText(true));
                     success.setTrue();
                 }
             });
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override
@@ -134,9 +129,9 @@ public class DashboardBlock extends HorizontalDirectionalBlock implements IWrenc
     }
 
     @Override
-    public BlockState updateShape(BlockState pState, Direction pDirection, BlockState pNeighborState,
-                                  LevelAccessor pLevel, BlockPos pCurrentPos, BlockPos pNeighborPos) {
-        updateWater(pLevel, pState, pCurrentPos);
+    public BlockState updateShape(BlockState pState, net.minecraft.world.level.LevelReader pLevel, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pCurrentPos, Direction pDirection, BlockPos pNeighborPos, BlockState pNeighborState, net.minecraft.util.RandomSource random) {
+        if (pState.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED))
+            ticks.scheduleTick(pCurrentPos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(pLevel));
         return pState;
     }
 

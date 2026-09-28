@@ -6,14 +6,14 @@ import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import net.createmod.catnip.net.base.ClientboundPacketPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.JukeboxSong;
 import net.neoforged.api.distmarker.Dist;
@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 public class PlayContraptionJukeboxPacket implements ClientboundPacketPayload {
     public static final StreamCodec<RegistryFriendlyByteBuf, PlayContraptionJukeboxPacket> STREAM_CODEC = composite(
-            ResourceLocation.STREAM_CODEC, packet -> packet.level,
+            Identifier.STREAM_CODEC, packet -> packet.level,
             ByteBufCodecs.VAR_INT, packet -> packet.contraptionId,
             BlockPos.STREAM_CODEC, packet -> packet.contraptionPos,
             BlockPos.STREAM_CODEC, packet -> packet.worldPos,
@@ -35,7 +35,7 @@ public class PlayContraptionJukeboxPacket implements ClientboundPacketPayload {
             PlayContraptionJukeboxPacket::new
     );
 
-    protected ResourceLocation level;
+    protected Identifier level;
     protected int contraptionId;
     protected BlockPos contraptionPos;
     protected BlockPos worldPos;
@@ -43,7 +43,7 @@ public class PlayContraptionJukeboxPacket implements ClientboundPacketPayload {
     protected boolean play;
     protected boolean silent;
 
-    public PlayContraptionJukeboxPacket(ResourceLocation level, int contraptionId, BlockPos contraptionPos, BlockPos worldPos, int recordId, boolean play, boolean silent) {
+    public PlayContraptionJukeboxPacket(Identifier level, int contraptionId, BlockPos contraptionPos, BlockPos worldPos, int recordId, boolean play, boolean silent) {
         this.level = level;
         this.contraptionId = contraptionId;
         this.contraptionPos = contraptionPos;
@@ -60,9 +60,9 @@ public class PlayContraptionJukeboxPacket implements ClientboundPacketPayload {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void handle(LocalPlayer player) {
+    public void handle(Player player) {
         ClientLevel world = Minecraft.getInstance().level;
-        if (world == null || !world.dimension().location().equals(level))
+        if (world == null || !world.dimension().identifier().equals(level))
             return;
         if (!world.isLoaded(worldPos))
             return;
@@ -71,8 +71,8 @@ public class PlayContraptionJukeboxPacket implements ClientboundPacketPayload {
             return;
         if (play) {
             Optional<JukeboxSong> song = world.registryAccess()
-                    .registryOrThrow(Registries.JUKEBOX_SONG)
-                    .getHolder(recordId)
+                    .lookupOrThrow(Registries.JUKEBOX_SONG)
+                    .get(recordId)
                     .map(Holder.Reference::value);
             if (song.isEmpty())
                 return;

@@ -93,12 +93,11 @@ import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 import com.tterrag.registrate.util.entry.BlockEntry;
-import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.registry.RegisteredObjectsHelper;
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
-import net.minecraft.client.renderer.RenderType;
+import net.createmod.catnip.api.data.Iterate;
+import net.createmod.catnip.api.registry.RegisteredObjectsHelper;
+import net.minecraft.advancements.predicates.StatePropertiesPredicate;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Rarity;
@@ -136,6 +135,8 @@ import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
 import static com.simibubi.create.foundation.data.TagGen.pickaxeOnly;
 
 @SuppressWarnings("removal")
+// Minecraft 26.2 bakes chunk layers from each sprite's transparency (MaterialInfo.of).
+// Do not call legacy Registrate.addLayer: it still links the removed RenderType API.
 public class CCBlocks {
     private static final CreateRegistrate REGISTRATE = CreateConnected.getRegistrate();
 
@@ -143,7 +144,7 @@ public class CCBlocks {
             REGISTRATE.block("encased_chain_cogwheel", ChainCogwheelBlock::new)
                     .initialProperties(SharedProperties::stone)
                     .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-                    .addLayer(() -> RenderType::cutoutMipped)
+
                     .transform(CStress.setNoImpact())
                     .transform(FeatureToggle.register(FeatureCategory.KINETIC))
                     .transform(axeOrPickaxe())
@@ -196,7 +197,7 @@ public class CCBlocks {
     public static final BlockEntry<SixWayGearboxBlock> SIX_WAY_GEARBOX = REGISTRATE.block("six_way_gearbox", SixWayGearboxBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(CStress.setNoImpact())
             .transform(FeatureToggle.register(FeatureCategory.KINETIC))
             .transform(axeOrPickaxe())
@@ -209,7 +210,7 @@ public class CCBlocks {
     public static final BlockEntry<CrossConnectorBlock> CROSS_CONNECTOR = REGISTRATE.block("cross_connector", CrossConnectorBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(FeatureToggle.register(FeatureCategory.KINETIC))
             .transform(axeOrPickaxe())
             .blockstate((c, p) -> axisBlock(c, p, $ -> partialBaseModel(c, p), false))
@@ -240,7 +241,7 @@ public class CCBlocks {
     public static final BlockEntry<OverstressClutchBlock> OVERSTRESS_CLUTCH = REGISTRATE.block("overstress_clutch", OverstressClutchBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(CStress.setNoImpact())
             .transform(FeatureToggle.register(FeatureCategory.KINETIC))
             .transform(axeOrPickaxe())
@@ -279,7 +280,7 @@ public class CCBlocks {
     public static final BlockEntry<InvertedClutchBlock> INVERTED_CLUTCH = REGISTRATE.block("inverted_clutch", InvertedClutchBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(CStress.setNoImpact())
             .transform(FeatureToggle.register(FeatureCategory.KINETIC))
             .transform(axeOrPickaxe())
@@ -291,7 +292,7 @@ public class CCBlocks {
     public static final BlockEntry<InvertedGearshiftBlock> INVERTED_GEARSHIFT = REGISTRATE.block("inverted_gearshift", InvertedGearshiftBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(CStress.setNoImpact())
             .transform(FeatureToggle.register(FeatureCategory.KINETIC))
             .transform(axeOrPickaxe())
@@ -304,7 +305,7 @@ public class CCBlocks {
     public static final BlockEntry<CentrifugalClutchBlock> CENTRIFUGAL_CLUTCH = REGISTRATE.block("centrifugal_clutch", CentrifugalClutchBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(CStress.setNoImpact())
             .transform(FeatureToggle.register(FeatureCategory.KINETIC))
             .transform(axeOrPickaxe())
@@ -317,7 +318,7 @@ public class CCBlocks {
     public static final BlockEntry<FreewheelClutchBlock> FREEWHEEL_CLUTCH = REGISTRATE.block("freewheel_clutch", FreewheelClutchBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(CStress.setNoImpact())
             .transform(FeatureToggle.register(FeatureCategory.KINETIC))
             .transform(axeOrPickaxe())
@@ -330,7 +331,7 @@ public class CCBlocks {
     public static final BlockEntry<KineticBridgeBlock> KINETIC_BRIDGE = REGISTRATE.block("kinetic_bridge", KineticBridgeBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.TERRACOTTA_BROWN))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(FeatureToggle.register(FeatureCategory.KINETIC))
             .transform(axeOrPickaxe())
             .onRegister(b -> BlockMovementChecks.registerAttachedCheck((state, world, pos, direction) -> {
@@ -354,7 +355,7 @@ public class CCBlocks {
     public static final BlockEntry<KineticBridgeDestinationBlock> KINETIC_BRIDGE_DESTINATION = REGISTRATE.block("kinetic_bridge_destination", KineticBridgeDestinationBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.TERRACOTTA_BROWN))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(FeatureToggle.registerDependent(CCBlocks.KINETIC_BRIDGE, FeatureCategory.KINETIC))
             .transform(axeOrPickaxe())
             .onRegister(b -> BlockMovementChecks.registerAttachedCheck((state, world, pos, direction) -> {
@@ -387,7 +388,7 @@ public class CCBlocks {
     public static final BlockEntry<BrakeBlock> BRAKE = REGISTRATE.block("brake", BrakeBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.PODZOL))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(CStress.setNoImpact()) // active stress is a separate config
             .transform(FeatureToggle.register(FeatureCategory.KINETIC))
             .transform(axeOrPickaxe())
@@ -399,7 +400,7 @@ public class CCBlocks {
     public static final BlockEntry<KineticBatteryBlock> KINETIC_BATTERY = REGISTRATE.block("kinetic_battery", KineticBatteryBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.noOcclusion().mapColor(MapColor.TERRACOTTA_BROWN))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(CStress.setCapacity(32.0))
             .transform(CStress.setImpact(64.0))
             .transform(FeatureToggle.register(FeatureCategory.KINETIC))
@@ -418,7 +419,6 @@ public class CCBlocks {
             })
             .item(KineticBatteryBlockItem::new)
             .properties(p -> p.component(CCDataComponents.KINETIC_BATTERY_CHARGE, 0.0))
-            .onRegister(KineticBatteryBlockItem::registerModelOverrides)
             .model(KineticBatteryOverrides::addOverrideModels)
             .build()
             .register();
@@ -429,7 +429,7 @@ public class CCBlocks {
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
                     .blockstate(CCBlockStateGen.sequencedPulseGenerator())
                     .transform(FeatureToggle.register(FeatureCategory.REDSTONE))
-                    .addLayer(() -> RenderType::cutoutMipped)
+
                     .simpleItem()
                     .register();
 
@@ -437,7 +437,7 @@ public class CCBlocks {
 
     static {
         BlockSetType.values().forEach(type -> {
-            Block button = RegisteredObjectsHelper.getBlock(ResourceLocation.parse(type.name() + "_button"));
+            Block button = RegisteredObjectsHelper.getBlock(Identifier.parse(type.name() + "_button"));
             if (button == null) return;
             if (!(button instanceof ButtonBlock buttonBlock))
                 return;
@@ -446,12 +446,12 @@ public class CCBlocks {
                     .block("linked_" + namePath + "_button", properties -> new LinkedButtonBlock(properties, buttonBlock))
                     .initialProperties(() -> buttonBlock)
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
-                    .addLayer(() -> RenderType::cutoutMipped)
+
                     .transform(LinkedTransmitterItem.register())
                     .onRegister(PreciseItemUseOverrides::addBlock)
                     .blockstate(CCBlockStateGen.linkedButton(
-                            ResourceLocation.withDefaultNamespace("block/" + namePath + "_button"),
-                            ResourceLocation.withDefaultNamespace("block/" + namePath + "_button_pressed")
+                            Identifier.withDefaultNamespace("block/" + namePath + "_button"),
+                            Identifier.withDefaultNamespace("block/" + namePath + "_button_pressed")
                     ))
                     .register());
         });
@@ -461,12 +461,12 @@ public class CCBlocks {
             .block("linked_lever", properties -> new LinkedLeverBlock(properties, (LeverBlock) Blocks.LEVER))
             .initialProperties(() -> Blocks.LEVER)
             .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(LinkedTransmitterItem.register())
             .onRegister(PreciseItemUseOverrides::addBlock)
             .blockstate(CCBlockStateGen.linkedLever(
-                    ResourceLocation.withDefaultNamespace("block/lever"),
-                    ResourceLocation.withDefaultNamespace("block/lever_on")
+                    Identifier.withDefaultNamespace("block/lever"),
+                    Identifier.withDefaultNamespace("block/lever_on")
             ))
             .register();
 
@@ -474,7 +474,7 @@ public class CCBlocks {
             .block("linked_analog_lever", properties -> new LinkedAnalogLeverBlock(properties, AllBlocks.ANALOG_LEVER))
             .initialProperties(() -> Blocks.LEVER)
             .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(LinkedTransmitterItem.register())
             .onRegister(PreciseItemUseOverrides::addBlock)
             .blockstate(CCBlockStateGen.linkedLeverNoPower(
@@ -490,7 +490,7 @@ public class CCBlocks {
                     .noOcclusion()
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.register(FeatureCategory.LOGISTICS))
             .blockstate((c, p) -> p.simpleBlock(c.getEntry(), AssetLookup.partialBaseModel(c, p)))
@@ -508,7 +508,7 @@ public class CCBlocks {
                     .lightLevel(s -> 10)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .blockstate((c, p) -> p.simpleBlock(c.getEntry(), AssetLookup.partialBaseModel(c, p)))
@@ -527,7 +527,7 @@ public class CCBlocks {
                     .lightLevel(s -> 10)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .blockstate((c, p) -> p.simpleBlock(c.getEntry(), AssetLookup.partialBaseModel(c, p)))
@@ -566,7 +566,7 @@ public class CCBlocks {
                     .lightLevel(s -> 5)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .blockstate((c, p) -> p.simpleBlock(c.getEntry(), AssetLookup.partialBaseModel(c, p)))
@@ -584,7 +584,7 @@ public class CCBlocks {
                     .noOcclusion()
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(() -> Mods.GARNISHED.isLoaded() || Mods.DREAMS_DESIRES.isLoaded() || Mods.DRAGONS_PLUS.isLoaded()))
@@ -603,7 +603,7 @@ public class CCBlocks {
                     .lightLevel(s -> 12)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.DREAMS_DESIRES::isLoaded))
@@ -621,7 +621,7 @@ public class CCBlocks {
                     .noOcclusion()
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(() -> Mods.DREAMS_DESIRES.isLoaded() || Mods.DRAGONS_PLUS.isLoaded()))
@@ -640,7 +640,7 @@ public class CCBlocks {
                     .lightLevel(s -> 13)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.NUCLEAR::isLoaded))
@@ -659,7 +659,7 @@ public class CCBlocks {
                     .lightLevel(s -> 15)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.DRAGONS_PLUS::isLoaded))
@@ -681,7 +681,7 @@ public class CCBlocks {
                     .lightLevel(s -> 0)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.DRAGONS_PLUS::isLoaded))
@@ -702,7 +702,7 @@ public class CCBlocks {
                     .lightLevel(s -> 0)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(() -> false)) // No mods support bulk withering in 1.21.1
@@ -720,7 +720,7 @@ public class CCBlocks {
                     .noOcclusion()
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.MORE_CATALYSTS::isLoaded))
@@ -738,7 +738,7 @@ public class CCBlocks {
                     .noOcclusion()
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.MORE_CATALYSTS::isLoaded))
@@ -757,7 +757,7 @@ public class CCBlocks {
                     .noOcclusion()
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.MORE_CATALYSTS::isLoaded))
@@ -776,7 +776,7 @@ public class CCBlocks {
                     .lightLevel(s -> 3)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.MORE_CATALYSTS::isLoaded))
@@ -795,7 +795,7 @@ public class CCBlocks {
                     .lightLevel(s -> 4)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.MORE_CATALYSTS::isLoaded))
@@ -814,7 +814,7 @@ public class CCBlocks {
                     .lightLevel(s -> 14)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.MORE_CATALYSTS::isLoaded))
@@ -833,7 +833,7 @@ public class CCBlocks {
                     .lightLevel(s -> 10)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.SHIMMER::isLoaded))
@@ -852,7 +852,7 @@ public class CCBlocks {
                     .lightLevel(s -> 10)
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.SHIMMER::isLoaded))
@@ -870,7 +870,7 @@ public class CCBlocks {
                     .noOcclusion()
                     .isRedstoneConductor((state, level, pos) -> false)
             )
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(pickaxeOnly())
             .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
             .transform(FeatureToggle.addCondition(Mods.NETHER_INDUSTRY::isLoaded))
@@ -885,7 +885,7 @@ public class CCBlocks {
     static {
         for (DyeColor color : DyeColor.values()) {
             String namespace = DyeDepotCompat.getColorNamespace(color);
-            boolean isVanilla = namespace.equals(ResourceLocation.DEFAULT_NAMESPACE);
+            boolean isVanilla = namespace.equals(Identifier.DEFAULT_NAMESPACE);
             FAN_DYEING_CATALYSTS.put(color, REGISTRATE.block((isVanilla ? "" : (namespace + "_")) + color.getName() + "_fan_dyeing_catalyst", WrenchableBlock::new)
                     .initialProperties(() -> Blocks.IRON_BLOCK)
                     .properties(p -> p
@@ -894,12 +894,12 @@ public class CCBlocks {
                             .noOcclusion()
                             .isRedstoneConductor((state, level, pos) -> false)
                     )
-                    .addLayer(() -> RenderType::cutoutMipped)
+
                     .transform(pickaxeOnly())
                     .transform(FeatureToggle.registerDependent(CCBlocks.EMPTY_FAN_CATALYST))
                     .transform(FeatureToggle.addCondition(() -> (Mods.DRAGONS_PLUS.isLoaded() || Mods.GARNISHED.isLoaded()) && (isVanilla || Mods.DYE_DEPOT.isLoaded())))
                     .blockstate((c, p) -> p.simpleBlock(c.getEntry(), p.models().withExistingParent(c.getName(), p.modLoc("block/fan_catalyst/with_content"))
-                            .texture("content", ResourceLocation.fromNamespaceAndPath(DyeDepotCompat.getColorNamespace(color), "block/" + color.getName() + "_concrete_powder"))
+                            .texture("content", Identifier.fromNamespaceAndPath(DyeDepotCompat.getColorNamespace(color), "block/" + color.getName() + "_concrete_powder"))
                     ))
                     .lang(RegistrateLangProvider.toEnglishName(color.getName() + "_fan_dyeing_catalyst"))
                     .tag(AllTags.AllBlockTags.FAN_TRANSPARENT.tag)
@@ -945,7 +945,7 @@ public class CCBlocks {
             .transform(displaySource(CCDisplaySources.BOILER_STATUS))
             .transform(mountedFluidStorage(CCMountedStorageTypes.FLUID_VESSEL))
             .onRegister(movementBehaviour(new FluidTankMovementBehavior()))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .item(FluidVesselItem::new)
             .model(AssetLookup.customBlockItemModel("_", "block_x_single_window"))
             .build()
@@ -960,7 +960,7 @@ public class CCBlocks {
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
                     .blockstate(new FluidVesselGenerator("creative_")::generate)
                     .onRegister(CreateRegistrate.blockModel(() -> FluidVesselModel::creative))
-                    .addLayer(() -> RenderType::cutoutMipped)
+
                     .item(FluidVesselItem::new)
                     .properties(p -> p.rarity(Rarity.EPIC))
                     .model((c, p) -> p.withExistingParent(c.getName(), p.modLoc("block/fluid_vessel/block_x_single_window"))
@@ -1014,7 +1014,7 @@ public class CCBlocks {
                     .isSuffocating((state, level, pos) -> false))
             .transform(pickaxeOnly())
             .transform(FeatureToggle.register(FeatureCategory.LOGISTICS))
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .clientExtension(() -> () -> new ReducedDestroyEffects())
             .blockstate(new ChuteGenerator()::generate)
             .item(ChuteItem::new)
@@ -1025,7 +1025,7 @@ public class CCBlocks {
             REGISTRATE.block("dashboard", DashboardBlock::new)
                     .initialProperties(SharedProperties::stone)
                     .properties(p -> p.mapColor(MapColor.PODZOL))
-                    .addLayer(() -> RenderType::cutoutMipped)
+
                     .transform(axeOrPickaxe())
                     .transform(FeatureToggle.register(FeatureCategory.KINETIC))
                     .transform(displayTarget(CCDisplayTargets.DASHBOARD))

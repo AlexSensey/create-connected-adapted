@@ -15,8 +15,8 @@ public class CuttingRecipeGen extends com.simibubi.create.api.data.recipe.Cuttin
             .withCondition(new FeatureEnabledCondition(CCBlocks.SHEAR_PIN.getId()))
             .output(CCBlocks.SHEAR_PIN.get()));
 
-    public CuttingRecipeGen(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-        super(output, registries, CreateConnected.MODID);
+    public CuttingRecipeGen(HolderLookup.Provider registries, net.minecraft.data.recipes.RecipeOutput output) {
+        super(registries, output, CreateConnected.MODID);
     }
 }
 

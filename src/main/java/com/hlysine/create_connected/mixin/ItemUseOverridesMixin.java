@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.simibubi.create.foundation.block.ItemUseOverrides;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -28,7 +28,7 @@ public class ItemUseOverridesMixin {
                                                         InteractionHand interactionHand,
                                                         BlockHitResult blockHitResult,
                                                         Operation<InteractionResult> original,
-                                                        @Local ResourceLocation id) {
+                                                        @Local Identifier id) {
         if (PreciseItemUseOverrides.OVERRIDES.contains(id)) {
             HitResult preciseHitResult = player.pick(player.blockInteractionRange(), 1, false);
             if (preciseHitResult instanceof BlockHitResult preciseBlockHitResult) {

@@ -83,6 +83,6 @@ public class KineticBridgeDestinationBlockEntity extends GeneratingKineticBlockE
     @Override
     protected void read(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket) {
         super.read(compound, registries, clientPacket);
-        updateKineticsNextTick = compound.getBoolean("UpdateKineticNextTick");
+        updateKineticsNextTick = compound.getBooleanOr("UpdateKineticNextTick", false);
     }
 }

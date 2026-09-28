@@ -14,7 +14,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.*;
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import com.simibubi.create.foundation.utility.CreateLang;
-import net.createmod.catnip.lang.FontHelper;
+import net.createmod.catnip.api.client.lang.FontHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -151,14 +151,14 @@ public class OverstressClutchBlockEntity extends SplitShaftBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (getBlockState().getValue(STATE) == ClutchState.UNCOUPLING && level != null && !level.isClientSide) {
+        if (getBlockState().getValue(STATE) == ClutchState.UNCOUPLING && level != null && !level.isClientSide()) {
             level.scheduleTick(getBlockPos(), CCBlocks.OVERSTRESS_CLUTCH.get(), 0, TickPriority.EXTREMELY_HIGH);
         }
     }
 
     @Override
     protected void read(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket) {
-        delay = compound.getInt("Delay");
+        delay = compound.getIntOr("Delay", 0);
         super.read(compound, registries, clientPacket);
     }
 

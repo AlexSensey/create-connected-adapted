@@ -59,7 +59,6 @@
     "sequencedgearshift.SequencerInstructionsMixin"
   ],
   "client": [
-    "featuretoggle.SubMenuConfigScreenMixin",
     "nestedschematics.ClientSchematicLoaderMixin",
     "sequencedgearshift.SequencedGearshiftScreenMixin"
   ],

@@ -5,7 +5,7 @@ import com.hlysine.create_connected.registries.CCShapes;
 import com.simibubi.create.content.kinetics.crank.HandCrankBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.CogWheelBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.ICogWheel;
-import net.createmod.catnip.data.Iterate;
+import net.createmod.catnip.api.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -98,8 +98,8 @@ public class CrankWheelBlock extends HandCrankBlock implements ICogWheel {
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
-        BlockState newState = super.updateShape(state, direction, neighborState, level, currentPos, neighborPos);
+    public BlockState updateShape(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos currentPos, Direction direction, BlockPos neighborPos, BlockState neighborState, net.minecraft.util.RandomSource random) {
+        BlockState newState = super.updateShape(state, level, ticks, currentPos, direction, neighborPos, neighborState, random);
         if (newState.getValue(FACING).getAxis() != newState.getValue(AXIS))
             return newState.setValue(AXIS, newState.getValue(FACING).getAxis());
         return newState;

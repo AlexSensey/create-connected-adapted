@@ -28,6 +28,14 @@ public class LinkedTransmitterBlockEntity extends SmartBlockEntity {
     }
 
     @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        LinkedTransmitterRemoval.prepare(this, containsBase);
+        if (hasLevel() && !level.isClientSide())
+            transmit(0);
+        super.preRemoveSideEffects(pos, state);
+    }
+
+    @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         createLink();
         behaviours.add(link);
@@ -64,7 +72,7 @@ public class LinkedTransmitterBlockEntity extends SmartBlockEntity {
     @Override
     protected void read(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
         super.read(tag, registries, clientPacket);
-        if (level == null || level.isClientSide || !link.newPosition)
-            transmittedSignal = tag.getInt("Transmit");
+        if (level == null || level.isClientSide() || !link.newPosition)
+            transmittedSignal = tag.getIntOr("Transmit", 0);
     }
 }

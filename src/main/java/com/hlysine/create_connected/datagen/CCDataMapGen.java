@@ -6,7 +6,7 @@ import com.hlysine.create_connected.compat.Mods;
 import com.hlysine.create_connected.registries.CCBlocks;
 import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.providers.RegistrateDataMapProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.conditions.AndCondition;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import plus.dragons.createdragonsplus.common.registry.CDPDataMaps;
@@ -24,9 +24,9 @@ public class CCDataMapGen {
             prov.builder(CDPDataMaps.BLOCK_FAN_COLORING_CATALYSTS)
                     .add(
                             block.getId(),
-                            ResourceLocation.fromNamespaceAndPath(namespace, color.getSerializedName()),
+                            Identifier.fromNamespaceAndPath(namespace, color.getSerializedName()),
                             false,
-                            namespace.equals(ResourceLocation.DEFAULT_NAMESPACE)
+                            namespace.equals(Identifier.DEFAULT_NAMESPACE)
                                     ? new ModLoadedCondition(Mods.DRAGONS_PLUS.id())
                                     : new AndCondition(List.of(new ModLoadedCondition(Mods.DRAGONS_PLUS.id()), new ModLoadedCondition(Mods.DYE_DEPOT.id())))
                     );

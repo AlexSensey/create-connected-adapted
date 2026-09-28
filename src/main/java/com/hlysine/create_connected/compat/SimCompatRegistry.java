@@ -11,7 +11,6 @@ import com.tterrag.registrate.util.entry.BlockEntry;
 import dev.simulated_team.simulated.Simulated;
 import dev.simulated_team.simulated.content.blocks.throttle_lever.ThrottleLeverVisual;
 import dev.simulated_team.simulated.index.SimBlocks;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.block.Blocks;
 
 public class SimCompatRegistry {
@@ -21,7 +20,7 @@ public class SimCompatRegistry {
             .block("linked_throttle_lever", properties -> new LinkedThrottleLeverBlock(properties, SimBlocks.THROTTLE_LEVER))
             .initialProperties(() -> Blocks.LEVER)
             .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
-            .addLayer(() -> RenderType::cutoutMipped)
+
             .transform(LinkedTransmitterItem.register())
             .onRegister(PreciseItemUseOverrides::addBlock)
             .blockstate(CCBlockStateGen.linkedLeverNoPower(

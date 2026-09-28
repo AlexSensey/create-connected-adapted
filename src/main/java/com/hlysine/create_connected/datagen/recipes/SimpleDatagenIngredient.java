@@ -2,12 +2,15 @@ package com.hlysine.create_connected.datagen.recipes;
 
 import com.hlysine.create_connected.compat.Mods;
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.foundation.mixin.accessor.MappedRegistryAccessor;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 import net.neoforged.neoforge.common.crafting.IngredientType;
@@ -19,17 +22,9 @@ import java.util.stream.Stream;
 
 public class SimpleDatagenIngredient implements ICustomIngredient {
 
-	/*
-	"ingredients": [
-		{
-			"item": "mod:compat_item"
-		}
-	]
-	 */
+	/* 26.2 compound children are identifier strings, e.g. "mod:compat_item". */
 
-    private static final MapCodec<SimpleDatagenIngredient> INTERNAL_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ResourceLocation.CODEC.fieldOf("item").forGetter(i -> i.mod.rl(i.id))
-    ).apply(instance, location -> {
+    private static final Codec<SimpleDatagenIngredient> INTERNAL_CODEC = Identifier.CODEC.xmap(location -> {
         for (Mods mod : Mods.values()) {
             if (mod.id().equals(location.getNamespace())) {
                 return new SimpleDatagenIngredient(mod, location.getPath());
@@ -37,10 +32,10 @@ public class SimpleDatagenIngredient implements ICustomIngredient {
         }
         throw new AssertionError("ID " + location.getNamespace() + " doesn't correspond to any compat mod." +
                 " SimpleDatagenIngredient is not meant for deserialization anyway");
-    }));
+    }, ingredient -> ingredient.mod.rl(ingredient.id));
 
     private static final MapCodec<SimpleDatagenIngredient> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            INTERNAL_CODEC.codec().listOf().fieldOf("ingredients").forGetter(List::of)
+            INTERNAL_CODEC.listOf(1, 1).fieldOf("children").forGetter(List::of)
     ).apply(instance, list -> {
         assert list.size() == 1 : "SimpleDatagenIngredient should only be serialized as a single-element list, and shouldn't be deserialized anyway";
         return list.getFirst();
@@ -57,11 +52,11 @@ public class SimpleDatagenIngredient implements ICustomIngredient {
 
     @Override
     public boolean test(@NotNull ItemStack stack) {
-        return stack.getItemHolder().getKey().location().equals(mod.rl(id));
+        return BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(mod.rl(id));
     }
 
     @Override
-    public @NotNull Stream<ItemStack> getItems() {
+    public @NotNull Stream<Holder<Item>> items() {
         return Stream.empty();
     }
 
@@ -92,16 +87,7 @@ public class SimpleDatagenIngredient implements ICustomIngredient {
                 //noinspection DataFlowIssue - it is ok to pass null as the owner, because this is only being used for serialization
                 mra$.getByValue().put(INGREDIENT_TYPE, Holder.Reference.createStandAlone(null, wrappedKey));
 
-				/*
-				{
-					"type": "neoforge:compound",
-					"ingredients": [
-						{
-							"item": "mod:compat_item"
-						}
-					]
-				}
-				 */
+				/* 26.2 compound children are identifier strings, e.g. "mod:compat_item". */
 
                 didRegistryInjection = true;
             } else {

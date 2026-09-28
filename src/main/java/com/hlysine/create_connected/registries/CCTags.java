@@ -3,10 +3,10 @@ package com.hlysine.create_connected.registries;
 import com.hlysine.create_connected.ConnectedLang;
 import com.hlysine.create_connected.CreateConnected;
 import com.hlysine.create_connected.compat.Mods;
-import net.createmod.catnip.lang.Lang;
+import net.createmod.catnip.api.lang.Lang;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -19,12 +19,12 @@ import net.minecraft.world.level.material.FluidState;
 import static com.hlysine.create_connected.registries.CCTags.NameSpace.*;
 
 public class CCTags {
-    public static <T> TagKey<T> optionalTag(Registry<T> registry, ResourceLocation id) {
+    public static <T> TagKey<T> optionalTag(Registry<T> registry, Identifier id) {
         return TagKey.create(registry.key(), id);
     }
 
     public static <T> TagKey<T> commonTag(Registry<T> registry, String path) {
-        return optionalTag(registry, ResourceLocation.fromNamespaceAndPath("c", path));
+        return optionalTag(registry, Identifier.fromNamespaceAndPath("c", path));
     }
 
     public static TagKey<Block> commonBlockTag(String path) {
@@ -95,7 +95,7 @@ public class CCTags {
         }
 
         Items(NameSpace namespace, String path, boolean optional, boolean alwaysDatagen) {
-            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(namespace.id, path == null ? ConnectedLang.asId(name()) : path);
+            Identifier id = Identifier.fromNamespaceAndPath(namespace.id, path == null ? ConnectedLang.asId(name()) : path);
             if (optional) {
                 tag = optionalTag(BuiltInRegistries.ITEM, id);
             } else {
@@ -143,7 +143,7 @@ public class CCTags {
         }
 
         Fluids(NameSpace namespace, String path, boolean optional, boolean alwaysDatagen) {
-            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(namespace.id, path == null ? Lang.asId(name()) : path);
+            Identifier id = Identifier.fromNamespaceAndPath(namespace.id, path == null ? Lang.asId(name()) : path);
             if (optional) {
                 tag = optionalTag(BuiltInRegistries.FLUID, id);
             } else {

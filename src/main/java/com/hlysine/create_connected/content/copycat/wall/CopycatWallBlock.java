@@ -3,13 +3,13 @@ package com.hlysine.create_connected.content.copycat.wall;
 import com.hlysine.create_connected.content.copycat.ICopycatWithWrappedBlock;
 import com.hlysine.create_connected.content.copycat.WaterloggedCopycatWrappedBlock;
 import com.simibubi.create.content.decoration.copycat.CopycatBlock;
-import net.createmod.catnip.data.Iterate;
+import net.createmod.catnip.api.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
@@ -36,10 +36,10 @@ public class CopycatWallBlock extends WaterloggedCopycatWrappedBlock {
         super(properties);
         registerDefaultState(defaultBlockState()
                 .setValue(UP, true)
-                .setValue(NORTH_WALL, WallSide.NONE)
-                .setValue(SOUTH_WALL, WallSide.NONE)
-                .setValue(EAST_WALL, WallSide.NONE)
-                .setValue(WEST_WALL, WallSide.NONE)
+                .setValue(net.minecraft.world.level.block.WallBlock.NORTH, WallSide.NONE)
+                .setValue(net.minecraft.world.level.block.WallBlock.SOUTH, WallSide.NONE)
+                .setValue(net.minecraft.world.level.block.WallBlock.EAST, WallSide.NONE)
+                .setValue(net.minecraft.world.level.block.WallBlock.WEST, WallSide.NONE)
         );
     }
 
@@ -50,7 +50,7 @@ public class CopycatWallBlock extends WaterloggedCopycatWrappedBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, BlockState> pBuilder) {
-        super.createBlockStateDefinition(pBuilder.add(UP, NORTH_WALL, SOUTH_WALL, EAST_WALL, WEST_WALL));
+        super.createBlockStateDefinition(pBuilder.add(UP, net.minecraft.world.level.block.WallBlock.NORTH, net.minecraft.world.level.block.WallBlock.SOUTH, net.minecraft.world.level.block.WallBlock.EAST, net.minecraft.world.level.block.WallBlock.WEST));
     }
 
     @Nullable
@@ -82,13 +82,13 @@ public class CopycatWallBlock extends WaterloggedCopycatWrappedBlock {
     }
 
     @Override
-    public @NotNull BlockState updateShape(@NotNull BlockState pState, @NotNull Direction pDirection, @NotNull BlockState pNeighborState, @NotNull LevelAccessor pLevel, @NotNull BlockPos pCurrentPos, @NotNull BlockPos pNeighborPos) {
-        return migrateOnUpdate(pLevel.isClientSide(), ICopycatWithWrappedBlock.unwrapForOperation(wall, pState, state -> state.updateShape(pDirection, pNeighborState, pLevel, pCurrentPos, pNeighborPos)));
+    public @NotNull BlockState updateShape(BlockState pState, net.minecraft.world.level.LevelReader pLevel, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pCurrentPos, Direction pDirection, BlockPos pNeighborPos, BlockState pNeighborState, net.minecraft.util.RandomSource random) {
+        return migrateOnUpdate(pLevel.isClientSide(), ICopycatWithWrappedBlock.unwrapForOperation(wall, pState, state -> state.updateShape(pLevel, ticks, pCurrentPos, pDirection, pNeighborPos, pNeighborState, random)));
     }
 
     @Override
-    public boolean propagatesSkylightDown(@NotNull BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos) {
-        return ICopycatWithWrappedBlock.wrappedState(wall, pState).propagatesSkylightDown(pLevel, pPos);
+    public boolean propagatesSkylightDown(@NotNull BlockState pState) {
+        return ICopycatWithWrappedBlock.wrappedState(wall, pState).propagatesSkylightDown();
     }
 
     @Override
@@ -102,7 +102,7 @@ public class CopycatWallBlock extends WaterloggedCopycatWrappedBlock {
     }
 
     @Override
-    public boolean isIgnoredConnectivitySide(BlockAndTintGetter reader, BlockState state, Direction face,
+    public boolean isIgnoredConnectivitySide(net.minecraft.world.level.BlockGetter reader, BlockState state, Direction face,
                                              @Nullable BlockPos fromPos, @Nullable BlockPos toPos) {
         if (fromPos == null || toPos == null)
             return true;
@@ -121,14 +121,14 @@ public class CopycatWallBlock extends WaterloggedCopycatWrappedBlock {
     }
 
     @Override
-    public boolean canConnectTexturesToward(BlockAndTintGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state) {
+    public boolean canConnectTexturesToward(net.minecraft.world.level.BlockGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state) {
         BlockState toState = reader.getBlockState(toPos);
         if (!toState.is(this)) return false;
 
         long sideCount = Arrays.stream(Iterate.horizontalDirections).filter(s -> state.getValue(byDirection(s)) != WallSide.NONE).count();
         if (sideCount > 2)
             return false;
-        if (sideCount == 2 && (state.getValue(NORTH_WALL) != state.getValue(SOUTH_WALL) || state.getValue(EAST_WALL) != state.getValue(WEST_WALL))) {
+        if (sideCount == 2 && (state.getValue(net.minecraft.world.level.block.WallBlock.NORTH) != state.getValue(net.minecraft.world.level.block.WallBlock.SOUTH) || state.getValue(net.minecraft.world.level.block.WallBlock.EAST) != state.getValue(net.minecraft.world.level.block.WallBlock.WEST))) {
             return false;
         }
 
@@ -136,7 +136,7 @@ public class CopycatWallBlock extends WaterloggedCopycatWrappedBlock {
         if (diff.equals(Vec3i.ZERO)) {
             return true;
         }
-        Direction face = Direction.fromDelta(diff.getX(), diff.getY(), diff.getZ());
+        Direction face = com.hlysine.create_connected.ConnectedDirections.fromDelta(diff.getX(), diff.getY(), diff.getZ());
         if (face == null) {
             if (diff.distManhattan(Vec3i.ZERO) > 2) return false;
             if (diff.getY() == 0) return false;
@@ -223,10 +223,10 @@ public class CopycatWallBlock extends WaterloggedCopycatWrappedBlock {
 
     public static EnumProperty<WallSide> byDirection(Direction direction) {
         return switch (direction) {
-            case NORTH -> NORTH_WALL;
-            case SOUTH -> SOUTH_WALL;
-            case WEST -> WEST_WALL;
-            case EAST -> EAST_WALL;
+            case NORTH -> net.minecraft.world.level.block.WallBlock.NORTH;
+            case SOUTH -> net.minecraft.world.level.block.WallBlock.SOUTH;
+            case WEST -> net.minecraft.world.level.block.WallBlock.WEST;
+            case EAST -> net.minecraft.world.level.block.WallBlock.EAST;
             default -> throw new IllegalArgumentException("Vertical directions not supported");
         };
     }

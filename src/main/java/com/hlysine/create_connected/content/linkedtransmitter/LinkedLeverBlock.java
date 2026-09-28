@@ -8,9 +8,9 @@ import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -94,7 +94,7 @@ public class LinkedLeverBlock extends LeverBlock implements IBE<LinkedTransmitte
     }
 
     @Override
-    public @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack stack,
+    public @NotNull InteractionResult useItemOn(@NotNull ItemStack stack,
                                                     @NotNull BlockState state,
                                                     @NotNull Level level,
                                                     @NotNull BlockPos pos,
@@ -105,12 +105,9 @@ public class LinkedLeverBlock extends LeverBlock implements IBE<LinkedTransmitte
     }
 
     @Override
-    public void onRemove(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock()) && !isMoving && getBlockEntityOptional(world, pos).map(be -> be.containsBase).orElse(false)) {
-            Block.popResource(world, pos, new ItemStack(CCItems.LINKED_TRANSMITTER.get()));
-        }
-        withBlockEntityDo(world, pos, be -> be.transmit(0));
-        base.defaultBlockState().onRemove(world, pos, newState, isMoving);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean isMoving) {
+        LinkedTransmitterRemoval.finish(world, pos, isMoving);
+        super.affectNeighborsAfterRemoval(state, world, pos, isMoving);
     }
 
     @Override
@@ -156,7 +153,7 @@ public class LinkedLeverBlock extends LeverBlock implements IBE<LinkedTransmitte
     }
 
     public void updateTransmittedSignal(Level worldIn, BlockPos pos) {
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
             return;
 
         BlockState state = worldIn.getBlockState(pos);
@@ -166,13 +163,12 @@ public class LinkedLeverBlock extends LeverBlock implements IBE<LinkedTransmitte
     }
 
     @Override
-    public @NotNull ItemStack getCloneItemStack(@NotNull BlockState state,
-                                                @NotNull HitResult target,
-                                                @NotNull LevelReader world,
-                                                @NotNull BlockPos pos,
+    public @NotNull ItemStack getCloneItemStack(@NotNull LevelReader world, @NotNull BlockPos pos,
+                                                @NotNull BlockState state, boolean includeData,
                                                 @NotNull Player player) {
+        HitResult target = player.pick(player.blockInteractionRange(), 1, false);
         if (isHittingBase(state, world, pos, target))
-            return base.getCloneItemStack(state, target, world, pos, player);
+            return base.getCloneItemStack(world, pos, state, includeData, player);
         return new ItemStack(CCItems.LINKED_TRANSMITTER.get());
     }
 

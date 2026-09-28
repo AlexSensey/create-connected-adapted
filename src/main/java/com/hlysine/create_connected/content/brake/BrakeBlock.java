@@ -50,9 +50,9 @@ public class BrakeBlock extends AbstractEncasedShaftBlock implements IBE<BrakeBl
             Level worldIn,
             @NotNull BlockPos pos,
             @NotNull Block blockIn,
-            @NotNull BlockPos fromPos,
+            net.minecraft.world.level.redstone.Orientation fromPos,
             boolean isMoving) {
-        if (worldIn.isClientSide)
+        if (worldIn.isClientSide())
             return;
 
         boolean previouslyPowered = state.getValue(POWERED);

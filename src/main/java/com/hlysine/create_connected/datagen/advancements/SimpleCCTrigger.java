@@ -4,19 +4,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jetbrains.annotations.Nullable;
 
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.advancements.critereon.ContextAwarePredicate;
-import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.advancements.predicates.ContextAwarePredicate;
+import net.minecraft.advancements.predicates.entity.EntityPredicate;
 import net.minecraft.server.level.ServerPlayer;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class SimpleCCTrigger extends CriterionTriggerBase<SimpleCCTrigger.Instance> {
 
     public SimpleCCTrigger(String id) {
@@ -24,7 +20,7 @@ public class SimpleCCTrigger extends CriterionTriggerBase<SimpleCCTrigger.Instan
     }
 
     public void trigger(ServerPlayer player) {
-        super.trigger(player, null);
+        super.trigger(player, (List<Supplier<Object>>) null);
     }
 
     public SimpleCCTrigger.Instance instance() {

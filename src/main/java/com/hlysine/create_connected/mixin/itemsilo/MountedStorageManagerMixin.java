@@ -3,7 +3,7 @@ package com.hlysine.create_connected.mixin.itemsilo;
 import com.hlysine.create_connected.content.itemsilo.ItemSiloMountedStorage;
 import com.simibubi.create.api.contraption.storage.item.MountedItemStorage;
 import com.simibubi.create.content.contraptions.MountedStorageManager;
-import net.createmod.catnip.nbt.NBTHelper;
+import net.createmod.catnip.api.nbt.NBTHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -29,9 +29,9 @@ public abstract class MountedStorageManagerMixin {
             )
     )
     private void readLegacy(HolderLookup.Provider registries, CompoundTag nbt, CallbackInfo ci) {
-        NBTHelper.iterateCompoundList(nbt.getList("Storage", Tag.TAG_COMPOUND), tag -> {
+        NBTHelper.iterateCompoundList(nbt.getListOrEmpty("Storage"), tag -> {
             BlockPos pos = NBTHelper.readBlockPos(tag, "Pos");
-            CompoundTag data = tag.getCompound("Data");
+            CompoundTag data = tag.getCompoundOrEmpty("Data");
 
             if (data.contains("NoFuel")) {
                 addStorage(ItemSiloMountedStorage.fromLegacy(registries, data), pos);

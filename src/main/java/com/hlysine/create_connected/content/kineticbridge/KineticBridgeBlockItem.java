@@ -1,8 +1,8 @@
 package com.hlysine.create_connected.content.kineticbridge;
 
 import com.hlysine.create_connected.ConnectedLang;
-import net.createmod.catnip.data.Pair;
-import net.createmod.catnip.outliner.Outliner;
+import net.createmod.catnip.api.data.Pair;
+import net.createmod.catnip.api.client.outliner.Outliner;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -35,7 +35,7 @@ public class KineticBridgeBlockItem extends BlockItem {
         Direction facing = ((KineticBridgeBlock) getBlock()).getDirectionForPlacement(context);
         if (!(context.getPlayer() instanceof LocalPlayer localPlayer))
             return;
-        Outliner.getInstance().showAABB(Pair.of("kinetic_bridge", pos), new AABB(pos).expandTowards(facing.getNormal().getX(), facing.getNormal().getY(), facing.getNormal().getZ()))
+        Outliner.getInstance().showAABB(Pair.of("kinetic_bridge", pos), new AABB(pos).expandTowards(facing.getUnitVec3i().getX(), facing.getUnitVec3i().getY(), facing.getUnitVec3i().getZ()))
                 .colored(0xFF_ff5d6c);
         ConnectedLang.translate("kinetic_bridge.not_enough_space")
                 .color(0xFF_ff5d6c)

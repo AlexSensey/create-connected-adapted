@@ -5,11 +5,11 @@ import com.hlysine.create_connected.content.inventoryaccessport.InventoryAccessP
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.content.redstone.thresholdSwitch.ThresholdSwitchBlock;
 import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
-import net.createmod.ponder.api.element.ElementLink;
-import net.createmod.ponder.api.element.EntityElement;
-import net.createmod.ponder.api.scene.SceneBuilder;
-import net.createmod.ponder.api.scene.SceneBuildingUtil;
-import net.createmod.ponder.api.scene.Selection;
+import net.createmod.ponder.api.client.element.ElementLink;
+import net.createmod.ponder.api.client.element.EntityElement;
+import net.createmod.ponder.api.client.scene.SceneBuilder;
+import net.createmod.ponder.api.client.scene.SceneBuildingUtil;
+import net.createmod.ponder.api.client.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -64,7 +64,7 @@ public class InventoryAccessPortScenes {
         scene.idle(5);
 
         for (int i = 0; i < 6; i++) {
-            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK, 16));
+            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK.weathering().unaffected(), 16));
             scene.idle(10);
         }
         scene.idle(10);
@@ -102,7 +102,7 @@ public class InventoryAccessPortScenes {
 
         scene.world().showSection(util.select().position(funnel), Direction.DOWN);
         scene.idle(5);
-        ItemStack stack = new ItemStack(Items.COPPER_BLOCK);
+        ItemStack stack = new ItemStack(Items.COPPER_BLOCK.weathering().unaffected());
         ElementLink<EntityElement> funnelItem =
                 scene.world().createItemEntity(util.vector().topOf(funnel), util.vector().of(0, 0.1, 0), stack);
         scene.world().showSection(util.select().position(comparator), Direction.DOWN);
@@ -176,7 +176,7 @@ public class InventoryAccessPortScenes {
         scene.idle(10);
 
         for (int i = 0; i < 4; i++) {
-            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK, 16));
+            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK.weathering().unaffected(), 16));
             scene.idle(10);
         }
 
@@ -196,7 +196,7 @@ public class InventoryAccessPortScenes {
         scene.idle(10);
 
         for (int i = 0; i < 4; i++) {
-            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK, 16));
+            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK.weathering().unaffected(), 16));
             scene.idle(10);
         }
 

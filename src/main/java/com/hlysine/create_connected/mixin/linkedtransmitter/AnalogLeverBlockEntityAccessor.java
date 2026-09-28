@@ -1,7 +1,7 @@
 package com.hlysine.create_connected.mixin.linkedtransmitter;
 
 import com.simibubi.create.content.redstone.analogLever.AnalogLeverBlockEntity;
-import net.createmod.catnip.animation.LerpedFloat;
+import net.createmod.catnip.api.animation.LerpedFloat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 

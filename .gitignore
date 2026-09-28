@@ -30,3 +30,7 @@ libs
 /runs
 /run
 /run-*
+
+# Local migration diagnostics
+__pycache__/
+*.pyc

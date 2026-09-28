@@ -2,7 +2,6 @@ package com.hlysine.create_connected.content.kineticbattery;
 
 import com.hlysine.create_connected.ConnectedLang;
 import com.hlysine.create_connected.registries.CCDataComponents;
-import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -42,25 +41,22 @@ public class KineticBatteryBlockItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+    public void appendHoverText(ItemStack stack, TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, java.util.function.Consumer<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, context, display, tooltipComponents, tooltipFlag);
         double batteryLevel = getBatteryLevel(stack);
-        ConnectedLang.builder().add(ConnectedLang.translateDirect("battery.charge")
+        tooltipComponents.accept(ConnectedLang.builder().add(ConnectedLang.translateDirect("battery.charge")
                         .withStyle(ChatFormatting.GRAY)
                         .append(" ")
                         .append(barComponent(0, getCrudeBatteryLevel(batteryLevel, 20), 20)))
-                .addTo(tooltipComponents);
-        ConnectedLang.builder().space()
+                .component());
+        tooltipComponents.accept(ConnectedLang.builder().space()
                 .add(ConnectedLang.number(batteryLevel / 3600 / 20).style(ChatFormatting.BLUE))
                 .add(ConnectedLang.text(" / ").style(ChatFormatting.GRAY))
                 .add(ConnectedLang.number(getMaxBatteryLevel() / 3600 / 20)
                         .add(Component.literal(" "))
                         .add(ConnectedLang.translate("generic.unit.su_hours"))
                         .style(ChatFormatting.DARK_GRAY))
-                .addTo(tooltipComponents);
+                .component());
     }
 
-    public void registerModelOverrides() {
-        CatnipServices.PLATFORM.executeOnClientOnly(() -> () -> KineticBatteryOverrides.registerModelOverridesClient(this));
-    }
 }

@@ -5,20 +5,19 @@ import com.hlysine.create_connected.registries.CCShapes;
 import com.hlysine.create_connected.content.copycat.ICopycatWithWrappedBlock;
 import com.hlysine.create_connected.content.copycat.MigratingWaterloggedCopycatBlock;
 import com.simibubi.create.content.decoration.copycat.CopycatBlock;
-import net.createmod.catnip.placement.IPlacementHelper;
-import net.createmod.catnip.placement.PlacementHelpers;
-import net.createmod.catnip.placement.PlacementOffset;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import net.createmod.catnip.api.placement.IPlacementHelper;
+import net.createmod.catnip.api.placement.PlacementHelpers;
+import net.createmod.catnip.api.placement.PlacementOffset;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -45,7 +44,7 @@ public class CopycatSlabBlock extends MigratingWaterloggedCopycatBlock implement
     public static final EnumProperty<Axis> AXIS = BlockStateProperties.AXIS;
     public static final EnumProperty<SlabType> SLAB_TYPE = BlockStateProperties.SLAB_TYPE;
 
-    private static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
+    private static final IPlacementHelper placementHelperId = PlacementHelpers.register(new PlacementHelper());
 
     public CopycatSlabBlock(Properties pProperties) {
         super(pProperties);
@@ -60,14 +59,14 @@ public class CopycatSlabBlock extends MigratingWaterloggedCopycatBlock implement
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected @NotNull InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!player.isShiftKeyDown() && player.mayBuild()) {
             ItemStack heldItem = player.getItemInHand(hand);
-            IPlacementHelper placementHelper = PlacementHelpers.get(placementHelperId);
+            IPlacementHelper placementHelper = placementHelperId;
             if (placementHelper.matchesItem(heldItem)) {
                 placementHelper.getOffset(player, level, state, pos, hitResult)
                         .placeInWorld(level, (BlockItem) heldItem.getItem(), player, hand, hitResult);
-                return ItemInteractionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             }
         }
 
@@ -75,7 +74,7 @@ public class CopycatSlabBlock extends MigratingWaterloggedCopycatBlock implement
     }
 
     @Override
-    public boolean isIgnoredConnectivitySide(BlockAndTintGetter reader, BlockState state, Direction face,
+    public boolean isIgnoredConnectivitySide(net.minecraft.world.level.BlockGetter reader, BlockState state, Direction face,
                                              @Nullable BlockPos fromPos, @Nullable BlockPos toPos) {
         if (fromPos == null || toPos == null)
             return true;
@@ -96,7 +95,7 @@ public class CopycatSlabBlock extends MigratingWaterloggedCopycatBlock implement
     }
 
     @Override
-    public boolean canConnectTexturesToward(BlockAndTintGetter reader, BlockPos fromPos, BlockPos toPos,
+    public boolean canConnectTexturesToward(net.minecraft.world.level.BlockGetter reader, BlockPos fromPos, BlockPos toPos,
                                             BlockState state) {
         Axis axis = state.getValue(AXIS);
         BlockState toState = reader.getBlockState(toPos);
@@ -105,7 +104,7 @@ public class CopycatSlabBlock extends MigratingWaterloggedCopycatBlock implement
         if (diff.equals(Vec3i.ZERO)) {
             return true;
         }
-        Direction face = Direction.fromDelta(diff.getX(), diff.getY(), diff.getZ());
+        Direction face = com.hlysine.create_connected.ConnectedDirections.fromDelta(diff.getX(), diff.getY(), diff.getZ());
         if (face == null) {
             boolean correctAxis = switch (axis) {
                 case X -> diff.getX() == 0;
@@ -295,8 +294,7 @@ public class CopycatSlabBlock extends MigratingWaterloggedCopycatBlock implement
         }
     }
 
-    @MethodsReturnNonnullByDefault
-    private static class PlacementHelper implements IPlacementHelper {
+        private static class PlacementHelper implements IPlacementHelper {
         @Override
         public Predicate<ItemStack> getItemPredicate() {
             return CCBlocks.COPYCAT_SLAB::isIn;

@@ -11,17 +11,16 @@ import com.simibubi.create.AllShapes;
 import com.simibubi.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.ShaftBlock;
 import com.simibubi.create.foundation.placement.PoleHelper;
-import net.createmod.catnip.placement.IPlacementHelper;
-import net.createmod.catnip.placement.PlacementHelpers;
-import net.createmod.catnip.placement.PlacementOffset;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import net.createmod.catnip.api.placement.IPlacementHelper;
+import net.createmod.catnip.api.placement.PlacementHelpers;
+import net.createmod.catnip.api.placement.PlacementOffset;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -40,7 +39,7 @@ import java.util.function.Predicate;
 
 public class ShearPinBlock extends AbstractBEShaftBlock<ShearPinBlockEntity> {
 
-    public static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
+    public static final IPlacementHelper placementHelperId = PlacementHelpers.register(new PlacementHelper());
 
     public ShearPinBlock(Properties properties) {
         super(properties);
@@ -64,7 +63,7 @@ public class ShearPinBlock extends AbstractBEShaftBlock<ShearPinBlockEntity> {
         if (!kte.isOverStressed())
             return;
 
-        if (!pLevel.isClientSide) {
+        if (!pLevel.isClientSide()) {
             pLevel.destroyBlock(pPos, false);
             Vec3 center = pPos.getCenter();
             pLevel.sendParticles(ParticleTypes.LARGE_SMOKE, center.x, center.y, center.z, 5, 0.1, 0.1, 0.1, 0.05);
@@ -92,21 +91,20 @@ public class ShearPinBlock extends AbstractBEShaftBlock<ShearPinBlockEntity> {
     }
 
     @Override
-    public @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack item, @NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, Player player, @NotNull InteractionHand hand,
+    public @NotNull InteractionResult useItemOn(@NotNull ItemStack item, @NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, Player player, @NotNull InteractionHand hand,
                                                     @NotNull BlockHitResult ray) {
         if (player.isShiftKeyDown() || !player.mayBuild())
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
-        IPlacementHelper helper = PlacementHelpers.get(placementHelperId);
+        IPlacementHelper helper = placementHelperId;
         if (helper.matchesItem(item))
             return helper.getOffset(player, world, state, pos, ray)
                     .placeInWorld(world, (BlockItem) item.getItem(), player, hand, ray);
 
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
-    @MethodsReturnNonnullByDefault
-    private static class PlacementHelper extends PoleHelper<Direction.Axis> {
+        private static class PlacementHelper extends PoleHelper<Direction.Axis> {
         // used for extending a shaft in its axis, like the piston poles. works with
         // shafts and cogs
 

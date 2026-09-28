@@ -1,7 +1,7 @@
 package com.hlysine.create_connected.content.copycat.board;
 
 import com.hlysine.create_connected.registries.CCBlocks;
-import net.createmod.catnip.data.Iterate;
+import net.createmod.catnip.api.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -20,13 +20,10 @@ import static com.hlysine.create_connected.content.copycat.board.CopycatBoardBlo
 public class CopycatBoxItem extends BlockItem {
 
     public CopycatBoxItem(Properties builder) {
-        super(CCBlocks.COPYCAT_BOARD.get(), builder);
+        super(CCBlocks.COPYCAT_BOARD.get(), builder.overrideDescription("item.create_connected.copycat_box"));
     }
 
-    @Override
-    public @NotNull String getDescriptionId() {
-        return "item.create_connected.copycat_box";
-    }
+
 
     @Override
     public void registerBlocks(@NotNull Map<Block, Item> map, @NotNull Item self) {

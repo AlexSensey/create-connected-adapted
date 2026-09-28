@@ -5,7 +5,7 @@ import com.simibubi.create.content.redstone.analogLever.AnalogLeverBlockEntity;
 import com.simibubi.create.content.redstone.analogLever.AnalogLeverRenderer;
 import com.simibubi.create.content.redstone.link.LinkRenderer;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.createmod.catnip.impl.client.render.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 
 public class LinkedAnalogLeverRenderer extends AnalogLeverRenderer {

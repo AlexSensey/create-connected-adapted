@@ -48,7 +48,7 @@ public class OverstressClutchBlock extends AbstractEncasedShaftBlock implements 
                                 @NotNull Level pLevel,
                                 @NotNull BlockPos pPos,
                                 @NotNull Block pBlock,
-                                @NotNull BlockPos pFromPos,
+                                net.minecraft.world.level.redstone.Orientation pFromPos,
                                 boolean pIsMoving) {
         super.neighborChanged(pState, pLevel, pPos, pBlock, pFromPos, pIsMoving);
         boolean flag = pState.getValue(POWERED);
@@ -83,7 +83,7 @@ public class OverstressClutchBlock extends AbstractEncasedShaftBlock implements 
 
     @SuppressWarnings("deprecation")
     @Override
-    public int getAnalogOutputSignal(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos) {
+    public int getAnalogOutputSignal(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, net.minecraft.core.Direction side) {
         return pState.getValue(STATE) == ClutchState.UNCOUPLED ? 0 : 15;
     }
 
@@ -106,7 +106,7 @@ public class OverstressClutchBlock extends AbstractEncasedShaftBlock implements 
             return;
         }
         if (kte.delay <= 0) {
-            if (!pLevel.isClientSide) {
+            if (!pLevel.isClientSide()) {
                 pLevel.setBlockAndUpdate(pPos, pState.setValue(STATE, ClutchState.UNCOUPLED));
                 RotationPropagator.handleRemoved(pLevel, pPos, kte);
                 RotationPropagator.handleAdded(pLevel, pPos, kte);

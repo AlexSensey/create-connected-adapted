@@ -1,27 +1,29 @@
 package com.hlysine.create_connected.content.fluidvessel;
 
+import com.hlysine.create_connected.CreateConnected;
 import com.hlysine.create_connected.registries.CCBlockEntityTypes;
 import com.hlysine.create_connected.registries.CCBlocks;
 import com.simibubi.create.api.connectivity.ConnectivityHandler;
 import com.simibubi.create.content.equipment.symmetryWand.SymmetryWandItem;
 import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.foundation.block.IBE;
-import net.createmod.catnip.math.VecHelper;
+import net.createmod.catnip.api.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TypedEntityData;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -46,23 +48,29 @@ public class FluidVesselItem extends BlockItem {
 		MinecraftServer minecraftserver = level.getServer();
 		if (minecraftserver == null)
 			return false;
-		CustomData blockEntityData = itemStack.get(DataComponents.BLOCK_ENTITY_DATA);
+		TypedEntityData<BlockEntityType<?>> blockEntityData = itemStack.get(DataComponents.BLOCK_ENTITY_DATA);
 		if (blockEntityData != null) {
-			CompoundTag nbt = blockEntityData.copyTag();
+			CompoundTag nbt = blockEntityData.copyTagWithoutId();
 			nbt.remove("Luminosity");
 			nbt.remove("Size");
 			nbt.remove("Height");
 			nbt.remove("Controller");
 			nbt.remove("LastKnownPos");
 			if (nbt.contains("TankContent")) {
-				FluidStack fluid = FluidStack.parseOptional(minecraftserver.registryAccess(), nbt.getCompound("TankContent"));
-				if (!fluid.isEmpty()) {
-					fluid.setAmount(Math.min(FluidTankBlockEntity.getCapacityMultiplier(), fluid.getAmount()));
-					nbt.put("TankContent", fluid.saveOptional(minecraftserver.registryAccess()));
-				}
+                var ops = minecraftserver.registryAccess().createSerializationContext(NbtOps.INSTANCE);
+                FluidStack.OPTIONAL_CODEC.parse(ops, nbt.getCompoundOrEmpty("TankContent"))
+                        .resultOrPartial(error -> CreateConnected.LOGGER.error("Cannot read vessel item fluid: {}", error))
+                        .ifPresent(fluid -> {
+                            if (!fluid.isEmpty()) {
+                                fluid.setAmount(Math.min(FluidTankBlockEntity.getCapacityMultiplier(), fluid.getAmount()));
+                                FluidStack.OPTIONAL_CODEC.encodeStart(ops, fluid)
+                                        .resultOrPartial(error -> CreateConnected.LOGGER.error("Cannot write vessel item fluid: {}", error))
+                                        .ifPresent(tag -> nbt.put("TankContent", tag));
+                            }
+                        });
 			}
-			BlockEntity.addEntityType(nbt, ((IBE<?>) this.getBlock()).getBlockEntityType());
-			itemStack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(nbt));
+
+			itemStack.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(((IBE<?>) this.getBlock()).getBlockEntityType(), nbt));
 		}
 		return super.updateCustomBlockEntityTag(blockPos, level, player, itemStack, blockState);
 	}

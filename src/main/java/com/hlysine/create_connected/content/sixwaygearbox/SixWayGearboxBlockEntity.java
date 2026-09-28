@@ -2,7 +2,6 @@ package com.hlysine.create_connected.content.sixwaygearbox;
 
 
 import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -10,7 +9,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import static net.minecraft.core.Direction.*;
 
-@MethodsReturnNonnullByDefault
 public class SixWayGearboxBlockEntity extends SplitShaftBlockEntity {
 
     public SixWayGearboxBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

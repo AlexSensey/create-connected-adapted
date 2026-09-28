@@ -119,14 +119,14 @@ public abstract class Instruction {
     }
 
     public static Instruction deserializeParams(CompoundTag nbt) {
-        String id = nbt.getString("ID");
+        String id = nbt.getStringOr("ID", "");
         Instruction instance = create(id);
         if (instance == null) return null;
         if (instance.hasSignal) {
-            instance.signal = nbt.getInt("Signal");
+            instance.signal = nbt.getIntOr("Signal", 0);
         }
         if (instance.paramConfig != null) {
-            instance.param = nbt.getInt("Value");
+            instance.param = nbt.getIntOr("Value", 0);
         }
         return instance;
     }

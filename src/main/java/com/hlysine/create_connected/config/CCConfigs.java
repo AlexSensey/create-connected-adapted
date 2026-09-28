@@ -2,7 +2,7 @@ package com.hlysine.create_connected.config;
 
 import com.hlysine.create_connected.CreateConnected;
 import com.simibubi.create.api.stress.BlockStressValues;
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;

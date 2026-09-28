@@ -32,7 +32,7 @@ public class RotationPropagatorMixin {
         final IRotate definitionTo = (IRotate) toBlock;
         final BlockPos diff = to.getBlockPos()
                 .subtract(from.getBlockPos());
-        final Direction direction = Direction.fromDelta(diff.getX(), diff.getY(), diff.getZ());
+        final Direction direction = com.hlysine.create_connected.ConnectedDirections.fromDelta(diff.getX(), diff.getY(), diff.getZ());
 
         if (stateFrom.is(CCBlocks.ENCASED_CHAIN_COGWHEEL.get()) && stateTo.is(CCBlocks.ENCASED_CHAIN_COGWHEEL.get())) {
             if (direction == null) {

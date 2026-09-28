@@ -4,7 +4,7 @@ import com.hlysine.create_connected.registries.CCBlockEntityTypes;
 import com.hlysine.create_connected.registries.CCBlocks;
 import com.simibubi.create.content.kinetics.base.DirectionalKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
-import net.createmod.catnip.data.Iterate;
+import net.createmod.catnip.api.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -107,13 +107,12 @@ public class KineticBridgeDestinationBlock extends DirectionalKineticBlock imple
     }
 
     @Override
-    public BlockState updateShape(BlockState pState, Direction pFacing, BlockState pFacingState, LevelAccessor pLevel,
-                                  BlockPos pCurrentPos, BlockPos pFacingPos) {
+    public BlockState updateShape(BlockState pState, net.minecraft.world.level.LevelReader pLevel, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pCurrentPos, Direction pFacing, BlockPos pFacingPos, BlockState pFacingState, net.minecraft.util.RandomSource random) {
         if (stillValid(pLevel, pCurrentPos, pState)) {
             BlockPos sourcePos = getSource(pCurrentPos, pState);
             if (pLevel.getBlockState(sourcePos).is(CCBlocks.KINETIC_BRIDGE.get()))
-                if (!pLevel.getBlockTicks().hasScheduledTick(sourcePos, CCBlocks.KINETIC_BRIDGE.get()))
-                    pLevel.scheduleTick(sourcePos, CCBlocks.KINETIC_BRIDGE.get(), 1);
+                if (!ticks.getBlockTicks().hasScheduledTick(sourcePos, CCBlocks.KINETIC_BRIDGE.get()))
+                    ticks.scheduleTick(sourcePos, CCBlocks.KINETIC_BRIDGE.get(), 1);
             return pState;
         }
         if (!(pLevel instanceof Level level) || level.isClientSide())

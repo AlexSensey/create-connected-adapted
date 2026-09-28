@@ -1,0 +1,54 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "create_connected:kinetic_battery_level",
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "create_connected:item/kinetic_battery_level_0"
+    },
+    "entries": [
+      {
+        "threshold": 0,
+        "model": {
+          "type": "minecraft:model",
+          "model": "create_connected:item/kinetic_battery_level_0"
+        }
+      },
+      {
+        "threshold": 1,
+        "model": {
+          "type": "minecraft:model",
+          "model": "create_connected:item/kinetic_battery_level_1"
+        }
+      },
+      {
+        "threshold": 2,
+        "model": {
+          "type": "minecraft:model",
+          "model": "create_connected:item/kinetic_battery_level_2"
+        }
+      },
+      {
+        "threshold": 3,
+        "model": {
+          "type": "minecraft:model",
+          "model": "create_connected:item/kinetic_battery_level_3"
+        }
+      },
+      {
+        "threshold": 4,
+        "model": {
+          "type": "minecraft:model",
+          "model": "create_connected:item/kinetic_battery_level_4"
+        }
+      },
+      {
+        "threshold": 5,
+        "model": {
+          "type": "minecraft:model",
+          "model": "create_connected:item/kinetic_battery_level_5"
+        }
+      }
+    ]
+  }
+}

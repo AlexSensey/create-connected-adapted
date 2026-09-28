@@ -61,7 +61,7 @@ public class TransformInstruction extends Instruction {
 
     @Override
     public void readState(CompoundTag nbt) {
-        input = nbt.getInt("Input");
+        input = nbt.getIntOr("Input", 0);
     }
 
     @Override

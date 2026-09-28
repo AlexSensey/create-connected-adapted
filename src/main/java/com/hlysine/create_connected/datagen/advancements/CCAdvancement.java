@@ -5,10 +5,15 @@ import com.simibubi.create.Create;
 import com.simibubi.create.foundation.advancement.CreateAdvancement;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import net.minecraft.advancements.*;
-import net.minecraft.advancements.critereon.*;
+import net.minecraft.advancements.triggers.Criterion;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.advancements.triggers.InventoryChangeTrigger;
+import net.minecraft.advancements.triggers.ItemUsedOnLocationTrigger;
+import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +29,7 @@ import java.util.function.UnaryOperator;
 
 public class CCAdvancement implements Awardable {
 
-    static final ResourceLocation BACKGROUND = Create.asResource("textures/gui/advancements.png");
+    static final Identifier BACKGROUND = Create.asResource("textures/gui/advancements.png");
     static final String LANG = "advancement." + CreateConnected.MODID + ".";
     static final String SECRET_SUFFIX = "\n§7(Hidden Advancement)";
 
@@ -34,6 +39,8 @@ public class CCAdvancement implements Awardable {
     private final Builder ccBuilder = new Builder();
 
     AdvancementHolder datagenResult;
+
+    private final java.util.List<Consumer<HolderLookup.Provider>> deferredCriteria = new java.util.ArrayList<>();
 
     private final String id;
     private String title;
@@ -66,7 +73,7 @@ public class CCAdvancement implements Awardable {
     public boolean isAlreadyAwardedTo(Player player) {
         if (!(player instanceof ServerPlayer sp))
             return true;
-        AdvancementHolder advancement = sp.getServer()
+        AdvancementHolder advancement = sp.level().getServer()
                 .getAdvancements()
                 .get(CreateConnected.asResource(id));
         if (advancement == null)
@@ -86,13 +93,14 @@ public class CCAdvancement implements Awardable {
     }
 
     void save(Consumer<AdvancementHolder> t, HolderLookup.Provider registries) {
+        deferredCriteria.forEach(criterion -> criterion.accept(registries));
         if (parent != null)
             mcBuilder.parent(parent.datagenResult);
 
         if (ccBuilder.func != null)
             ccBuilder.icon(ccBuilder.func.apply(registries));
 
-        mcBuilder.display(ccBuilder.icon, Component.translatable(titleKey()),
+        mcBuilder.display(ItemStackTemplate.fromNonEmptyStack(ccBuilder.icon), Component.translatable(titleKey()),
                 Component.translatable(descriptionKey()).withStyle(s -> s.withColor(0xDBA213)),
                 id.equals("root") ? BACKGROUND : null, ccBuilder.type.advancementType, ccBuilder.type.toast,
                 ccBuilder.type.announce, ccBuilder.type.hide);
@@ -192,8 +200,12 @@ public class CCAdvancement implements Awardable {
         }
 
         CCAdvancement.Builder whenItemCollected(TagKey<Item> tag) {
-            return externalTrigger(InventoryChangeTrigger.TriggerInstance
-                    .hasItems(ItemPredicate.Builder.item().of(tag).build()));
+            String key = String.valueOf(keyIndex++);
+            externalTrigger = true;
+            deferredCriteria.add(registries -> mcBuilder.addCriterion(key,
+                    InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item()
+                            .of(registries.lookupOrThrow(Registries.ITEM), tag).build())));
+            return this;
         }
 
         CCAdvancement.Builder awardedForFree() {

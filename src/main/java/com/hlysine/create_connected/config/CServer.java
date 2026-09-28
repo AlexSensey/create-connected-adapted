@@ -1,6 +1,6 @@
 package com.hlysine.create_connected.config;
 
-import net.createmod.catnip.config.ConfigBase;
+import net.createmod.catnip.api.config.ConfigBase;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;

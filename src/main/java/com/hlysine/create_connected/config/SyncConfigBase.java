@@ -2,8 +2,7 @@ package com.hlysine.create_connected.config;
 
 import com.hlysine.create_connected.CreateConnected;
 import io.netty.buffer.ByteBuf;
-import net.createmod.catnip.config.ConfigBase;
-import net.createmod.catnip.platform.CatnipServices;
+import net.createmod.catnip.api.config.ConfigBase;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -46,7 +45,7 @@ public abstract class SyncConfigBase extends ConfigBase {
         if (children != null)
             for (ConfigBase child : children) {
                 if (child instanceof SyncConfigBase syncChild) {
-                    CompoundTag nbt = config.getCompound(child.getName());
+                    CompoundTag nbt = config.getCompoundOrEmpty(child.getName());
                     syncChild.readSyncConfig(nbt);
                 }
             }
@@ -69,8 +68,12 @@ public abstract class SyncConfigBase extends ConfigBase {
     }
 
     public void syncToAllPlayers() {
-        CatnipServices.PLATFORM.executeOnServerOnly(() -> () -> {
-            if (ServerLifecycleHooks.getCurrentServer() == null) return;
+        var server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return;
+        // Config reloads can originate from the file watcher or the client UI.
+        // Use the logical server thread, including an integrated server.
+        server.execute(() -> {
+            if (ServerLifecycleHooks.getCurrentServer() != server) return;
             CreateConnected.LOGGER.debug("Sync Config: Sending server config to all players on reload");
             PacketDistributor.sendToAllPlayers(new SyncConfig(getSyncConfig()));
         });
@@ -78,7 +81,10 @@ public abstract class SyncConfigBase extends ConfigBase {
 
     public void syncToPlayer(ServerPlayer player) {
         if (player == null) return;
-        CatnipServices.PLATFORM.executeOnServerOnly(() -> () -> {
+        var server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return;
+        server.execute(() -> {
+            if (ServerLifecycleHooks.getCurrentServer() != server) return;
             CreateConnected.LOGGER.debug("Sync Config: Sending server config to {}", player.getScoreboardName());
             PacketDistributor.sendToPlayer(player, new SyncConfig(getSyncConfig()));
         });

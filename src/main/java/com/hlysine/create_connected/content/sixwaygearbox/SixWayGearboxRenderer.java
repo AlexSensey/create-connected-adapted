@@ -1,56 +1,65 @@
 package com.hlysine.create_connected.content.sixwaygearbox;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
-import dev.engine_room.flywheel.api.visualization.VisualizationManager;
-import net.createmod.catnip.animation.AnimationTickHolder;
-import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.render.CachedBuffers;
-import net.createmod.catnip.render.SuperByteBuffer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import com.simibubi.create.foundation.model.CreateStandaloneModels;
+import com.simibubi.create.foundation.render.CreateVisualizationManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.BlockModelRenderState;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.Axis;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import java.util.List;
 
 public class SixWayGearboxRenderer extends KineticBlockEntityRenderer<SixWayGearboxBlockEntity> {
-
     public SixWayGearboxRenderer(BlockEntityRendererProvider.Context context) {
         super(context);
     }
 
     @Override
-    protected void renderSafe(SixWayGearboxBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer,
-                              int light, int overlay) {
-        if (VisualizationManager.supportsVisualization(be.getLevel())) return;
+    public void submit(BlockEntityRenderState state, PoseStack pose, SubmitNodeCollector collector,
+                       CameraRenderState camera) {
+        if (!(state instanceof KineticRenderState kinetic)
+                || !(kinetic.blockEntity instanceof SixWayGearboxBlockEntity be) || isInvalid(be)) return;
+        if (CreateVisualizationManager.supportsVisualization(be.getLevel())) return;
 
-        final BlockState state = be.getBlockState();
-        final Axis boxAxis = state.getValue(BlockStateProperties.AXIS);
-        final BlockPos pos = be.getBlockPos();
-        float time = AnimationTickHolder.getRenderTime(be.getLevel());
+        // Resolve from the current model manager so resource reloads cannot leave stale geometry.
+        var shaft = Minecraft.getInstance().getModelManager().getStandaloneModel(CreateStandaloneModels.SHAFT_HALF);
+        if (shaft == null) return;
+        var parts = List.of(shaft);
+        Direction.Axis boxAxis = getRotationAxisOf(be);
+        BlockPos pos = be.getBlockPos();
+        float time = getRenderTime(be, kinetic.partialTicks);
+        for (Direction direction : Direction.values()) {
 
-        for (Direction direction : Iterate.directions) {
-            final Axis axis = direction.getAxis();
-
-            SuperByteBuffer shaft = CachedBuffers.partialFacing(AllPartialModels.SHAFT_HALF, be.getBlockState(), direction);
-            float offset = getRotationOffsetForPosition(be, pos, axis);
+            Direction.Axis axis = direction.getAxis();
             float angle = (time * be.getSpeed() * 3f / 10) % 360;
-
             if (be.getSpeed() != 0 && be.hasSource()) {
-                BlockPos source = be.source.subtract(be.getBlockPos());
-                Direction sourceFacing = Direction.getNearest(source.getX(), source.getY(), source.getZ());
-                angle *= SixWayGearboxBlockEntity.getRotationSpeedModifier(state, direction, sourceFacing);
+                Direction sourceFacing = Direction.getApproximateNearest(
+                    be.source.getX() - pos.getX(), be.source.getY() - pos.getY(), be.source.getZ() - pos.getZ());
+                angle *= SixWayGearboxBlockEntity.getRotationSpeedModifier(be.getBlockState(), direction, sourceFacing);
             }
-
-            angle += offset;
-            angle = angle / 180f * (float) Math.PI;
-
-            kineticRotationTransform(shaft, be, axis, angle, light);
-            shaft.renderInto(ms, buffer.getBuffer(RenderType.solid()));
+            angle += getRotationOffsetForPosition(be, pos, axis);
+            pose.pushPose();
+            pose.translate(.5, .5, .5);
+            pose.mulPose(rotation(axis, angle / 180f * (float) Math.PI));
+            switch (direction) {
+                case NORTH -> pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180));
+                case EAST -> pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(90));
+                case WEST -> pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-90));
+                case UP -> pose.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-90));
+                case DOWN -> pose.mulPose(com.mojang.math.Axis.XP.rotationDegrees(90));
+                case SOUTH -> {}
+            }
+            pose.translate(-.5, -.5, -.5);
+            collector.submitBlockModel(pose, RenderTypes.cutoutMovingBlock(), parts,
+                    BlockModelRenderState.EMPTY_TINTS, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+            pose.popPose();
         }
     }
 }

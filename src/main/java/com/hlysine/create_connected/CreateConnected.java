@@ -14,10 +14,10 @@ import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.KineticStats;
 import com.simibubi.create.foundation.item.TooltipModifier;
-import net.createmod.catnip.lang.FontHelper;
+import net.createmod.catnip.api.client.lang.FontHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
@@ -70,8 +70,10 @@ public class CreateConnected {
         if (Mods.COPYCATS.isLoaded())
             NeoForge.EVENT_BUS.addListener(CopycatsManager::onLevelTick);
 
-        modEventBus.addListener(EventPriority.HIGHEST, CCDatagen::gatherDataHighPriority);
-        modEventBus.addListener(EventPriority.LOWEST, CCDatagen::gatherData);
+        modEventBus.addListener(EventPriority.HIGHEST, CCDatagen::gatherClientHighPriority);
+        modEventBus.addListener(EventPriority.HIGHEST, CCDatagen::gatherServerHighPriority);
+        modEventBus.addListener(EventPriority.LOWEST, CCDatagen::gatherClientData);
+        modEventBus.addListener(EventPriority.LOWEST, CCDatagen::gatherServerData);
         modEventBus.addListener(CCSoundEvents::register);
 
         Mods.ADDITIONAL_PLACEMENTS.executeIfInstalled(() -> AdditionalPlacementsCompat::register);
@@ -102,7 +104,7 @@ public class CreateConnected {
         return REGISTRATE;
     }
 
-    public static ResourceLocation asResource(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+    public static Identifier asResource(String path) {
+        return Identifier.fromNamespaceAndPath(MODID, path);
     }
 }

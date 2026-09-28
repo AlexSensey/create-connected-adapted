@@ -42,7 +42,7 @@ public class LoopForInstruction extends Instruction {
 
     @Override
     public void readState(CompoundTag nbt) {
-        progress = nbt.getInt("Progress");
+        progress = nbt.getIntOr("Progress", 0);
     }
 
     @Override

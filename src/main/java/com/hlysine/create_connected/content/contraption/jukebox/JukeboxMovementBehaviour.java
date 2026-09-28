@@ -20,7 +20,7 @@ public class JukeboxMovementBehaviour extends AutoPlayMovementBehaviour {
                 context.contraption,
                 context.localPos,
                 currentState,
-                be -> be.jukeboxSongPlayer.stop(be.getLevel(), currentState),
+                be -> be.getSongPlayer().stop(be.getLevel(), currentState),
                 true
         );
     }
@@ -44,11 +44,11 @@ public class JukeboxMovementBehaviour extends AutoPlayMovementBehaviour {
         if (!(interactor instanceof JukeboxInteractionBehaviour jukeboxInteraction)) return;
         jukeboxInteraction.withTempBlockEntity(context.contraption, context.localPos, state, be -> {
             if (!isActive) {
-                if (!be.jukeboxSongPlayer.isPlaying())
-                    JukeboxSong.fromStack(be.getLevel().registryAccess(), be.getTheItem())
-                            .ifPresent(song -> be.jukeboxSongPlayer.play(be.getLevel(), song));
+                if (!be.getSongPlayer().isPlaying())
+                    JukeboxSong.fromStack(be.getTheItem())
+                            .ifPresent(song -> be.getSongPlayer().play(be.getLevel(), song));
             } else {
-                be.jukeboxSongPlayer.stop(be.getLevel(), state);
+                be.getSongPlayer().stop(be.getLevel(), state);
             }
         }, true);
     }

@@ -32,7 +32,7 @@ public enum CCPackets implements BasePacketPayload.PacketTypeProvider {
     }
 
     public static void register() {
-        CatnipPacketRegistry packetRegistry = new CatnipPacketRegistry(CreateConnected.MODID, 1);
+        CatnipPacketRegistry packetRegistry = new CatnipPacketRegistry(CreateConnected.MODID, "1");
         for (CCPackets packet : CCPackets.values()) {
             packetRegistry.registerPacket(packet.type);
         }

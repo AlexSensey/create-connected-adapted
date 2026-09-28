@@ -5,7 +5,7 @@ import com.simibubi.create.content.redstone.link.LinkRenderer;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
 import dev.simulated_team.simulated.content.blocks.throttle_lever.ThrottleLeverBlockEntity;
 import dev.simulated_team.simulated.content.blocks.throttle_lever.ThrottleLeverRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.createmod.catnip.impl.client.render.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 
 public class LinkedThrottleLeverRenderer extends ThrottleLeverRenderer {

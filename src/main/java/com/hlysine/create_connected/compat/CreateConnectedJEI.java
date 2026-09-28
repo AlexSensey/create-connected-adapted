@@ -10,7 +10,7 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.runtime.IIngredientManager;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 
 @JeiPlugin
 public class CreateConnectedJEI implements IModPlugin {
-    private static final ResourceLocation ID = CreateConnected.asResource("jei_plugin");
+    private static final Identifier ID = CreateConnected.asResource("jei_plugin");
 
     public static IIngredientManager MANAGER;
 
     @Override
     @NotNull
-    public ResourceLocation getPluginUid() {
+    public Identifier getPluginUid() {
         return ID;
     }
 

@@ -11,7 +11,6 @@ import dev.simulated_team.simulated.content.blocks.throttle_lever.ThrottleLeverB
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -92,7 +91,7 @@ public class LinkedThrottleLeverBlock extends ThrottleLeverBlock implements Spec
     }
 
     @Override
-    public @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack stack,
+    public @NotNull InteractionResult useItemOn(@NotNull ItemStack stack,
                                                     @NotNull BlockState state,
                                                     @NotNull Level level,
                                                     @NotNull BlockPos pos,

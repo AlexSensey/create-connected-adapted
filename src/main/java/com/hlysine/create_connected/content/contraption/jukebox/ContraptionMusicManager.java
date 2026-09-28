@@ -1,21 +1,18 @@
 package com.hlysine.create_connected.content.contraption.jukebox;
 
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
-import net.createmod.catnip.data.Pair;
+import net.createmod.catnip.api.data.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.item.JukeboxSong;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class ContraptionMusicManager {
     private static final Map<Pair<Integer, BlockPos>, SoundInstance> playingContraptionRecords = new HashMap<>();
@@ -34,7 +31,7 @@ public class ContraptionMusicManager {
 
         if (song != null) {
             if (!silent) {
-                Minecraft.getInstance().gui.setNowPlaying(song.description());
+                Minecraft.getInstance().gui.hud.setNowPlaying(song.description());
             }
 
             SoundInstance newInstance = new ContraptionRecordSoundInstance(
@@ -52,6 +49,11 @@ public class ContraptionMusicManager {
             playingContraptionRecords.put(contraption, newInstance);
             Minecraft.getInstance().getSoundManager().play(newInstance);
         }
-        Minecraft.getInstance().levelRenderer.notifyNearbyEntities(Minecraft.getInstance().level, worldPos, song != null);
+        // Match 26.2 LevelEventHandler without requiring access to its private helper.
+        var level = Minecraft.getInstance().level;
+        if (level != null) {
+            for (LivingEntity nearby : level.getEntitiesOfClass(LivingEntity.class, new AABB(worldPos).inflate(3)))
+                nearby.setRecordPlayingNearby(worldPos, song != null);
+        }
     }
 }

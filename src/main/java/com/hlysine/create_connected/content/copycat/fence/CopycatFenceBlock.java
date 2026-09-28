@@ -3,12 +3,12 @@ package com.hlysine.create_connected.content.copycat.fence;
 import com.hlysine.create_connected.content.copycat.ICopycatWithWrappedBlock;
 import com.hlysine.create_connected.content.copycat.WaterloggedCopycatWrappedBlock;
 import com.simibubi.create.content.decoration.copycat.CopycatBlock;
-import net.createmod.catnip.data.Iterate;
+import net.createmod.catnip.api.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
@@ -62,8 +62,8 @@ public class CopycatFenceBlock extends WaterloggedCopycatWrappedBlock {
     }
 
     @Override
-    public boolean propagatesSkylightDown(@NotNull BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos) {
-        return ICopycatWithWrappedBlock.wrappedState(fence, pState).propagatesSkylightDown(pLevel, pPos);
+    public boolean propagatesSkylightDown(@NotNull BlockState pState) {
+        return ICopycatWithWrappedBlock.wrappedState(fence, pState).propagatesSkylightDown();
     }
 
     @Override
@@ -87,8 +87,8 @@ public class CopycatFenceBlock extends WaterloggedCopycatWrappedBlock {
     }
 
     @Override
-    public @NotNull VoxelShape getOcclusionShape(@NotNull BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos) {
-        return ICopycatWithWrappedBlock.wrappedState(fence, pState).getOcclusionShape(pLevel, pPos);
+    public @NotNull VoxelShape getOcclusionShape(@NotNull BlockState pState) {
+        return ICopycatWithWrappedBlock.wrappedState(fence, pState).getOcclusionShape();
     }
 
     @Override
@@ -102,12 +102,12 @@ public class CopycatFenceBlock extends WaterloggedCopycatWrappedBlock {
     }
 
     @Override
-    public @NotNull BlockState updateShape(@NotNull BlockState pState, @NotNull Direction pDirection, @NotNull BlockState pNeighborState, @NotNull LevelAccessor pLevel, @NotNull BlockPos pCurrentPos, @NotNull BlockPos pNeighborPos) {
-        return migrateOnUpdate(pLevel.isClientSide(), ICopycatWithWrappedBlock.unwrapForOperation(fence, pState, state -> state.updateShape(pDirection, pNeighborState, pLevel, pCurrentPos, pNeighborPos)));
+    public @NotNull BlockState updateShape(BlockState pState, net.minecraft.world.level.LevelReader pLevel, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pCurrentPos, Direction pDirection, BlockPos pNeighborPos, BlockState pNeighborState, net.minecraft.util.RandomSource random) {
+        return migrateOnUpdate(pLevel.isClientSide(), ICopycatWithWrappedBlock.unwrapForOperation(fence, pState, state -> state.updateShape(pLevel, ticks, pCurrentPos, pDirection, pNeighborPos, pNeighborState, random)));
     }
 
     @Override
-    public boolean isIgnoredConnectivitySide(BlockAndTintGetter reader, BlockState state, Direction face,
+    public boolean isIgnoredConnectivitySide(net.minecraft.world.level.BlockGetter reader, BlockState state, Direction face,
                                              @Nullable BlockPos fromPos, @Nullable BlockPos toPos) {
         if (fromPos == null || toPos == null)
             return true;
@@ -118,7 +118,7 @@ public class CopycatFenceBlock extends WaterloggedCopycatWrappedBlock {
     }
 
     @Override
-    public boolean canConnectTexturesToward(BlockAndTintGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state) {
+    public boolean canConnectTexturesToward(net.minecraft.world.level.BlockGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state) {
         if (toPos.getX() == fromPos.getX() && toPos.getZ() == fromPos.getZ()) {
             BlockState toState = reader.getBlockState(toPos);
             if (toState.is(this)) {

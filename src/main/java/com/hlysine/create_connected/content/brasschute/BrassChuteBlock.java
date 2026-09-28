@@ -10,7 +10,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -34,7 +33,7 @@ public class BrassChuteBlock extends ChuteBlock {
         if (shape == Shape.INTERSECTION)
             return InteractionResult.PASS;
         Level level = context.getLevel();
-        if (level.isClientSide)
+        if (level.isClientSide())
             return InteractionResult.SUCCESS;
         if (shape == Shape.ENCASED) {
             level.setBlockAndUpdate(context.getClickedPos(), state.setValue(SHAPE, Shape.NORMAL));
@@ -48,36 +47,36 @@ public class BrassChuteBlock extends ChuteBlock {
         return InteractionResult.SUCCESS;
     }
 
-    protected ItemInteractionResult retrieveItem(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+    protected InteractionResult retrieveItem(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                                  InteractionHand hand, BlockHitResult hitResult) {
         if (!stack.isEmpty())
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-        if (level.isClientSide)
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        if (level.isClientSide())
+            return InteractionResult.SUCCESS;
 
         return onBlockEntityUseItemOn(level, pos, be -> {
             if (be.getItem().isEmpty())
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                return InteractionResult.TRY_WITH_EMPTY_HAND;
             player.getInventory()
                     .placeItemBackInInventory(be.getItem());
             be.setItem(ItemStack.EMPTY);
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         });
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected @NotNull InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         Shape shape = state.getValue(SHAPE);
         if (!AllBlocks.BRASS_BLOCK.isIn(stack))
             return retrieveItem(stack, state, level, pos, player, hand, hitResult);
         if (shape == Shape.INTERSECTION || shape == Shape.ENCASED)
             return retrieveItem(stack, state, level, pos, player, hand, hitResult);
-        if (player == null || level.isClientSide)
-            return ItemInteractionResult.SUCCESS;
+        if (player == null || level.isClientSide())
+            return InteractionResult.SUCCESS;
 
         level.setBlockAndUpdate(pos, state.setValue(SHAPE, Shape.ENCASED));
         level.playSound(null, pos, SoundEvents.NETHERITE_BLOCK_HIT, SoundSource.BLOCKS, 0.5f, 1.05f);
-        return ItemInteractionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override

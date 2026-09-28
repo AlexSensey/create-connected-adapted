@@ -7,11 +7,10 @@ import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.CogWheelBlock;
 import com.simibubi.create.content.kinetics.simpleRelays.ICogWheel;
-import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.placement.IPlacementHelper;
-import net.createmod.catnip.placement.PlacementHelpers;
-import net.createmod.catnip.placement.PlacementOffset;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import net.createmod.catnip.api.data.Iterate;
+import net.createmod.catnip.api.placement.IPlacementHelper;
+import net.createmod.catnip.api.placement.PlacementHelpers;
+import net.createmod.catnip.api.placement.PlacementOffset;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -33,8 +32,8 @@ public class CrankWheelItem extends BlockItem {
 
     boolean large;
 
-    private final int placementHelperId;
-    private final int integratedCogHelperId;
+    private final IPlacementHelper placementHelperId;
+    private final IPlacementHelper integratedCogHelperId;
 
     public CrankWheelItem(CrankWheelBlock block, Properties builder) {
         super(block, builder);
@@ -51,7 +50,7 @@ public class CrankWheelItem extends BlockItem {
         BlockPos pos = context.getClickedPos();
         BlockState state = world.getBlockState(pos);
 
-        IPlacementHelper helper = PlacementHelpers.get(placementHelperId);
+        IPlacementHelper helper = placementHelperId;
         Player player = context.getPlayer();
         BlockHitResult ray = new BlockHitResult(context.getClickLocation(), context.getClickedFace(), pos, true);
         if (helper.matchesState(state) && player != null && !player.isShiftKeyDown()) {
@@ -60,7 +59,7 @@ public class CrankWheelItem extends BlockItem {
         }
 
         if (integratedCogHelperId != -1) {
-            helper = PlacementHelpers.get(integratedCogHelperId);
+            helper = integratedCogHelperId;
 
             if (helper.matchesState(state) && player != null && !player.isShiftKeyDown()) {
                 return helper.getOffset(player, world, state, pos, ray)
@@ -75,8 +74,7 @@ public class CrankWheelItem extends BlockItem {
         return item.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof CrankWheelBlock;
     }
 
-    @MethodsReturnNonnullByDefault
-    private static class SmallCogHelper extends DiagonalCogHelper {
+        private static class SmallCogHelper extends DiagonalCogHelper {
 
         @Override
         public Predicate<ItemStack> getItemPredicate() {
@@ -114,8 +112,7 @@ public class CrankWheelItem extends BlockItem {
         }
     }
 
-    @MethodsReturnNonnullByDefault
-    private static class LargeCogHelper extends DiagonalCogHelper {
+        private static class LargeCogHelper extends DiagonalCogHelper {
 
         @Override
         public Predicate<ItemStack> getItemPredicate() {
@@ -154,8 +151,7 @@ public class CrankWheelItem extends BlockItem {
         }
     }
 
-    @MethodsReturnNonnullByDefault
-    public abstract static class DiagonalCogHelper implements IPlacementHelper {
+        public abstract static class DiagonalCogHelper implements IPlacementHelper {
 
         @Override
         public Predicate<BlockState> getStatePredicate() {
@@ -198,8 +194,7 @@ public class CrankWheelItem extends BlockItem {
         }
     }
 
-    @MethodsReturnNonnullByDefault
-    public static class IntegratedLargeCogHelper implements IPlacementHelper {
+        public static class IntegratedLargeCogHelper implements IPlacementHelper {
 
         @Override
         public Predicate<ItemStack> getItemPredicate() {
@@ -253,8 +248,7 @@ public class CrankWheelItem extends BlockItem {
 
     }
 
-    @MethodsReturnNonnullByDefault
-    public static class IntegratedSmallCogHelper implements IPlacementHelper {
+        public static class IntegratedSmallCogHelper implements IPlacementHelper {
 
         @Override
         public Predicate<ItemStack> getItemPredicate() {

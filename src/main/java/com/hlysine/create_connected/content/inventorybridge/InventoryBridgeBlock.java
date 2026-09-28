@@ -72,10 +72,10 @@ public class InventoryBridgeBlock extends Block implements IBE<InventoryBridgeBl
     }
 
     @Override
-    public void neighborChanged(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Block block, @NotNull BlockPos fromPos,
+    public void neighborChanged(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Block block, net.minecraft.world.level.redstone.Orientation fromPos,
                                 boolean isMoving) {
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
         if (!level.getBlockTicks().willTickThisTick(pos, this))
             level.scheduleTick(pos, this, 1);
@@ -100,16 +100,16 @@ public class InventoryBridgeBlock extends Block implements IBE<InventoryBridgeBl
     }
 
     @Override
-    public int getAnalogOutputSignal(@NotNull BlockState blockState, @NotNull Level worldIn, @NotNull BlockPos pos) {
+    public int getAnalogOutputSignal(@NotNull BlockState blockState, @NotNull Level worldIn, @NotNull BlockPos pos, net.minecraft.core.Direction side) {
         BlockPos pos1 = pos.relative(getNegativeTarget(blockState));
         BlockPos pos2 = pos.relative(getPositiveTarget(blockState));
         BlockState target1 = worldIn.getBlockState(pos1);
         BlockState target2 = worldIn.getBlockState(pos2);
         int total = 0;
         if (blockState.getValue(ATTACHED_NEGATIVE) && !target1.is(this) && target1.hasAnalogOutputSignal())
-            total += target1.getAnalogOutputSignal(worldIn, pos1);
+            total += target1.getAnalogOutputSignal(worldIn, pos1, side);
         if (blockState.getValue(ATTACHED_POSITIVE) && !target2.is(this) && target2.hasAnalogOutputSignal())
-            total += target2.getAnalogOutputSignal(worldIn, pos2);
+            total += target2.getAnalogOutputSignal(worldIn, pos2, side);
         return total / 2;
     }
 

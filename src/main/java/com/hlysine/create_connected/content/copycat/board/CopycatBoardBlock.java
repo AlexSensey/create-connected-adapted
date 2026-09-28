@@ -6,7 +6,7 @@ import com.hlysine.create_connected.content.copycat.MigratingWaterloggedCopycatB
 import com.simibubi.create.api.schematic.requirement.SpecialBlockItemRequirement;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
-import net.createmod.catnip.data.Iterate;
+import net.createmod.catnip.api.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
@@ -18,7 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -68,7 +68,7 @@ public class CopycatBoardBlock extends MigratingWaterloggedCopycatBlock implemen
     }
 
     @Override
-    public boolean isIgnoredConnectivitySide(BlockAndTintGetter reader, BlockState state, Direction face,
+    public boolean isIgnoredConnectivitySide(net.minecraft.world.level.BlockGetter reader, BlockState state, Direction face,
                                              @Nullable BlockPos fromPos, @Nullable BlockPos toPos) {
         if (fromPos == null || toPos == null)
             return true;
@@ -77,7 +77,7 @@ public class CopycatBoardBlock extends MigratingWaterloggedCopycatBlock implemen
     }
 
     @Override
-    public boolean canConnectTexturesToward(BlockAndTintGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state) {
+    public boolean canConnectTexturesToward(net.minecraft.world.level.BlockGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state) {
         return reader.getBlockState(toPos).is(this);
     }
 
@@ -131,7 +131,7 @@ public class CopycatBoardBlock extends MigratingWaterloggedCopycatBlock implemen
         if (!pState.getValue(byDirection(pUseContext.getClickedFace().getOpposite()))) {
             Direction direction = pUseContext.getClickedFace().getOpposite();
             double pos = getByAxis(pUseContext.getClickedPos(), direction.getAxis());
-            if (getByAxis(direction.getNormal(), direction.getAxis()) > 0) pos += 1;
+            if (getByAxis(direction.getUnitVec3i(), direction.getAxis()) > 0) pos += 1;
             double loc = getByAxis(pUseContext.getClickLocation(), direction.getAxis());
             if (Math.abs(pos - loc) < 2 / 16.0) {
                 return true;
@@ -139,7 +139,7 @@ public class CopycatBoardBlock extends MigratingWaterloggedCopycatBlock implemen
         }
         if (!pState.getValue(byDirection(pUseContext.getClickedFace()))) {
             double hitLoc = getByAxis(pUseContext.getClickLocation(), pUseContext.getClickedFace().getAxis());
-            int direction = getByAxis(pUseContext.getClickedFace().getNormal(), pUseContext.getClickedFace().getAxis());
+            int direction = getByAxis(pUseContext.getClickedFace().getUnitVec3i(), pUseContext.getClickedFace().getAxis());
             double offset = hitLoc - Math.round(hitLoc);
             if (Mth.sign(direction) == Mth.sign(offset) && Math.abs(offset) < 2 / 16.0) {
                 return true;
@@ -160,7 +160,7 @@ public class CopycatBoardBlock extends MigratingWaterloggedCopycatBlock implemen
         for (Direction direction : Iterate.directions) {
             if (!state.getValue(byDirection(direction))) continue;
             double pos = getByAxis(context.getClickedPos(), direction.getAxis());
-            if (getByAxis(direction.getNormal(), direction.getAxis()) > 0) pos += 1;
+            if (getByAxis(direction.getUnitVec3i(), direction.getAxis()) > 0) pos += 1;
             double loc = getByAxis(context.getClickLocation(), direction.getAxis());
             if (Math.abs(pos - loc) < 2 / 16.0) {
                 options.add(direction);

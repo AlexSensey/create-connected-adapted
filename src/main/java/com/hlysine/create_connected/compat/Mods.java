@@ -1,7 +1,7 @@
 package com.hlysine.create_connected.compat;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.neoforged.fml.ModList;
 
@@ -41,15 +41,15 @@ public enum Mods {
         return id;
     }
 
-    public ResourceLocation rl(String path) {
-        return ResourceLocation.fromNamespaceAndPath(id, path);
+    public Identifier rl(String path) {
+        return Identifier.fromNamespaceAndPath(id, path);
     }
 
     public Item getItem(String id) {
         return BuiltInRegistries.ITEM.get(rl(id));
     }
 
-    public Item getItem(ResourceLocation id) {
+    public Item getItem(Identifier id) {
         return BuiltInRegistries.ITEM.get(id);
     }
 

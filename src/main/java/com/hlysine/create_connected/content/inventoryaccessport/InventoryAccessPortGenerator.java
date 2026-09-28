@@ -5,7 +5,7 @@ import com.hlysine.create_connected.ConnectedLang;
 import com.simibubi.create.foundation.data.SpecialBlockStateGen;
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
@@ -26,7 +26,7 @@ public class InventoryAccessPortGenerator extends SpecialBlockStateGen {
     public <T extends Block> ModelFile getModel(DataGenContext<Block, T> ctx, RegistrateBlockstateProvider prov,
                                                 BlockState state) {
         boolean attached = state.getValue(InventoryAccessPortBlock.ATTACHED);
-        ResourceLocation path = prov.modLoc("block/inventory_access_port/block_" + ConnectedLang.asId(state.getValue(InventoryAccessPortBlock.TARGET).name()));
+        Identifier path = prov.modLoc("block/inventory_access_port/block_" + ConnectedLang.asId(state.getValue(InventoryAccessPortBlock.TARGET).name()));
         return prov.models().withExistingParent(path + (attached ? "_on" : "_off"), path)
                 .texture("level", prov.modLoc("block/inventory_access_port_" + (attached ? "on" : "off")));
     }

@@ -1,15 +1,16 @@
 package com.hlysine.create_connected.datagen.recipes;
 
-import com.google.common.hash.HashCode;
 import com.hlysine.create_connected.compat.Mods;
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.foundation.mixin.accessor.MappedRegistryAccessor;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.common.crafting.IngredientType;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredientType;
@@ -21,29 +22,20 @@ import java.util.stream.Stream;
 
 public class SimpleFluidIngredient extends FluidIngredient {
 
-	/*
-	"ingredients": [
-		{
-            "type": "neoforge:single",
-            "fluid": "create_shimmer:shimmer"
-		}
-	]
-	 */
+	/* 26.2 compound children are identifier strings, e.g. "mod:compat_fluid". */
 
-    private static final MapCodec<SimpleFluidIngredient> INTERNAL_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ResourceLocation.CODEC.fieldOf("fluid").forGetter(i -> i.mod.rl(i.id))
-    ).apply(instance, (fluid) -> {
+    private static final Codec<SimpleFluidIngredient> INTERNAL_CODEC = Identifier.CODEC.xmap(location -> {
         for (Mods mod : Mods.values()) {
-            if (mod.id().equals(fluid.getNamespace())) {
-                return new SimpleFluidIngredient(mod, fluid.getPath());
+            if (mod.id().equals(location.getNamespace())) {
+                return new SimpleFluidIngredient(mod, location.getPath());
             }
         }
-        throw new AssertionError("ID " + fluid.getNamespace() + " doesn't correspond to any compat mod." +
+        throw new AssertionError("ID " + location.getNamespace() + " doesn't correspond to any compat mod." +
                 " SimpleFluidIngredient is not meant for deserialization anyway");
-    }));
+    }, ingredient -> ingredient.mod.rl(ingredient.id));
 
     private static final MapCodec<SimpleFluidIngredient> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            INTERNAL_CODEC.codec().listOf().fieldOf("ingredients").forGetter(List::of)
+            INTERNAL_CODEC.listOf(1, 1).fieldOf("children").forGetter(List::of)
     ).apply(instance, list -> {
         assert list.size() == 1 : "SimpleFluidIngredient should only be serialized as a single-element list, and shouldn't be deserialized anyway";
         return list.getFirst();
@@ -60,11 +52,11 @@ public class SimpleFluidIngredient extends FluidIngredient {
 
     @Override
     public boolean test(@NotNull FluidStack stack) {
-        return stack.getFluidHolder().getKey().location().equals(mod.rl(id));
+        return BuiltInRegistries.FLUID.getKey(stack.getFluid()).equals(mod.rl(id));
     }
 
     @Override
-    public @NotNull Stream<FluidStack> generateStacks() {
+    public @NotNull Stream<Holder<Fluid>> generateFluids() {
         return Stream.empty();
     }
 
@@ -86,7 +78,7 @@ public class SimpleFluidIngredient extends FluidIngredient {
                 @SuppressWarnings("unchecked")
                 MappedRegistryAccessor<FluidIngredientType<?>> mra$ = (MappedRegistryAccessor<FluidIngredientType<?>>) mra;
 
-                IngredientType<?> baseType = NeoForgeMod.COMPOUND_INGREDIENT_TYPE.get();
+                FluidIngredientType<?> baseType = NeoForgeMod.COMPOUND_FLUID_INGREDIENT_TYPE.get();
 
                 int wrappedId = mra$.getToId().getOrDefault(baseType, -1);
                 ResourceKey<FluidIngredientType<?>> wrappedKey = NeoForgeMod.COMPOUND_FLUID_INGREDIENT_TYPE.getKey();
@@ -95,17 +87,7 @@ public class SimpleFluidIngredient extends FluidIngredient {
                 //noinspection DataFlowIssue - it is ok to pass null as the owner, because this is only being used for serialization
                 mra$.getByValue().put(INGREDIENT_TYPE, Holder.Reference.createStandAlone(null, wrappedKey));
 
-				/*
-				{
-					"type": "neoforge:compound",
-					"ingredients": [
-						{
-							"fluid": "mod:compat_item"
-						}
-
-					]
-				}
-				 */
+				/* 26.2 compound children are identifier strings, e.g. "mod:compat_fluid". */
 
                 didRegistryInjection = true;
             } else {
@@ -120,7 +102,7 @@ public class SimpleFluidIngredient extends FluidIngredient {
     }
 
     public int hashCode() {
-        return HashCode.fromString(mod.id() + ":" + id).asInt();
+        return java.util.Objects.hash(mod, id);
     }
 
     public boolean equals(Object obj) {

@@ -17,7 +17,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
 import com.simibubi.create.foundation.utility.CreateLang;
 import joptsimple.internal.Strings;
-import net.createmod.catnip.codecs.CatnipCodecUtils;
+import net.createmod.catnip.api.data.codec.CatnipCodecUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -229,7 +229,7 @@ public class KineticBatteryBlockEntity extends GeneratingKineticBlockEntity impl
     }
 
     @Override
-    protected void applyImplicitComponents(DataComponentInput componentInput) {
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter componentInput) {
         setBatteryLevel(componentInput.getOrDefault(CCDataComponents.KINETIC_BATTERY_CHARGE, 0.0));
     }
 
@@ -293,11 +293,11 @@ public class KineticBatteryBlockEntity extends GeneratingKineticBlockEntity impl
     @Override
     protected void read(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket) {
         super.read(compound, registries, clientPacket);
-        batteryLevel = compound.getFloat("batteryLevel");
-        queuedSync = compound.getBoolean("queuedSync");
-        consumedStress = compound.getFloat("consumedStress");
-        applyMinStress = compound.getBoolean("applyMinStress");
-        componentPatch = CatnipCodecUtils.decode(DataComponentPatch.CODEC, registries, compound.getCompound("Components")).orElse(DataComponentPatch.EMPTY);
+        batteryLevel = compound.getFloatOr("batteryLevel", 0f);
+        queuedSync = compound.getBooleanOr("queuedSync", false);
+        consumedStress = compound.getFloatOr("consumedStress", 0f);
+        applyMinStress = compound.getBooleanOr("applyMinStress", false);
+        componentPatch = CatnipCodecUtils.decode(DataComponentPatch.CODEC, registries, compound.getCompoundOrEmpty("Components")).orElse(DataComponentPatch.EMPTY);
     }
 
     @Override

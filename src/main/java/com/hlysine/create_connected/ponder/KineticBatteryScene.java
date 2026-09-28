@@ -1,5 +1,6 @@
 package com.hlysine.create_connected.ponder;
 
+import com.hlysine.create_connected.StorageSerialization;
 import com.hlysine.create_connected.content.kineticbattery.KineticBatteryBlock;
 import com.hlysine.create_connected.content.kineticbattery.KineticBatteryBlockEntity;
 import com.hlysine.create_connected.registries.CCBlocks;
@@ -14,10 +15,10 @@ import com.simibubi.create.content.kinetics.saw.SawBlock;
 import com.simibubi.create.content.redstone.displayLink.DisplayLinkBlock;
 import com.simibubi.create.content.redstone.thresholdSwitch.ThresholdSwitchBlock;
 import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
-import net.createmod.catnip.math.Pointing;
-import net.createmod.ponder.api.scene.SceneBuilder;
-import net.createmod.ponder.api.scene.SceneBuildingUtil;
-import net.createmod.ponder.api.scene.Selection;
+import net.createmod.catnip.api.math.Pointing;
+import net.createmod.ponder.api.client.scene.SceneBuilder;
+import net.createmod.ponder.api.client.scene.SceneBuildingUtil;
+import net.createmod.ponder.api.client.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -420,7 +421,7 @@ public class KineticBatteryScene {
         scene.idle(140);
         scene.world().modifyEntity(item, e -> e.remove(Entity.RemovalReason.DISCARDED));
 
-        scene.world().modifyBlockEntityNBT(util.select().position(deployer), DeployerBlockEntity.class, nbt -> nbt.put("HeldItem", batteryStack.saveOptional(scene.world().getHolderLookupProvider())));
+        scene.world().modifyBlockEntityNBT(util.select().position(deployer), DeployerBlockEntity.class, nbt -> StorageSerialization.writeItem(scene.world().getHolderLookupProvider(), nbt, "HeldItem", batteryStack));
         scene.world().showSection(deployerGroup, Direction.DOWN);
         scene.idle(10);
         scene.world().showSection(armGroup, Direction.DOWN);

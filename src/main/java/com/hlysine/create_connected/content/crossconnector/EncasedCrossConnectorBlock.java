@@ -36,7 +36,7 @@ public class EncasedCrossConnectorBlock extends CrossConnectorBlock implements S
 
     @Override
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
-        if (context.getLevel().isClientSide)
+        if (context.getLevel().isClientSide())
             return InteractionResult.SUCCESS;
         context.getLevel().levelEvent(2001, context.getClickedPos(), Block.getId(state));
         KineticBlockEntity.switchToBlockState(context.getLevel(), context.getClickedPos(),
@@ -50,11 +50,12 @@ public class EncasedCrossConnectorBlock extends CrossConnectorBlock implements S
     }
 
     @Override
-    public @NotNull ItemStack getCloneItemStack(@NotNull BlockState state, @NotNull HitResult target, @NotNull LevelReader level, @NotNull BlockPos pos, @NotNull Player player) {
+    public @NotNull ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
+        HitResult target = player.pick(player.blockInteractionRange(), 1, false);
         if (target instanceof BlockHitResult)
             return ((BlockHitResult) target).getDirection()
                     .getAxis() == getRotationAxis(state) ? CCBlocks.CROSS_CONNECTOR.asStack() : getCasing().asItem().getDefaultInstance();
-        return super.getCloneItemStack(state, target, level, pos, player);
+        return super.getCloneItemStack(level, pos, state, includeData, player);
     }
 
     @Override

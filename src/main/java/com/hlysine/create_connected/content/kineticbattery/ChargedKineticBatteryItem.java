@@ -19,13 +19,10 @@ import java.util.Map;
 public class ChargedKineticBatteryItem extends BlockItem {
 
     public ChargedKineticBatteryItem(Properties builder) {
-        super(CCBlocks.KINETIC_BATTERY.get(), builder);
+        super(CCBlocks.KINETIC_BATTERY.get(), builder.overrideDescription("item.create_connected.charged_kinetic_battery"));
     }
 
-    @Override
-    public @NotNull String getDescriptionId() {
-        return "item.create_connected.charged_kinetic_battery";
-    }
+
 
     @Override
     public void registerBlocks(@NotNull Map<Block, Item> map, @NotNull Item self) {

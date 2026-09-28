@@ -11,8 +11,8 @@ import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.Freq
 import com.simibubi.create.infrastructure.config.AllConfigs;
 import dev.ryanhcode.sable.companion.SableCompanion;
 import dev.ryanhcode.sable.companion.SubLevelAccess;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.levelWrappers.WorldHelper;
+import net.createmod.catnip.api.data.Couple;
+import net.createmod.catnip.api.level.WorldHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.Level;

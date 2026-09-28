@@ -8,7 +8,7 @@ import com.simibubi.create.AllFluids;
 import com.simibubi.create.AllItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
@@ -91,7 +91,7 @@ public class ItemApplicationRecipeGen extends com.simibubi.create.api.data.recip
     private GeneratedRecipe applyFanDyeingCatalysts() {
         CCBlocks.FAN_DYEING_CATALYSTS.forEach((color, block) -> {
             String namespace = DyeDepotCompat.getColorNamespace(color);
-            boolean isVanilla = namespace.equals(ResourceLocation.DEFAULT_NAMESPACE);
+            boolean isVanilla = namespace.equals(Identifier.DEFAULT_NAMESPACE);
             fanCatalystFromEmpty(
                     color.getName() + "_dyeing_catalyst_dragons_plus",
                     new SimpleDatagenIngredient(Mods.DRAGONS_PLUS, (isVanilla ? "" : (namespace + "_")) + color.getName() + "_dye_bucket").toVanilla(),
@@ -135,7 +135,7 @@ public class ItemApplicationRecipeGen extends com.simibubi.create.api.data.recip
                 .output(output.get()));
     }
 
-    public ItemApplicationRecipeGen(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-        super(output, registries, CreateConnected.MODID);
+    public ItemApplicationRecipeGen(HolderLookup.Provider registries, net.minecraft.data.recipes.RecipeOutput output) {
+        super(registries, output, CreateConnected.MODID);
     }
 }

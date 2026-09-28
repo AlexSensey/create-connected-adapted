@@ -1,5 +1,6 @@
 package com.hlysine.create_connected.content.itemsilo;
 
+import com.hlysine.create_connected.StorageSerialization;
 import com.hlysine.create_connected.registries.CCBlockEntityTypes;
 import com.hlysine.create_connected.CreateConnected;
 import com.simibubi.create.api.connectivity.ConnectivityHandler;
@@ -11,13 +12,12 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryWrapper;
 import com.simibubi.create.foundation.mixin.accessor.ItemStackHandlerAccessor;
 import com.simibubi.create.infrastructure.config.AllConfigs;
-import net.createmod.catnip.nbt.NBTHelper;
+import net.createmod.catnip.api.nbt.NBTHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
@@ -40,6 +40,8 @@ import java.util.List;
 public class ItemSiloBlockEntity extends SmartBlockEntity implements IMultiBlockEntityContainer.Inventory, Clearable {
 
     protected ICapabilityProvider<IItemHandler> itemCapability = null;
+    private SiloItemTransfer itemTransfer;
+    private boolean queuedRemoval;
     protected InventoryIdentifier invId;
 
     protected ItemStackHandler inventory;
@@ -69,15 +71,33 @@ public class ItemSiloBlockEntity extends SmartBlockEntity implements IMultiBlock
     @SubscribeEvent
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
+                Capabilities.Item.BLOCK,
                 CCBlockEntityTypes.ITEM_SILO.get(),
-                (be, context) -> {
-                    be.initCapability();
-                    if (be.itemCapability == null)
-                        return null;
-                    return be.itemCapability.getCapability();
-                }
+                (be, context) -> be.getItemTransfer()
         );
+    }
+
+    private SiloItemTransfer getItemTransfer() {
+        // Every face and part of the assembly must share the same journals.
+        if (!isController()) {
+            ItemSiloBlockEntity controllerBE = getControllerBE();
+            return controllerBE == null || controllerBE.isRemoved() ? null : controllerBE.getItemTransfer();
+        }
+        initCapability();
+        if (itemCapability == null) return null;
+        if (itemTransfer == null && itemCapability.getCapability() instanceof IItemHandlerModifiable handler)
+            itemTransfer = new SiloItemTransfer(handler);
+        return itemTransfer;
+    }
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        if (!queuedRemoval && hasLevel() && !level.isClientSide()) {
+            queuedRemoval = true;
+            com.simibubi.create.foundation.item.ItemHelper.dropContents(level, pos, inventory);
+            ItemSiloBlock.prepareRemoval(this);
+        }
+        super.preRemoveSideEffects(pos, state);
     }
 
     @Override
@@ -167,6 +187,7 @@ public class ItemSiloBlockEntity extends SmartBlockEntity implements IMultiBlock
         }
 
         itemCapability = null;
+        itemTransfer = null;
         invalidateCapabilities();
         setChanged();
         sendData();
@@ -174,12 +195,13 @@ public class ItemSiloBlockEntity extends SmartBlockEntity implements IMultiBlock
 
     @Override
     public void setController(BlockPos controller) {
-        if (level.isClientSide && !isVirtual())
+        if (level.isClientSide() && !isVirtual())
             return;
         if (controller.equals(this.controller))
             return;
         this.controller = controller;
         itemCapability = null;
+        itemTransfer = null;
         invalidateCapabilities();
         setChanged();
         sendData();
@@ -209,12 +231,12 @@ public class ItemSiloBlockEntity extends SmartBlockEntity implements IMultiBlock
             controller = NBTHelper.readBlockPos(compound, "Controller");
 
         if (isController()) {
-            radius = compound.getInt("Size");
-            length = compound.getInt("Length");
+            radius = compound.getIntOr("Size", 0);
+            length = compound.getIntOr("Length", 0);
         }
 
         if (!clientPacket) {
-            inventory.deserializeNBT(registries, compound.getCompound("Inventory"));
+            StorageSerialization.read(inventory, registries, compound.getCompoundOrEmpty("Inventory"));
             return;
         }
 
@@ -229,9 +251,9 @@ public class ItemSiloBlockEntity extends SmartBlockEntity implements IMultiBlock
         if (updateConnectivity)
             compound.putBoolean("Uninitialized", true);
         if (lastKnownPos != null)
-            compound.put("LastKnownPos", NbtUtils.writeBlockPos(lastKnownPos));
+            compound.put("LastKnownPos", writeStoredPosition(lastKnownPos));
         if (!isController())
-            compound.put("Controller", NbtUtils.writeBlockPos(controller));
+            compound.put("Controller", writeStoredPosition(controller));
         if (isController()) {
             compound.putInt("Size", radius);
             compound.putInt("Length", length);
@@ -241,7 +263,7 @@ public class ItemSiloBlockEntity extends SmartBlockEntity implements IMultiBlock
 
         if (!clientPacket) {
             compound.putString("StorageType", "CombinedInv");
-            compound.put("Inventory", inventory.serializeNBT(registries));
+            compound.put("Inventory", StorageSerialization.write(inventory, registries));
         }
     }
 
@@ -316,6 +338,7 @@ public class ItemSiloBlockEntity extends SmartBlockEntity implements IMultiBlock
             level.setBlock(getBlockPos(), state.setValue(ItemSiloBlock.LARGE, radius > 2), 6);
         }
         itemCapability = null;
+        itemTransfer = null;
         invalidateCapabilities();
         setChanged();
     }
@@ -365,5 +388,13 @@ public class ItemSiloBlockEntity extends SmartBlockEntity implements IMultiBlock
     public void clearContent() {
         ((ItemStackHandlerAccessor) inventory).create$getStacks().clear();
     }
+    private static CompoundTag writeStoredPosition(BlockPos pos) {
+        CompoundTag tag = new CompoundTag();
+        tag.putInt("X", pos.getX());
+        tag.putInt("Y", pos.getY());
+        tag.putInt("Z", pos.getZ());
+        return tag;
+    }
+
 }
 

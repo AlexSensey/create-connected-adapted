@@ -3,7 +3,7 @@ package com.hlysine.create_connected.registries;
 import com.hlysine.create_connected.content.inventoryaccessport.InventoryAccessPortBlockEntity;
 import com.hlysine.create_connected.content.inventorybridge.InventoryBridgeBlockEntity;
 import com.simibubi.create.api.packager.InventoryIdentifier;
-import net.createmod.catnip.math.BlockFace;
+import net.createmod.catnip.api.math.BlockFace;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;

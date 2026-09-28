@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -39,13 +38,9 @@ public class ParallelGearboxBlock extends RotatedPillarKineticBlock implements I
     }
 
     @Override
-    public @NotNull ItemStack getCloneItemStack(BlockState state,
-                                                @NotNull HitResult target,
-                                                @NotNull LevelReader world,
-                                                @NotNull BlockPos pos,
-                                                @NotNull Player player) {
+    public @NotNull ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state, boolean includeData, Player player) {
         if (state.getValue(AXIS).isVertical())
-            return super.getCloneItemStack(state, target, world, pos, player);
+            return super.getCloneItemStack(world, pos, state, includeData, player);
         return new ItemStack(CCItems.VERTICAL_PARALLEL_GEARBOX.get());
     }
 

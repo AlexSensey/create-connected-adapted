@@ -3,10 +3,9 @@ package com.hlysine.create_connected.mixin.itemsilo;
 import com.google.common.collect.Multimap;
 import com.hlysine.create_connected.content.itemsilo.ItemSiloBlock;
 import com.simibubi.create.content.contraptions.Contraption;
-import net.createmod.catnip.nbt.NBTHelper;
+import net.createmod.catnip.api.nbt.NBTHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import org.spongepowered.asm.mixin.Mixin;
@@ -64,7 +63,11 @@ public abstract class ContraptionMixin {
             if (!entry.getValue().nbt().contains("Length") && (
                     blocks.get(NBTHelper.readBlockPos(entry.getValue().nbt(), "Controller")) == null ||
                             !(blocks.get(NBTHelper.readBlockPos(entry.getValue().nbt(), "Controller")).state().getBlock() instanceof ItemSiloBlock))) {
-                entry.getValue().nbt().put("Controller", NbtUtils.writeBlockPos(entry.getKey()));
+                CompoundTag controller = new CompoundTag();
+                controller.putInt("X", entry.getKey().getX());
+                controller.putInt("Y", entry.getKey().getY());
+                controller.putInt("Z", entry.getKey().getZ());
+                entry.getValue().nbt().put("Controller", controller);
                 entry.getValue().nbt().putInt("Length", 1);
                 entry.getValue().nbt().putInt("Size", 1);
                 iterator.remove();
@@ -99,7 +102,7 @@ public abstract class ContraptionMixin {
 
             if (parts.size() == 1) {
                 StructureTemplate.StructureBlockInfo part = parts.iterator().next();
-                if (part.nbt().contains("Length") && part.nbt().getInt("Length") > 1) {
+                if (part.nbt().contains("Length") && part.nbt().getIntOr("Length", 0) > 1) {
                     part.nbt().putInt("Length", 1);
                     part.nbt().putInt("Size", 1);
                     toBeReplaced.add(new AbstractMap.SimpleEntry<>(blockPos, new StructureTemplate.StructureBlockInfo(part.pos(), part.state().setValue(ItemSiloBlock.LARGE, false), part.nbt())));

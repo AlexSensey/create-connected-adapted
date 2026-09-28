@@ -7,7 +7,7 @@ import com.simibubi.create.AllTags;
 import com.simibubi.create.foundation.data.TagGen;
 import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.providers.RegistrateTagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -68,9 +68,9 @@ public class CCTagGen {
         CCBlocks.FAN_DYEING_CATALYSTS.forEach((color, block) -> {
             prov.tag(BlockTags.create(Mods.GARNISHED.rl("fan_processing_catalysts/dye/" + color.getName())))
                     .addOptional(block.getId());
-            prov.tag(BlockTags.create(ResourceLocation.fromNamespaceAndPath("c", "dyes/" + color.getName())))
+            prov.tag(BlockTags.create(Identifier.fromNamespaceAndPath("c", "dyes/" + color.getName())))
                     .addOptional(block.getId());
-            prov.tag(BlockTags.create(ResourceLocation.fromNamespaceAndPath("c", "dyes")))
+            prov.tag(BlockTags.create(Identifier.fromNamespaceAndPath("c", "dyes")))
                     .addOptional(block.getId());
         });
     }

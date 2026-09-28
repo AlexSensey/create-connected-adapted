@@ -1,11 +1,15 @@
 package com.hlysine.create_connected.content.contraption.jukebox;
 
+import com.hlysine.create_connected.CreateConnected;
 import com.simibubi.create.api.behaviour.interaction.MovingInteractionBehaviour;
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.Contraption;
-import net.createmod.catnip.levelWrappers.WrappedLevel;
+import net.createmod.catnip.api.level.wrapper.WrappedLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.JukeboxSong;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -40,9 +44,9 @@ public class JukeboxInteractionBehaviour extends MovingInteractionBehaviour {
             withTempBlockEntity(contraption, contraptionPos, currentState, JukeboxBlockEntity::popOutTheItem, false);
         } else {
             ItemStack item = player.getItemInHand(activeHand);
-            if (item.getItem().components().has(DataComponents.JUKEBOX_PLAYABLE)) {
+            if (JukeboxSong.fromStack(item).isPresent()) {
                 withTempBlockEntity(contraption, contraptionPos, currentState, be -> {
-                    be.setTheItem(item.copy());
+                    be.setTheItem(item.copyWithCount(1));
                     be.getLevel().gameEvent(GameEvent.BLOCK_CHANGE, be.getBlockPos(), GameEvent.Context.of(player, currentState));
                     if (!player.isCreative())
                         item.shrink(1);
@@ -58,7 +62,12 @@ public class JukeboxInteractionBehaviour extends MovingInteractionBehaviour {
         AbstractContraptionEntity contraptionEntity = contraption.entity;
         BlockPos realPos = BlockPos.containing(contraptionEntity.toGlobalVector(Vec3.atCenterOf(contraptionPos), 1));
         JukeboxBlockEntity be = new JukeboxBlockEntity(realPos, currentState);
-        be.loadWithComponents(contraption.getBlocks().get(contraptionPos).nbt(), contraptionEntity.level().registryAccess());
+        var savedData = contraption.getBlocks().get(contraptionPos).nbt();
+        if (savedData != null) {
+            try (var problems = new ProblemReporter.ScopedCollector(CreateConnected.LOGGER)) {
+                be.loadWithComponents(TagValueInput.create(problems, contraptionEntity.level().registryAccess(), savedData));
+            }
+        }
         be.setLevel(new WrappedLevel(contraptionEntity.level()) {
             @Override
             public boolean setBlock(BlockPos pos, BlockState newState, int flags) {
@@ -70,18 +79,18 @@ public class JukeboxInteractionBehaviour extends MovingInteractionBehaviour {
             }
 
             @Override
-            public BlockState getBlockState(@Nullable BlockPos pos) {
+            public BlockState getBlockState(BlockPos pos) {
                 if (pos.equals(realPos))
                     return state.get();
                 return super.getBlockState(pos);
             }
 
             @Override
-            public void levelEvent(@Nullable Player player, int type, BlockPos pos, int data) {
+            public void levelEvent(@Nullable Entity source, int type, BlockPos pos, int data) {
                 if (type == 1010 || type == 1011)
                     PacketDistributor.sendToPlayersInDimension(
                             (ServerLevel) contraptionEntity.level(),
-                            new PlayContraptionJukeboxPacket(dimension().location(),
+                            new PlayContraptionJukeboxPacket(dimension().identifier(),
                                     contraptionEntity.getId(),
                                     contraptionPos,
                                     pos,

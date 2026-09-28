@@ -19,11 +19,10 @@ import com.simibubi.create.api.data.recipe.BaseRecipeProvider;
 import com.simibubi.create.foundation.mixin.accessor.MappedRegistryAccessor;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
-import net.createmod.catnip.registry.RegisteredObjectsHelper;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import net.createmod.catnip.api.registry.RegisteredObjectsHelper;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -32,7 +31,7 @@ import net.minecraft.data.recipes.*;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -46,7 +45,6 @@ import net.neoforged.neoforge.common.conditions.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -374,7 +372,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
                     new ModLoadedCondition(Mods.DRAGONS_PLUS.id())
             ));
             String namespace = DyeDepotCompat.getColorNamespace(color);
-            boolean isVanilla = namespace.equals(ResourceLocation.DEFAULT_NAMESPACE);
+            boolean isVanilla = namespace.equals(Identifier.DEFAULT_NAMESPACE);
             clearFanCatalyst((isVanilla ? "" : (namespace + "_")) + color.getName() + "_dye", block,
                     isVanilla
                             ? hasDyeingMods
@@ -472,7 +470,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
         return new GeneratedRecipeBuilder(currentFolder, result);
     }
 
-    GeneratedRecipeBuilder create(ResourceLocation result) {
+    GeneratedRecipeBuilder create(Identifier result) {
         return new GeneratedRecipeBuilder(currentFolder, result);
     }
 
@@ -482,7 +480,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
 
     GeneratedRecipe createSpecial(Function<CraftingBookCategory, Recipe<?>> builder, String recipeType,
                                   String path) {
-        ResourceLocation location = CreateConnected.asResource(recipeType + "/" + currentFolder + "/" + path);
+        Identifier location = CreateConnected.asResource(recipeType + "/" + currentFolder + "/" + path);
         return register(consumer -> {
             SpecialRecipeBuilder b = SpecialRecipeBuilder.special(builder);
             b.save(consumer, location.toString());
@@ -553,7 +551,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
                 .unlockedBy(AllItems.ZINC_INGOT::get)
                 .requiresResultFeature()
                 .disabledInCopycats()
-                .viaStonecutting(Ingredient.of(TagKey.create(BuiltInRegistries.ITEM.key(), ResourceLocation.fromNamespaceAndPath("c", "ingots/zinc"))), resultCount);
+                .viaStonecutting(Ingredient.of(TagKey.create(BuiltInRegistries.ITEM.key(), Identifier.fromNamespaceAndPath("c", "ingots/zinc"))), resultCount);
     }
 
     protected static class Marker {
@@ -566,7 +564,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
         private String suffix;
         private Supplier<? extends ItemLike> result;
         private RecipeCategory category = null;
-        private ResourceLocation compatDatagenOutput;
+        private Identifier compatDatagenOutput;
         List<ICondition> recipeConditions;
 
         private Supplier<ItemPredicate> unlockedBy;
@@ -586,7 +584,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
             this.result = result;
         }
 
-        public GeneratedRecipeBuilder(String path, ResourceLocation result) {
+        public GeneratedRecipeBuilder(String path, Identifier result) {
             this(path);
             this.compatDatagenOutput = result;
         }
@@ -633,7 +631,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
             return this;
         }
 
-        GeneratedRecipeBuilder requiresFeature(ResourceLocation location) {
+        GeneratedRecipeBuilder requiresFeature(Identifier location) {
             recipeConditions.add(new FeatureEnabledCondition(location));
             return this;
         }
@@ -716,15 +714,15 @@ public class CCStandardRecipes extends BaseRecipeProvider {
             });
         }
 
-        private ResourceLocation createSimpleLocation(String recipeType) {
+        private Identifier createSimpleLocation(String recipeType) {
             return CreateConnected.asResource(recipeType + "/" + getRegistryName().getPath() + suffix);
         }
 
-        private ResourceLocation createLocation(String recipeType) {
+        private Identifier createLocation(String recipeType) {
             return CreateConnected.asResource(recipeType + "/" + path + "/" + getRegistryName().getPath() + suffix);
         }
 
-        private ResourceLocation getRegistryName() {
+        private Identifier getRegistryName() {
             return compatDatagenOutput == null ? RegisteredObjectsHelper.getKeyOrThrow(result.get()
                     .asItem()) : compatDatagenOutput;
         }
@@ -818,20 +816,18 @@ public class CCStandardRecipes extends BaseRecipeProvider {
         return "Create: Connected's Standard Recipes";
     }
 
-    public CCStandardRecipes(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-        super(output, registries, CreateConnected.MODID);
+    public CCStandardRecipes(HolderLookup.Provider registries, net.minecraft.data.recipes.RecipeOutput output) {
+        super(registries, output, CreateConnected.MODID);
     }
 
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
-    private static class ModdedCookingRecipeOutputShim implements Recipe<RecipeInput> {
+            private static class ModdedCookingRecipeOutputShim implements Recipe<RecipeInput> {
 
         private static final Map<RecipeType<?>, Serializer> serializers = new ConcurrentHashMap<>();
 
         private final Recipe<?> wrapped;
-        private final ResourceLocation overrideID;
+        private final Identifier overrideID;
 
-        private ModdedCookingRecipeOutputShim(Recipe<?> wrapped, ResourceLocation overrideID) {
+        private ModdedCookingRecipeOutputShim(Recipe<?> wrapped, Identifier overrideID) {
             this.wrapped = wrapped;
             this.overrideID = overrideID;
         }
@@ -916,17 +912,15 @@ public class CCStandardRecipes extends BaseRecipeProvider {
             }
         }
 
-        private record FakeItemStack(ResourceLocation id) {
+        private record FakeItemStack(Identifier id) {
             public static Codec<FakeItemStack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                    ResourceLocation.CODEC.fieldOf("id").forGetter(FakeItemStack::id)
+                    Identifier.CODEC.fieldOf("id").forGetter(FakeItemStack::id)
             ).apply(instance, FakeItemStack::new));
         }
     }
 
-    @ParametersAreNonnullByDefault
-    @MethodsReturnNonnullByDefault
-    private record ModdedCookingRecipeOutput(RecipeOutput wrapped,
-                                             ResourceLocation outputOverride) implements RecipeOutput {
+            private record ModdedCookingRecipeOutput(RecipeOutput wrapped,
+                                             Identifier outputOverride) implements RecipeOutput {
 
         @Override
         public Advancement.Builder advancement() {
@@ -934,7 +928,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
         }
 
         @Override
-        public void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
+        public void accept(Identifier id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
             wrapped.accept(id, new ModdedCookingRecipeOutputShim(recipe, outputOverride), advancement, conditions);
         }
     }

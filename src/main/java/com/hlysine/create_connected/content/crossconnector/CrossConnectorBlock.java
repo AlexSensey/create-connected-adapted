@@ -7,12 +7,12 @@ import com.simibubi.create.content.decoration.encasing.EncasableBlock;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
-import net.createmod.catnip.data.Iterate;
+import net.createmod.catnip.api.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -96,7 +96,7 @@ public class CrossConnectorBlock extends Block implements IWrenchable, IConnecti
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack stack,
+    protected @NotNull InteractionResult useItemOn(@NotNull ItemStack stack,
                                                        @NotNull BlockState state,
                                                        @NotNull Level level,
                                                        @NotNull BlockPos pos,
@@ -104,7 +104,7 @@ public class CrossConnectorBlock extends Block implements IWrenchable, IConnecti
                                                        @NotNull InteractionHand hand,
                                                        @NotNull BlockHitResult hitResult) {
         if (player.isShiftKeyDown() || !player.mayBuild())
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
 
         return tryEncase(state, level, pos, stack, player, hand, hitResult);
     }
@@ -156,7 +156,7 @@ public class CrossConnectorBlock extends Block implements IWrenchable, IConnecti
         Vec3i offset = neighbourPos.subtract(sourcePos);
         if (!(sourceState.getBlock() instanceof IRotate rotatingBlock))
             return neighbourPos;
-        Direction offsetDirection = Direction.fromDelta(offset.getX(), offset.getY(), offset.getZ());
+        Direction offsetDirection = com.hlysine.create_connected.ConnectedDirections.fromDelta(offset.getX(), offset.getY(), offset.getZ());
         if (offsetDirection == null)
             return neighbourPos;
         if (!rotatingBlock.hasShaftTowards(level, sourcePos, sourceState, offsetDirection))

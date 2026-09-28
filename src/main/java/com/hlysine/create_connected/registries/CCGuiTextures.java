@@ -2,11 +2,11 @@ package com.hlysine.create_connected.registries;
 
 import com.hlysine.create_connected.CreateConnected;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.createmod.catnip.gui.UIRenderHelper;
-import net.createmod.catnip.gui.element.ScreenElement;
-import net.createmod.catnip.theme.Color;
+import net.createmod.catnip.api.client.gui.UIRenderHelper;
+import net.createmod.catnip.api.client.gui.element.ScreenElement;
+import net.createmod.catnip.api.theme.Color;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -22,7 +22,7 @@ public enum CCGuiTextures implements ScreenElement {
 
     public static final int FONT_COLOR = 0x575F7A;
 
-    public final ResourceLocation location;
+    public final Identifier location;
     public final int width;
     public final int height;
     public final int startX;
@@ -41,7 +41,7 @@ public enum CCGuiTextures implements ScreenElement {
     }
 
     CCGuiTextures(String namespace, String location, int startX, int startY, int width, int height) {
-        this.location = ResourceLocation.fromNamespaceAndPath(namespace, "textures/gui/" + location + ".png");
+        this.location = Identifier.fromNamespaceAndPath(namespace, "textures/gui/" + location + ".png");
         this.width = width;
         this.height = height;
         this.startX = startX;

@@ -1,7 +1,7 @@
 package com.hlysine.create_connected.compat;
 
 import mezz.jei.api.runtime.IIngredientManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.Event;
 
 /*
@@ -11,15 +11,15 @@ import net.neoforged.bus.api.Event;
  * @see FeatureRefreshEvent.Post
  */
 public class FeatureRefreshEvent extends Event {
-    private final ResourceLocation jeiPluginId;
+    private final Identifier jeiPluginId;
     private final IIngredientManager ingredientManager;
 
-    protected FeatureRefreshEvent(ResourceLocation jeiPluginId, IIngredientManager ingredientManager) {
+    protected FeatureRefreshEvent(Identifier jeiPluginId, IIngredientManager ingredientManager) {
         this.jeiPluginId = jeiPluginId;
         this.ingredientManager = ingredientManager;
     }
 
-    public ResourceLocation getJeiPluginId() {
+    public Identifier getJeiPluginId() {
         return jeiPluginId;
     }
 
@@ -31,7 +31,7 @@ public class FeatureRefreshEvent extends Event {
      * Fired before Create: Connected updates the JEI item list according to enabled features.
      */
     public static class Pre extends FeatureRefreshEvent {
-        public Pre(ResourceLocation jeiPluginId, IIngredientManager ingredientManager) {
+        public Pre(Identifier jeiPluginId, IIngredientManager ingredientManager) {
             super(jeiPluginId, ingredientManager);
         }
     }
@@ -40,7 +40,7 @@ public class FeatureRefreshEvent extends Event {
      * Fired after Create: Connected updates the JEI item list according to enabled features.
      */
     public static class Post extends FeatureRefreshEvent {
-        public Post(ResourceLocation jeiPluginId, IIngredientManager ingredientManager) {
+        public Post(Identifier jeiPluginId, IIngredientManager ingredientManager) {
             super(jeiPluginId, ingredientManager);
         }
     }

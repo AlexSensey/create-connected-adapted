@@ -103,8 +103,8 @@ public class CopycatStairsBlock extends WaterloggedCopycatWrappedBlock {
     }
 
     @Override
-    public @NotNull BlockState updateShape(@NotNull BlockState pState, @NotNull Direction pDirection, @NotNull BlockState pNeighborState, @NotNull LevelAccessor pLevel, @NotNull BlockPos pCurrentPos, @NotNull BlockPos pNeighborPos) {
-        return migrateOnUpdate(pLevel.isClientSide(), ICopycatWithWrappedBlock.unwrapForOperation(stairs, pState, state -> state.updateShape(pDirection, pNeighborState, pLevel, pCurrentPos, pNeighborPos)));
+    public @NotNull BlockState updateShape(BlockState pState, net.minecraft.world.level.LevelReader pLevel, net.minecraft.world.level.ScheduledTickAccess ticks, BlockPos pCurrentPos, Direction pDirection, BlockPos pNeighborPos, BlockState pNeighborState, net.minecraft.util.RandomSource random) {
+        return migrateOnUpdate(pLevel.isClientSide(), ICopycatWithWrappedBlock.unwrapForOperation(stairs, pState, state -> state.updateShape(pLevel, ticks, pCurrentPos, pDirection, pNeighborPos, pNeighborState, random)));
     }
 
     @Override
@@ -123,7 +123,7 @@ public class CopycatStairsBlock extends WaterloggedCopycatWrappedBlock {
     }
 
     @Override
-    public boolean isIgnoredConnectivitySide(BlockAndTintGetter reader, BlockState state, Direction face,
+    public boolean isIgnoredConnectivitySide(net.minecraft.world.level.BlockGetter reader, BlockState state, Direction face,
                                              @Nullable BlockPos fromPos, @Nullable BlockPos toPos) {
         if (fromPos == null || toPos == null)
             return true;
@@ -135,7 +135,7 @@ public class CopycatStairsBlock extends WaterloggedCopycatWrappedBlock {
         if (diff.equals(Vec3i.ZERO)) {
             return true;
         }
-        Direction side = Direction.fromDelta(diff.getX(), diff.getY(), diff.getZ());
+        Direction side = com.hlysine.create_connected.ConnectedDirections.fromDelta(diff.getX(), diff.getY(), diff.getZ());
 
         if (toState.is(this)) {
             return false;
@@ -158,13 +158,13 @@ public class CopycatStairsBlock extends WaterloggedCopycatWrappedBlock {
     }
 
     @Override
-    public boolean canConnectTexturesToward(BlockAndTintGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state) {
+    public boolean canConnectTexturesToward(net.minecraft.world.level.BlockGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state) {
         BlockState toState = reader.getBlockState(toPos);
         BlockPos diff = toPos.subtract(fromPos);
         if (diff.equals(Vec3i.ZERO)) {
             return true;
         }
-        Direction side = Direction.fromDelta(diff.getX(), diff.getY(), diff.getZ());
+        Direction side = com.hlysine.create_connected.ConnectedDirections.fromDelta(diff.getX(), diff.getY(), diff.getZ());
 
         if (side != null) {
             FaceShape sideShape = getFaceShape(state, side);

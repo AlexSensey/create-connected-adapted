@@ -1,8 +1,8 @@
 package com.hlysine.create_connected;
 
-import net.createmod.catnip.lang.Lang;
-import net.createmod.catnip.lang.LangBuilder;
-import net.createmod.catnip.lang.LangNumberFormat;
+import net.createmod.catnip.api.lang.Lang;
+import net.createmod.catnip.api.lang.LangBuilder;
+import net.createmod.catnip.api.lang.LangNumberFormat;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;

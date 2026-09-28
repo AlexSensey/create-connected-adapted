@@ -8,6 +8,10 @@ import com.simibubi.create.content.logistics.vault.ItemVaultBlock;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.item.ItemHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.resources.ResourceKey;
+import java.util.HashMap;
+import java.util.Map;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
@@ -15,16 +19,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.neoforged.neoforge.common.util.DeferredSoundType;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemSiloBlock extends Block implements IWrenchable, IBE<ItemSiloBlockEntity> {
+    private record RemovedSiloKey(ResourceKey<Level> dimension, BlockPos pos) {}
+    private static final Map<RemovedSiloKey, ItemSiloBlockEntity> REMOVED_SILOS = new HashMap<>();
+
     public static final BooleanProperty LARGE = ItemVaultBlock.LARGE;
 
     public ItemSiloBlock(Properties p_i48440_1_) {
@@ -47,16 +53,16 @@ public class ItemSiloBlock extends Block implements IWrenchable, IBE<ItemSiloBlo
         withBlockEntityDo(pLevel, pPos, ItemSiloBlockEntity::updateConnectivity);
     }
 
+    static void prepareRemoval(ItemSiloBlockEntity silo) {
+        REMOVED_SILOS.put(new RemovedSiloKey(silo.getLevel().dimension(), silo.getBlockPos()), silo);
+    }
+
     @Override
-    public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean pIsMoving) {
-        if (state.hasBlockEntity() && (state.getBlock() != newState.getBlock() || !newState.hasBlockEntity())) {
-            BlockEntity be = world.getBlockEntity(pos);
-            if (!(be instanceof ItemSiloBlockEntity vaultBE))
-                return;
-            ItemHelper.dropContents(world, pos, vaultBE.inventory);
-            world.removeBlockEntity(pos);
-            ConnectivityHandler.splitMulti(vaultBE);
-        }
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean isMoving) {
+        ItemSiloBlockEntity removed = REMOVED_SILOS.remove(new RemovedSiloKey(world.dimension(), pos));
+        if (removed != null)
+            ConnectivityHandler.splitMulti(removed);
+        super.affectNeighborsAfterRemoval(state, world, pos, isMoving);
     }
 
     public static boolean isVault(BlockState state) {
@@ -97,7 +103,7 @@ public class ItemSiloBlock extends Block implements IWrenchable, IBE<ItemSiloBlo
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos) {
+    public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos, net.minecraft.core.Direction side) {
         return ItemHelper.calcRedstoneFromBlockEntity(this, pLevel, pPos);
     }
 
