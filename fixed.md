@@ -1,10 +1,11 @@
 # Create: Connected (Adapted) - Minecraft 26.1.2
 
-Version: 1.3.3-adapted-26.1.2-0.2
+Version: 1.3.3-adapted-26.1.2-0.3
 Branch: adapted/26.1.2
 NeoForge: 26.1.2.109 or newer within Minecraft 26.1.2.
 Create dependency: 6.0.11-adapted-1.27 or newer.
 
+- Replaced the mod icon with the supplied Logo_ico.png for Minecraft and Prism mod lists. Code and gameplay resources are unchanged from 0.2.
 - Adapted Flywheel namespaces, GUI rendering, advancement imports and tag generation to 26.1.2.
 - Preserved the 26.2 adaptation's kinetic, bridge, copycat, fluid, recipe and linked-control fixes.
 - REI respects feature toggles and optional-mod requirements. Unsupported catalysts are hidden.
