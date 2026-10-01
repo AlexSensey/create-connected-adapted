@@ -1,22 +1,16 @@
 {
   "minecraft": "26.3",
-  "version": "1.3.3-adapted-26.3-0.3",
-  "sha256": "9afe8aba640edeba06ce2864c8199e676b5ea878fc011ad52eb1fae1f03b35d9",
-  "icon_sha256": "dc996fb7fdb09880e9e88132cd10a4cf2637f6bb4520992dc601eccfafc10352",
-  "icon_only_changes": [
+  "version": "1.3.3-adapted-26.3-0.4",
+  "sha256": "fc930fed7c2e61bf7017f1a8c888945f1e3c0394b31708174b4ea605459ffa06",
+  "bridge_assertions": 96,
+  "native_test": "C:\\Users\\alexn\\RiderProjects\\Create\\build\\cross-version-compat\\26.3\\tests\\absence\\20261002-023937",
+  "changed_jar_entries": [
     "META-INF/MANIFEST.MF",
     "META-INF/neoforge.mods.toml",
-    "create_connected_icon.png"
-  ],
-  "validation": "All class files and gameplay resources are byte-identical to tested 0.2. Icon bytes match supplied PNG. Metadata and ZIP integrity verified.",
-  "previous_runtime_verification": {
-    "minecraft": "26.3",
-    "version": "1.3.3-adapted-26.3-0.2",
-    "sha256": "9e92837e6ad6315078f4ec5af8bd0976998015402f5d1a74ddcd8f860c3afd64",
-    "native_core_assertions": 44,
-    "native_rei_assertions": 161,
-    "world_test": "C:\\Users\\alexn\\RiderProjects\\Create\\build\\cross-version-compat\\26.3\\tests\\absence\\20261002-021345",
-    "rei_test": "C:\\Users\\alexn\\RiderProjects\\Create\\build\\cross-version-compat\\26.3\\tests\\rei\\20261002-021426",
-    "coverage": "Isolated client and integrated server with Create; not the complete installed modpack."
-  }
+    "com/hlysine/create_connected/content/kineticbridge/KineticBridgeRenderer$1.class",
+    "com/hlysine/create_connected/content/kineticbridge/KineticBridgeRenderer$2.class",
+    "com/hlysine/create_connected/content/kineticbridge/KineticBridgeRenderer$BridgeRenderState.class",
+    "com/hlysine/create_connected/content/kineticbridge/KineticBridgeRenderer.class",
+    "com/hlysine/create_connected/content/kineticbridge/KineticBridgeValueBox.class"
+  ]
 }
