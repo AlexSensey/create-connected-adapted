@@ -1,13 +1,10 @@
 package com.hlysine.create_connected.compat;
 
-import com.hlysine.create_connected.registries.CCBlocks;
-import com.hlysine.create_connected.registries.CCItems;
 import com.hlysine.create_connected.CreateConnected;
 import com.hlysine.create_connected.config.CCConfigs;
-import com.tterrag.registrate.util.entry.BlockEntry;
-import com.tterrag.registrate.util.entry.ItemEntry;
 import net.createmod.catnip.api.registry.RegisteredObjectsHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -19,42 +16,44 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 import java.util.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class CopycatsManager {
-    public static Map<String, BlockEntry<?>> BLOCK_MAP = new HashMap<>();
-    public static Map<String, ItemEntry<?>> ITEM_MAP = new HashMap<>();
+    private static final Map<String, Identifier> BLOCK_MAP = Map.ofEntries(
+            Map.entry("copycat_block", Mods.COPYCATS.rl("copycat_block")),
+            Map.entry("copycat_slab", Mods.COPYCATS.rl("copycat_slab")),
+            Map.entry("copycat_beam", Mods.COPYCATS.rl("copycat_beam")),
+            Map.entry("copycat_vertical_step", Mods.COPYCATS.rl("copycat_vertical_step")),
+            Map.entry("copycat_stairs", Mods.COPYCATS.rl("copycat_stairs")),
+            Map.entry("copycat_fence", Mods.COPYCATS.rl("copycat_fence")),
+            Map.entry("copycat_fence_gate", Mods.COPYCATS.rl("copycat_fence_gate")),
+            Map.entry("copycat_wall", Mods.COPYCATS.rl("copycat_wall")),
+            Map.entry("copycat_board", Mods.COPYCATS.rl("copycat_board")));
+    private static final Map<String, Identifier> ITEM_MAP = Map.of(
+            "copycat_box", Mods.COPYCATS.rl("copycat_box"),
+            "copycat_catwalk", Mods.COPYCATS.rl("copycat_catwalk"));
 
     public static final Map<Level, Set<BlockPos>> migrationQueue = Collections.synchronizedMap(new WeakHashMap<>());
-
-    static {
-        BLOCK_MAP.put(CCBlocks.COPYCAT_BLOCK.getKey().identifier().getPath(), com.copycatsplus.copycats.CCBlocks.COPYCAT_BLOCK);
-        BLOCK_MAP.put(CCBlocks.COPYCAT_SLAB.getKey().identifier().getPath(), com.copycatsplus.copycats.CCBlocks.COPYCAT_SLAB);
-        BLOCK_MAP.put(CCBlocks.COPYCAT_BEAM.getKey().identifier().getPath(), com.copycatsplus.copycats.CCBlocks.COPYCAT_BEAM);
-        BLOCK_MAP.put(CCBlocks.COPYCAT_VERTICAL_STEP.getKey().identifier().getPath(), com.copycatsplus.copycats.CCBlocks.COPYCAT_VERTICAL_STEP);
-        BLOCK_MAP.put(CCBlocks.COPYCAT_STAIRS.getKey().identifier().getPath(), com.copycatsplus.copycats.CCBlocks.COPYCAT_STAIRS);
-        BLOCK_MAP.put(CCBlocks.COPYCAT_FENCE.getKey().identifier().getPath(), com.copycatsplus.copycats.CCBlocks.COPYCAT_FENCE);
-        BLOCK_MAP.put(CCBlocks.COPYCAT_FENCE_GATE.getKey().identifier().getPath(), com.copycatsplus.copycats.CCBlocks.COPYCAT_FENCE_GATE);
-        BLOCK_MAP.put(CCBlocks.COPYCAT_WALL.getKey().identifier().getPath(), com.copycatsplus.copycats.CCBlocks.COPYCAT_WALL);
-        BLOCK_MAP.put(CCBlocks.COPYCAT_BOARD.getKey().identifier().getPath(), com.copycatsplus.copycats.CCBlocks.COPYCAT_BOARD);
-        ITEM_MAP.put(CCItems.COPYCAT_BOX.getKey().identifier().getPath(), com.copycatsplus.copycats.CCItems.COPYCAT_BOX);
-        ITEM_MAP.put(CCItems.COPYCAT_CATWALK.getKey().identifier().getPath(), com.copycatsplus.copycats.CCItems.COPYCAT_CATWALK);
-    }
 
     public static Block convert(Block self) {
         Identifier key = RegisteredObjectsHelper.getKeyOrThrow(self);
         if (!validateNamespace(key)) return self;
-        BlockEntry<?> result = BLOCK_MAP.get(key.getPath());
-        if (result != null) return result.get();
+        Identifier result = BLOCK_MAP.get(key.getPath());
+        if (result != null && BuiltInRegistries.BLOCK.containsKey(result))
+            return BuiltInRegistries.BLOCK.getValue(result);
         return self;
     }
 
     public static Item convert(Item self) {
         Identifier key = RegisteredObjectsHelper.getKeyOrThrow(self);
         if (!validateNamespace(key)) return self;
-        ItemEntry<?> result = ITEM_MAP.get(key.getPath());
-        if (result != null) return result.get();
-        BlockEntry<?> blockResult = BLOCK_MAP.get(key.getPath());
-        if (blockResult != null) return blockResult.asItem();
+        Identifier result = ITEM_MAP.get(key.getPath());
+        if (result != null && BuiltInRegistries.ITEM.containsKey(result))
+            return BuiltInRegistries.ITEM.getValue(result);
+        Identifier blockResult = BLOCK_MAP.get(key.getPath());
+        if (blockResult != null && BuiltInRegistries.BLOCK.containsKey(blockResult))
+            return BuiltInRegistries.BLOCK.getValue(blockResult).asItem();
         return self;
     }
 
@@ -112,9 +111,40 @@ public class CopycatsManager {
     }
 
     public static boolean isFeatureEnabled(Identifier key) {
-        if (!existsInCopycats(key))
+        if (!existsInCopycats(key) || !Mods.COPYCATS.isLoaded())
             return false;
-        return com.copycatsplus.copycats.config.FeatureToggle.isEnabled(Mods.COPYCATS.rl(key.getPath()));
+        return CopycatsFeatureToggle.isEnabled(Mods.COPYCATS.rl(key.getPath()));
+    }
+
+    /** Resolve the optional public API only when Copycats+ is actually used. */
+    private static class CopycatsFeatureToggle {
+        private static final Method IS_ENABLED = resolve();
+
+        private static Method resolve() {
+            try {
+                Class<?> api = Class.forName("com.copycatsplus.copycats.config.FeatureToggle");
+                Method method = api.getMethod("isEnabled", Identifier.class);
+                if (method.getReturnType() != boolean.class || !java.lang.reflect.Modifier.isStatic(method.getModifiers()))
+                    throw new NoSuchMethodException("Expected static boolean isEnabled(Identifier)");
+                return method;
+            } catch (ReflectiveOperationException e) {
+                throw new IllegalStateException("Copycats+ feature toggle API is incompatible with Minecraft 26.2", e);
+            }
+        }
+
+        private static boolean isEnabled(Identifier key) {
+            try {
+                // Cache the method, not its result: config changes must remain visible.
+                return (boolean) IS_ENABLED.invoke(null, key);
+            } catch (InvocationTargetException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof RuntimeException runtime) throw runtime;
+                if (cause instanceof Error error) throw error;
+                throw new IllegalStateException("Copycats+ feature check failed", cause);
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException("Copycats+ feature toggle API is inaccessible", e);
+            }
+        }
     }
 
     public static void enqueueMigration(Level level, BlockPos pos) {

@@ -25,9 +25,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:fan_freezing_catalyst"
-    }
+    "create_connected:fan_freezing_catalyst"
   ],
   "result": {
     "count": 1,

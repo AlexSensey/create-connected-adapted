@@ -10,12 +10,12 @@ import com.simibubi.create.foundation.gui.widget.IconButton;
 import com.simibubi.create.foundation.gui.widget.ScrollInput;
 import com.simibubi.create.foundation.gui.widget.SelectionScrollInput;
 import net.createmod.catnip.api.client.gui.AbstractSimiScreen;
-import net.createmod.catnip.api.client.gui.element.GuiGameElement;
-import net.minecraft.client.gui.GuiGraphics;
+import com.simibubi.create.compat.jei.render.GuiGameElement;
+import net.createmod.catnip.api.client.network.ClientNetworkHelper;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Vector;
 import java.util.function.Function;
@@ -33,6 +33,8 @@ public class SequencedPulseGeneratorScreen extends AbstractSimiScreen {
     private final Vector<Instruction> instructions;
 
     private Vector<Vector<ScrollInput>> inputs;
+    private int guiLeft;
+    private int guiTop;
 
     public SequencedPulseGeneratorScreen(SequencedPulseGeneratorBlockEntity be) {
         super(ConnectedLang.translateDirect("gui.sequenced_pulse_generator.title"));
@@ -43,8 +45,8 @@ public class SequencedPulseGeneratorScreen extends AbstractSimiScreen {
 
     @Override
     protected void init() {
-        setWindowSize(background.width, background.height);
-        setWindowOffset(-20, 0);
+        guiLeft = (width - background.width) / 2 - 20;
+        guiTop = (height - background.height) / 2;
         super.init();
 
         int x = guiLeft;
@@ -68,7 +70,7 @@ public class SequencedPulseGeneratorScreen extends AbstractSimiScreen {
         int rowHeight = 22;
 
         Vector<ScrollInput> rowInputs = inputs.get(row);
-        removeWidgets(rowInputs);
+        rowInputs.forEach(this::removeWidget);
         rowInputs.clear();
         Instruction instruction = instructions.get(row);
 
@@ -91,7 +93,7 @@ public class SequencedPulseGeneratorScreen extends AbstractSimiScreen {
         rowInputs.add(value);
         rowInputs.add(signal);
 
-        addRenderableWidgets(rowInputs);
+        rowInputs.forEach(this::addRenderableWidget);
         updateParamsOfRow(row);
     }
 
@@ -125,7 +127,12 @@ public class SequencedPulseGeneratorScreen extends AbstractSimiScreen {
     }
 
     @Override
-    protected void renderWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+        renderWindow(graphics, mouseX, mouseY, partialTicks);
+        super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
+    }
+
+    protected void renderWindow(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
         int x = guiLeft;
         int y = guiTop;
 
@@ -160,32 +167,32 @@ public class SequencedPulseGeneratorScreen extends AbstractSimiScreen {
                 label(graphics, 209, yOffset - 1, Component.literal(String.valueOf(instruction.getSignal())));
         }
 
-        graphics.drawString(font, title, x + (background.width - 8) / 2 - font.width(title) / 2, y + 4, 0x592424, false);
+        graphics.text(font, title, x + (background.width - 8) / 2 - font.width(title) / 2, y + 4, 0xFF592424, false);
         renderAdditional(graphics, mouseX, mouseY, partialTicks, x, y, background);
     }
 
-    private void renderAdditional(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks, int guiLeft, int guiTop,
+    private void renderAdditional(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks, int guiLeft, int guiTop,
                                   CCGuiTextures background) {
-        GuiGameElement.of(renderedItem).<GuiGameElement
-                        .GuiRenderBuilder>at(guiLeft + background.width + 6, guiTop + background.height - 56, 100)
+        GuiGameElement.of(renderedItem).at(guiLeft + background.width + 6, guiTop + background.height - 56, 100)
                 .scale(5)
-                .render(graphics);
+                .submit(graphics);
     }
 
-    private void label(GuiGraphics graphics, int x, int y, Component text) {
-        graphics.drawString(font, text, guiLeft + x, guiTop + 26 + y, 0xFFFFEE);
+    private void label(GuiGraphicsExtractor graphics, int x, int y, Component text) {
+        graphics.text(font, text, guiLeft + x, guiTop + 26 + y, 0xFFFFFFEE);
     }
 
     public void sendPacket() {
         ListTag serialized = Instruction.serializeAll(instructions);
         if (serialized.equals(compareTag))
             return;
-        PacketDistributor.sendToServer(new ConfigureSequencedPulseGeneratorPacket(be.getBlockPos(), serialized));
+        ClientNetworkHelper.INSTANCE.sendToServer(new ConfigureSequencedPulseGeneratorPacket(be.getBlockPos(), serialized));
     }
 
     @Override
     public void removed() {
         sendPacket();
+        super.removed();
     }
 
     private void instructionUpdated(int index, int state) {
@@ -196,7 +203,7 @@ public class SequencedPulseGeneratorScreen extends AbstractSimiScreen {
             for (int i = instructions.size() - 1; i > index; i--) {
                 instructions.remove(i);
                 Vector<ScrollInput> rowInputs = inputs.get(i);
-                removeWidgets(rowInputs);
+                rowInputs.forEach(this::removeWidget);
                 rowInputs.clear();
             }
         } else {

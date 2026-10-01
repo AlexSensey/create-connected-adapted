@@ -11,14 +11,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(PackagerBlockEntity.class)
+@Mixin(value = PackagerBlockEntity.class, remap = false)
 public class PackagerBlockEntityMixin {
     @Inject(
-            method = "supportsBlockEntity",
+            method = "supportsBlockEntity(Lnet/minecraft/world/level/block/entity/BlockEntity;)Z",
             at = @At("HEAD"),
             cancellable = true
     )
-    private static void supportsInventoryAccess(BlockEntity target, CallbackInfoReturnable<Boolean> cir) {
+    private void supportsInventoryAccess(BlockEntity target, CallbackInfoReturnable<Boolean> cir) {
         if (target == null) return;
         if (target instanceof InventoryAccessPortBlockEntity accessPort) {
             BlockState attached = accessPort.getAttachedBlock();

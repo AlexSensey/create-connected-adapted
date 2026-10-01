@@ -12,9 +12,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:copycat_slab"
-    }
+    "create_connected:copycat_slab"
   ],
   "result": {
     "count": 1,

@@ -8,12 +8,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "create:display_board"
-    },
-    "C": {
-      "item": "create:brass_casing"
-    }
+    "B": "create:display_board",
+    "C": "create:brass_casing"
   },
   "pattern": [
     "B",

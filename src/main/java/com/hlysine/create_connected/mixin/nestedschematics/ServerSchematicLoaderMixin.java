@@ -79,7 +79,7 @@ public abstract class ServerSchematicLoaderMixin {
     @ModifyExpressionValue(
             at = @At(value = "INVOKE", target = "Ljava/nio/file/Files;list(Ljava/nio/file/Path;)Ljava/util/stream/Stream;"),
             slice = @Slice(
-                    from = @At(value = "FIELD", target = "Lcom/simibubi/create/infrastructure/config/CSchematics;maxSchematics:Lnet/createmod/catnip/config/ConfigBase$ConfigInt;"),
+                    from = @At(value = "FIELD", target = "Lcom/simibubi/create/infrastructure/config/CSchematics;maxSchematics:Lnet/createmod/catnip/api/config/ConfigBase$ConfigInt;"),
                     to = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;filter(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;")
             ),
             method = "handleNewUpload(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;JLnet/minecraft/core/BlockPos;)V"

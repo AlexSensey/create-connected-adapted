@@ -3,7 +3,7 @@ package com.hlysine.create_connected.content.kineticbattery;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 
-import dev.engine_room.create_flywheel.lib.transform.TransformStack;
+import dev.engine_room.flywheel.lib.transform.TransformStack;
 import net.createmod.catnip.api.math.Pointing;
 import net.createmod.catnip.api.math.VecHelper;
 import net.createmod.catnip.api.math.AngleHelper;

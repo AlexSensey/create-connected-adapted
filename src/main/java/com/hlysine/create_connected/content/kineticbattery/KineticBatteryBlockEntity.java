@@ -161,7 +161,7 @@ public class KineticBatteryBlockEntity extends GeneratingKineticBlockEntity impl
         if (batteryCapacity <= 0) {
             consumedStress = 0;
         } else {
-            consumedStress = batteryCapacity / batteryCount;
+            consumedStress = batteryCount == 0 ? 0 : batteryCapacity / batteryCount;
         }
 
         updateMinStress();
@@ -293,7 +293,7 @@ public class KineticBatteryBlockEntity extends GeneratingKineticBlockEntity impl
     @Override
     protected void read(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket) {
         super.read(compound, registries, clientPacket);
-        batteryLevel = compound.getFloatOr("batteryLevel", 0f);
+        batteryLevel = compound.getDoubleOr("batteryLevel", 0.0);
         queuedSync = compound.getBooleanOr("queuedSync", false);
         consumedStress = compound.getFloatOr("consumedStress", 0f);
         applyMinStress = compound.getBooleanOr("applyMinStress", false);

@@ -64,7 +64,7 @@ public class InventoryAccessPortScenes {
         scene.idle(5);
 
         for (int i = 0; i < 6; i++) {
-            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK.weathering().unaffected(), 16));
+            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK, 16));
             scene.idle(10);
         }
         scene.idle(10);
@@ -102,7 +102,7 @@ public class InventoryAccessPortScenes {
 
         scene.world().showSection(util.select().position(funnel), Direction.DOWN);
         scene.idle(5);
-        ItemStack stack = new ItemStack(Items.COPPER_BLOCK.weathering().unaffected());
+        ItemStack stack = new ItemStack(Items.COPPER_BLOCK);
         ElementLink<EntityElement> funnelItem =
                 scene.world().createItemEntity(util.vector().topOf(funnel), util.vector().of(0, 0.1, 0), stack);
         scene.world().showSection(util.select().position(comparator), Direction.DOWN);
@@ -176,7 +176,7 @@ public class InventoryAccessPortScenes {
         scene.idle(10);
 
         for (int i = 0; i < 4; i++) {
-            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK.weathering().unaffected(), 16));
+            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK, 16));
             scene.idle(10);
         }
 
@@ -196,7 +196,7 @@ public class InventoryAccessPortScenes {
         scene.idle(10);
 
         for (int i = 0; i < 4; i++) {
-            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK.weathering().unaffected(), 16));
+            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK, 16));
             scene.idle(10);
         }
 

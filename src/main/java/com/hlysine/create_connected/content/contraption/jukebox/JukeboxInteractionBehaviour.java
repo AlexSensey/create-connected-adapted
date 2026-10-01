@@ -36,8 +36,14 @@ public class JukeboxInteractionBehaviour extends MovingInteractionBehaviour {
         if (player.level().isClientSide()) {
             return true;
         }
+        if (contraptionEntity.isRemoved() || contraptionEntity.level() != player.level())
+            return false;
         Contraption contraption = contraptionEntity.getContraption();
+        if (contraption == null)
+            return false;
         StructureTemplate.StructureBlockInfo info = contraption.getBlocks().get(contraptionPos);
+        if (info == null || !info.state().is(net.minecraft.world.level.block.Blocks.JUKEBOX))
+            return false;
         BlockState currentState = info.state();
 
         if (currentState.getValue(HAS_RECORD)) {
@@ -57,12 +63,39 @@ public class JukeboxInteractionBehaviour extends MovingInteractionBehaviour {
         return true;
     }
 
+    public void tickPlaying(Contraption contraption, BlockPos contraptionPos) {
+        if (contraption == null)
+            return;
+        var info = contraption.getBlocks().get(contraptionPos);
+        if (info == null || info.nbt() == null || !info.nbt().contains("ticks_since_song_started"))
+            return;
+        withTempBlockEntity(contraption, contraptionPos, info.state(), be -> {
+            if (be.getSongPlayer().isPlaying()) {
+                be.getSongPlayer().tick(be.getLevel(), be.getBlockState());
+            } else {
+                // Native loading does not restore a song whose saved duration has elapsed.
+                be.getLevel().levelEvent(1011, be.getBlockPos(), 0);
+            }
+        }, true, false);
+    }
+
     public void withTempBlockEntity(Contraption contraption, BlockPos contraptionPos, BlockState currentState, Consumer<JukeboxBlockEntity> action, boolean silent) {
-        AtomicReference<BlockState> state = new AtomicReference<>(currentState);
+        withTempBlockEntity(contraption, contraptionPos, currentState, action, silent, true);
+    }
+
+    private void withTempBlockEntity(Contraption contraption, BlockPos contraptionPos, BlockState currentState,
+                                     Consumer<JukeboxBlockEntity> action, boolean silent, boolean synchronize) {
         AbstractContraptionEntity contraptionEntity = contraption.entity;
+        if (contraptionEntity == null || contraptionEntity.isRemoved()
+                || !(contraptionEntity.level() instanceof ServerLevel))
+            return;
+        var info = contraption.getBlocks().get(contraptionPos);
+        if (info == null || !info.state().is(net.minecraft.world.level.block.Blocks.JUKEBOX))
+            return;
+        AtomicReference<BlockState> state = new AtomicReference<>(currentState);
         BlockPos realPos = BlockPos.containing(contraptionEntity.toGlobalVector(Vec3.atCenterOf(contraptionPos), 1));
         JukeboxBlockEntity be = new JukeboxBlockEntity(realPos, currentState);
-        var savedData = contraption.getBlocks().get(contraptionPos).nbt();
+        var savedData = info.nbt();
         if (savedData != null) {
             try (var problems = new ProblemReporter.ScopedCollector(CreateConnected.LOGGER)) {
                 be.loadWithComponents(TagValueInput.create(problems, contraptionEntity.level().registryAccess(), savedData));
@@ -86,6 +119,11 @@ public class JukeboxInteractionBehaviour extends MovingInteractionBehaviour {
             }
 
             @Override
+            public void levelEvent(int type, BlockPos pos, int data) {
+                levelEvent(null, type, pos, data);
+            }
+
+            @Override
             public void levelEvent(@Nullable Entity source, int type, BlockPos pos, int data) {
                 if (type == 1010 || type == 1011)
                     PacketDistributor.sendToPlayersInDimension(
@@ -102,6 +140,20 @@ public class JukeboxInteractionBehaviour extends MovingInteractionBehaviour {
             }
         });
         action.accept(be);
-        setContraptionBlockData(contraptionEntity, contraptionPos, new StructureTemplate.StructureBlockInfo(contraptionPos, state.get(), be.saveWithoutMetadata(contraptionEntity.level().registryAccess())));
+        net.minecraft.nbt.CompoundTag updatedData;
+        if (!synchronize && savedData != null && be.getSongPlayer().isPlaying()) {
+            // During playback only the timer changes; retain the item and component data.
+            updatedData = savedData.copy();
+            updatedData.putLong("ticks_since_song_started", be.getSongPlayer().getTicksSinceSongStarted());
+        } else {
+            updatedData = be.saveWithoutMetadata(contraptionEntity.level().registryAccess());
+        }
+        var updatedInfo = new StructureTemplate.StructureBlockInfo(contraptionPos, state.get(), updatedData);
+        if (synchronize || state.get() != currentState) {
+            setContraptionBlockData(contraptionEntity, contraptionPos, updatedInfo);
+        } else {
+            // Native setBlock broadcasts a block-state packet; elapsed time is server-only.
+            contraption.getBlocks().put(contraptionPos, updatedInfo);
+        }
     }
 }

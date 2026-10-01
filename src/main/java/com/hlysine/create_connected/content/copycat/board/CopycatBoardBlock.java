@@ -1,6 +1,5 @@
 package com.hlysine.create_connected.content.copycat.board;
 
-import com.google.common.collect.ImmutableMap;
 import com.hlysine.create_connected.registries.CCShapes;
 import com.hlysine.create_connected.content.copycat.MigratingWaterloggedCopycatBlock;
 import com.simibubi.create.api.schematic.requirement.SpecialBlockItemRequirement;
@@ -47,7 +46,7 @@ public class CopycatBoardBlock extends MigratingWaterloggedCopycatBlock implemen
     public static BooleanProperty EAST = BlockStateProperties.EAST;
     public static BooleanProperty WEST = BlockStateProperties.WEST;
     public static final Map<Direction, BooleanProperty> PROPERTY_BY_DIRECTION = PipeBlock.PROPERTY_BY_DIRECTION;
-    private final ImmutableMap<BlockState, VoxelShape> shapesCache;
+    private final Function<BlockState, VoxelShape> shapesCache;
 
     public CopycatBoardBlock(Properties properties) {
         super(properties);
@@ -104,7 +103,7 @@ public class CopycatBoardBlock extends MigratingWaterloggedCopycatBlock implemen
     @SuppressWarnings("deprecation")
     @Override
     public @NotNull VoxelShape getShape(@NotNull BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
-        return Objects.requireNonNull(this.shapesCache.get(pState));
+        return Objects.requireNonNull(this.shapesCache.apply(pState));
     }
 
     @Override

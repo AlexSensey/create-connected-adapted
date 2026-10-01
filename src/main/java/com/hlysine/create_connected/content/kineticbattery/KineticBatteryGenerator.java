@@ -1,42 +1,45 @@
 package com.hlysine.create_connected.content.kineticbattery;
 
+import com.google.gson.JsonObject;
 import com.hlysine.create_connected.CreateConnected;
-import com.simibubi.create.foundation.data.SpecialBlockStateGen;
-import com.tterrag.registrate.providers.DataGenContext;
-import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
+import com.hlysine.create_connected.datagen.CCSimpleModelGen;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
 
-public class KineticBatteryGenerator extends SpecialBlockStateGen {
-
-    @Override
-    protected int getXRotation(BlockState state) {
-        Direction dir = state.getValue(KineticBatteryBlock.FACING);
-        return dir == Direction.DOWN ? 180
-                : dir.getAxis()
-                .isHorizontal() ? 90 : 0;
+/** Native battery block models and all charge/power/facing variants. */
+public class KineticBatteryGenerator {
+    public void register(Block block) {
+        CCSimpleModelGen.registerBlockstate(block, definition());
+        for (int level = 0; level <= 5; level++)
+            for (boolean powered : new boolean[] { false, true }) {
+                String suffix = level + "_" + (powered ? "discharge" : "charge");
+                CCSimpleModelGen.registerModel(CreateConnected.asResource("block/kinetic_battery/block_" + suffix),
+                        levelModel("block", suffix));
+            }
+        KineticBatteryOverrides.registerModels(block);
     }
 
-    @Override
-    protected int getYRotation(BlockState state) {
-        Direction dir = state.getValue(KineticBatteryBlock.FACING);
-        return dir.getAxis()
-                .isVertical() ? 0 : (((int) dir.toYRot()) + 180) % 360;
+    public static JsonObject definition() {
+        JsonObject variants = new JsonObject();
+        for (Direction facing : Direction.values())
+            for (int level = 0; level <= 5; level++)
+                for (int power = 0; power <= 15; power++) {
+                    String suffix = level + "_" + (power > 0 ? "discharge" : "charge");
+                    JsonObject variant = CCSimpleModelGen.directionalVariant(
+                            CreateConnected.asResource("block/kinetic_battery/block_" + suffix), facing);
+                    variants.add("facing=" + facing.getSerializedName() + ",level=" + level + ",power=" + power, variant);
+                }
+        JsonObject json = new JsonObject();
+        json.add("variants", variants);
+        return json;
     }
 
-    @Override
-    public <T extends Block> ModelFile getModel(DataGenContext<Block, T> ctx, RegistrateBlockstateProvider prov,
-                                                BlockState state) {
-        int level = state.getValue(KineticBatteryBlock.LEVEL);
-        boolean powered = state.getValue(KineticBatteryBlock.POWER) > 0;
-        String path = "block/kinetic_battery/block";
-        String suffix = level + "_" + (powered ? "discharge" : "charge");
-        return prov.models()
-                .withExistingParent(path + "_" + suffix, CreateConnected.asResource(path))
-                .texture("level", CreateConnected.asResource("block/kinetic_battery/level_" + suffix));
+    public static JsonObject levelModel(String parent, String suffix) {
+        JsonObject json = new JsonObject();
+        json.addProperty("parent", "create_connected:block/kinetic_battery/" + parent);
+        JsonObject textures = new JsonObject();
+        textures.addProperty("level", "create_connected:block/kinetic_battery/level_" + suffix);
+        json.add("textures", textures);
+        return json;
     }
-
 }
-

@@ -8,15 +8,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create:gearbox"
-    },
-    {
-      "item": "create:large_cogwheel"
-    },
-    {
-      "item": "create:large_cogwheel"
-    }
+    "create:gearbox",
+    "create:large_cogwheel",
+    "create:large_cogwheel"
   ],
   "result": {
     "count": 1,

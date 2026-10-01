@@ -12,9 +12,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:copycat_fence_gate"
-    }
+    "create_connected:copycat_fence_gate"
   ],
   "result": {
     "count": 1,

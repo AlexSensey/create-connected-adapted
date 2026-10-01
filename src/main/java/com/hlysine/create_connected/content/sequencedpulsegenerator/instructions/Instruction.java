@@ -5,7 +5,7 @@ import com.hlysine.create_connected.ConnectedLang;
 import com.hlysine.create_connected.CreateConnected;
 import com.hlysine.create_connected.content.sequencedpulsegenerator.SequencedPulseGeneratorBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -147,9 +147,11 @@ public abstract class Instruction {
         } else {
             Vector<Instruction> instructions = new Vector<>(INSTRUCTION_CAPACITY);
             list.forEach(tag -> {
-                Instruction instruction = Instruction.deserializeParams((CompoundTag) tag);
+                if (!(tag instanceof CompoundTag compound))
+                    return;
+                Instruction instruction = Instruction.deserializeParams(compound);
                 if (instruction == null) return;
-                instruction.readState((CompoundTag) tag);
+                instruction.readState(compound);
                 instructions.add(instruction);
             });
             return instructions;
@@ -166,14 +168,14 @@ public abstract class Instruction {
 
     public String getParamLangKey() {
         String key = getLangKey() + ".param";
-        if (I18n.exists(CreateConnected.MODID + "." + key))
+        if (Language.getInstance().has(CreateConnected.MODID + "." + key))
             return key;
         return "gui.sequenced_pulse_generator.param";
     }
 
     public String getSignalLangKey() {
         String key = getLangKey() + ".signal";
-        if (I18n.exists(CreateConnected.MODID + "." + key))
+        if (Language.getInstance().has(CreateConnected.MODID + "." + key))
             return key;
         return "gui.sequenced_pulse_generator.signal";
     }
@@ -210,8 +212,8 @@ public abstract class Instruction {
             case 0 -> "I+C";
             case 1 -> "I-C";
             case 2 -> "C-I";
-            case 3 -> "I×C";
-            case 4 -> "I÷C";
+            case 3 -> "IÃ—C";
+            case 4 -> "IÃ·C";
             case 5 -> "I&C";
             case 6 -> "I|C";
             case 7 -> "I^C";

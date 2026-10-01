@@ -1,40 +1,33 @@
 package com.hlysine.create_connected.content.copycat.slab;
 
-import com.simibubi.create.content.decoration.copycat.CopycatModel;
-import com.simibubi.create.foundation.model.BakedModelHelper;
-import com.simibubi.create.foundation.model.BakedQuadHelper;
+import com.hlysine.create_connected.content.copycat.ConnectedCopycatModel;
+import com.hlysine.create_connected.content.copycat.CopycatQuadGeometry;
 import net.createmod.catnip.api.data.Iterate;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import net.neoforged.neoforge.model.data.ModelData;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CopycatSlabModel extends CopycatModel {
+public class CopycatSlabModel extends ConnectedCopycatModel {
 
     protected static final AABB CUBE_AABB = new AABB(BlockPos.ZERO);
 
-    public CopycatSlabModel(BakedModel originalModel) {
+    public CopycatSlabModel(BlockStateModel originalModel) {
         super(originalModel);
     }
 
     @Override
-    protected List<BakedQuad> getCroppedQuads(BlockState state, Direction side, RandomSource rand, BlockState material,
-                                              ModelData wrappedData, RenderType renderType) {
+    protected List<BakedQuad> getCroppedQuads(BlockState state, List<BakedQuad> templateQuads) {
         Direction facing = state.getOptionalValue(CopycatSlabBlock.SLAB_TYPE).isPresent() ? CopycatSlabBlock.getApparentDirection(state) : Direction.UP;
 
-        BakedModel model = getModelOf(material);
-        List<BakedQuad> templateQuads = model.getQuads(material, side, rand, wrappedData, renderType);
 
         List<BakedQuad> quads = new ArrayList<>();
         boolean isDouble = state.getOptionalValue(CopycatSlabBlock.SLAB_TYPE).orElse(SlabType.BOTTOM) == SlabType.DOUBLE;
@@ -66,7 +59,7 @@ public class CopycatSlabModel extends CopycatModel {
 
         for (int i = 0; i < size; i++) {
             BakedQuad quad = templateQuads.get(i);
-            Direction direction = quad.getDirection();
+            Direction direction = quad.direction();
 
             if (front && direction == facing)
                 continue;
@@ -77,8 +70,7 @@ public class CopycatSlabModel extends CopycatModel {
             if (isDouble && !topSlab && direction == facing.getOpposite())
                 continue;
 
-            quads.add(BakedQuadHelper.cloneWithCustomGeometry(quad,
-                    BakedModelHelper.cropAndMove(quad.getVertices(), quad.getSprite(), bb, normalScaledN8)));
+            quads.add(CopycatQuadGeometry.cropAndMove(quad, bb, normalScaledN8));
         }
     }
 }

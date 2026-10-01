@@ -3,14 +3,6 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.141'
-    id 'me.modmuss50.mod-publish-plugin' version '2.2.0'
-}
-
-def secrets = new Properties()
-if (file("./secrets.properties").exists()) {
-    file("./secrets.properties").withInputStream {
-        stream -> secrets.load(stream)
-    }
 }
 
 version = mod_version
@@ -20,8 +12,18 @@ base {
     archivesName = mod_id
 }
 
+sourceSets { simulated }
+sourceSets.simulated.compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+sourceSets.simulated.runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+
 // Java version target
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+// NFRT 2.0.31 includes JST 2.0.11's fix for anonymous-class access transformers.
+// Earlier JST leaves HolderSet$1.contents protected after widening Named.contents.
+neoFormRuntime {
+    version = '2.0.31'
+}
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
@@ -34,9 +36,11 @@ neoForge {
         file('src/main/resources/META-INF/accesstransformer.cfg')
     }
 
-    parchment {
-        mappingsVersion = parchment_version
-        minecraftVersion = parchment_minecraft_version
+    if (parchment_version != 'none') {
+        parchment {
+            mappingsVersion = parchment_version
+            minecraftVersion = parchment_minecraft_version
+        }
     }
 
     runs {
@@ -48,10 +52,8 @@ neoForge {
             logLevel = org.slf4j.event.Level.DEBUG
 
             //Allows for reloading the project during runtime with compatible jvm
+            jvmArgument "-XX:+IgnoreUnrecognizedVMOptions"
             jvmArgument "-XX:+AllowEnhancedClassRedefinition"
-
-            systemProperty "mixin.env.remapRefMap", "true"
-            systemProperty "mixin.env.refMapRemappingFile", "${projectDir}/build/createSrgToMcp/output.srg"
         }
 
         client {
@@ -75,10 +77,11 @@ neoForge {
         }
 
         data {
-            data()
+            type = "serverData"
 
             gameDirectory = project.file('run-data')
-            programArguments.addAll '--mod', mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath(), '--existing-mod', 'create', '--existing-mod', 'simulated', '--existing-mod', 'dye_depot'
+            // Keep migration runs from replacing the checked-in generated assets.
+            programArguments.addAll '--mod', mod_id, '--all', '--output', file('build/generated/runData/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath(), '--existing', file('src/generated/resources/').getAbsolutePath(), '--existing-mod', 'create', '--existing-mod', 'simulated', '--existing-mod', 'dye_depot'
         }
     }
 
@@ -96,130 +99,73 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
-repositories {
-    maven {
-        // Create, Ponder, Flywheel
-        url = "https://maven.createmod.net"
-    }
-    maven {
-        // Registrate
-        url = "https://maven.ithundxr.dev/snapshots"
-    }
-    maven {
-        // Registrate
-        url = "https://mvn.devos.one/snapshots/"
-    }
-    maven {
-        // ForgeConfigAPIPort
-        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
-    }
-    maven {
-        // location of the maven that hosts JEI files before January 2023
-        name = "Progwml6's maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        // location of the maven that hosts JEI files since January 2023
-        name = "Jared's maven"
-        url = "https://maven.blamejared.com/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.dev"
-    }
-    maven {
-        // maven for Copycats+
-        name = "realrobotixCopycats"
-        url = "https://maven.realrobotix.me/copycats"
-    }
-    maven {
-        // Conditional Mixin
-        name = "ConditionalMixin"
-        url 'https://maven.fallenbreath.me/releases'
-    }
-    maven {
-        // Create: Dragons Plus
-        name = "DragonsPlusMinecraft"
-        url "https://maven.dragons.plus/releases"
-    }
-    maven {
-        // Sable + Create: Aeronautics
-        name = "RyanHCode Maven"
-        url = "https://maven.ryanhcode.dev/releases"
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Modrinth"
-                url = "https://api.modrinth.com/maven"
-            }
-        }
-        filter {
-            includeGroup "maven.modrinth"
-        }
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Curse Maven"
-                url = "https://cursemaven.com"
-            }
-        }
-        filter {
-            includeGroup "curse.maven"
-        }
-    }
-
-    // Mod jar dependencies in ./libs
-    flatDir {
-        dir 'libs'
-    }
-}
-
-configurations {
-    localCompile
-    compileClasspath {
-        extendsFrom(localCompile)
-    }
-}
+// Prepare these files with tools/prepare_build_dependencies.py.
+// Nested Create libraries are compile-only: Create already supplies them at runtime.
+def adaptedManifestFile = file('build/dependencies-26.1.2/manifest.json')
+def adaptedManifest = adaptedManifestFile.isFile()
+        ? new groovy.json.JsonSlurper().parseText(providers.fileContents(
+                layout.projectDirectory.file('build/dependencies-26.1.2/manifest.json')).asText.get()) : [:]
+def adaptedEntries = adaptedManifest.entries ?: []
 
 dependencies {
-    implementation "net.neoforged:neoforge:${neoforge_version}"
+    implementation files(adaptedEntries.findAll { it.runtime }.collect { file(it.path) })
+    compileOnly files(adaptedEntries.findAll { !it.runtime && it.role != 'simulated' }.collect { file(it.path) })
+    simulatedCompileOnly files(adaptedEntries.findAll { it.role == 'simulated' }.collect { file(it.path) })
+}
 
-    implementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
-    implementation("net.createmod.ponder:ponder-neoforge:${ponder_version}+mc${minecraft_version}")
-    compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${flywheel_minecraft_version}:${flywheel_version}")
-    runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${flywheel_minecraft_version}:${flywheel_version}")
-    implementation("com.tterrag.registrate:Registrate:${registrate_version}")
+def adaptedProjectRoot = projectDir.canonicalFile
 
-    compileOnly("mezz.jei:jei-${jei_minecraft_version}-common-api:${jei_version}")
-    compileOnly("mezz.jei:jei-${jei_minecraft_version}-neoforge-api:${jei_version}")
-    runtimeOnly("mezz.jei:jei-${jei_minecraft_version}-neoforge:${jei_version}")
-
-    runtimeOnly("maven.modrinth:create-garnished:${garnished_version}")
-//    runtimeOnly("maven.modrinth:create-dreams-and-desires:${dreams_desires_version}")
-    implementation("plus.dragons.createdragonsplus:create-dragons-plus-${minecraft_version}:${create_dragons_plus_version}")
-    implementation("com.copycatsplus:copycats:${copycats_version}") { transitive = false }
-    implementation("maven.modrinth:additional-placements:${additional_placements_version}")
-//    runtimeOnly("maven.modrinth:create-steam-n-rails:${steam_n_rails_version}")
-    implementation("maven.modrinth:dye-depot:${dye_depot_version}")
-
-//    runtimeOnly("maven.modrinth:adorn:${adorn_version}")
-
-    // Sable compatibility
-    implementation("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}")
-    implementation("dev.simulated_team.simulated:simulated-neoforge-${minecraft_version}:${simulated_version}") {
-        transitive = false
-    }
-    implementation("dev.eriksonn.aeronautics:aeronautics-neoforge-${minecraft_version}:${aeronautics_version}") {
-        transitive = false
-    }
-    jarJar(api("dev.ryanhcode.sable-companion:sable-companion-common-${minecraft_version}:[${sable_companion_version},)")) {
-        version {
-            prefer sable_companion_version
+tasks.register('verifyAdaptedDependencies') {
+    group = 'verification'
+    description = 'Verify the staged, pinned Create 26.1.2 dependency files and hashes.'
+    inputs.file(adaptedManifestFile).optional()
+    inputs.files(adaptedEntries.collect { file(it.path) })
+    doLast {
+        if (!adaptedManifestFile.isFile())
+            throw new GradleException('Run python tools/prepare_build_dependencies.py first.')
+        def manifest = new groovy.json.JsonSlurper().parse(adaptedManifestFile)
+        if (manifest.schema != 1 || manifest.minecraft != '26.1.2'
+                || manifest.neoforge != '26.1.2.109'
+                || manifest.create_version != '6.0.11-adapted-1.27')
+            throw new GradleException('Dependency manifest does not match the diagnosed 26.1.2 baseline.')
+        def roles = manifest.entries.collect { it.role }
+        if (roles.size() != roles.toSet().size()
+                || !roles.containsAll(['create', 'catnip', 'flywheel', 'ponder', 'registrate', 'jei', 'annotations', 'rei', 'architectury']))
+            throw new GradleException('Missing or duplicate staged dependency roles.')
+        manifest.entries.each { entry ->
+            def dependency = new File(adaptedProjectRoot, entry.path).canonicalFile
+            if (!dependency.toPath().startsWith(adaptedProjectRoot.toPath()) || !dependency.isFile())
+                throw new GradleException("Missing or external staged dependency: ${entry.role}")
+            def hash = java.security.MessageDigest.getInstance('SHA-256').digest(dependency.bytes).encodeHex().toString()
+            if (hash != entry.sha256)
+                throw new GradleException("Staged dependency hash mismatch: ${entry.role}")
         }
+        logger.lifecycle("Verified ${manifest.entries.size()} staged adapted dependencies.")
     }
+}
+
+tasks.register('requireSimulatedDependency') {
+    group = 'verification'
+    description = 'Require the real Simulated API for the optional bridge source set.'
+    dependsOn tasks.named('verifyAdaptedDependencies')
+    inputs.file(adaptedManifestFile).optional()
+    doLast {
+        def manifest = new groovy.json.JsonSlurper().parse(adaptedManifestFile)
+        if (!manifest.entries.any { it.role == 'simulated' })
+            throw new GradleException('Simulated 26.1.2 is missing. Supply its real JAR with python tools/prepare_build_dependencies.py --simulated-jar <path>. The optional bridge sources remain available in src/simulated/java.')
+    }
+}
+
+tasks.named('compileJava') {
+    dependsOn tasks.named('verifyAdaptedDependencies')
+}
+
+tasks.named('compileSimulatedJava') {
+    dependsOn tasks.named('requireSimulatedDependency')
+}
+
+tasks.matching { it.name in ['runClient', 'runServer', 'runData', 'runGameTestServer'] }.configureEach {
+    dependsOn tasks.named('verifyAdaptedDependencies')
 }
 
 // Expands all declared replace properties in the specified resource targets.
@@ -248,8 +194,35 @@ processResources {
     }
 }
 
+tasks.named('processSimulatedResources') {
+    dependsOn tasks.named('requireSimulatedDependency')
+    def bridgeProperties = [loader_version_range: loader_version_range,
+            mod_license: mod_license, mod_version: mod_version, mod_authors: mod_authors,
+            minecraft_version_range: minecraft_version_range, neoforge_version_range: neoforge_version_range]
+    inputs.properties bridgeProperties
+    filesMatching('META-INF/neoforge.mods.toml') { expand bridgeProperties }
+}
+
+tasks.register('simulatedJar', Jar) {
+    group = 'build'
+    description = 'Build the optional Simulated bridge with its real 26.1.2 dependency.'
+    archiveClassifier = 'simulated'
+    from sourceSets.simulated.output
+    from 'LICENSE'
+}
+
+java.withSourcesJar()
+tasks.named('sourcesJar') { from 'LICENSE'; duplicatesStrategy(DuplicatesStrategy.EXCLUDE) }
+tasks.register('simulatedSourcesJar', Jar) {
+    group = 'build'
+    archiveClassifier = 'simulated-sources'
+    from sourceSets.simulated.allSource
+    from 'LICENSE'
+}
+
 // Get properties into the manifest for reading at runtime.
 jar {
+    from 'LICENSE'
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 
     manifest {
@@ -269,47 +242,6 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
-tasks.publishMods.dependsOn(tasks.assemble)
-tasks.publishMods.mustRunAfter(tasks.build)
-
-publishMods {
-    changelog = "## NOTE: Create: Connected 1.2.0 contains breaking changes for dependents\n" +
-            "\n" +
-            "- Mod registrations moved to `registries` package\n" +
-            "\n" +
-            "Check out the detailed changelog at https://github.com/hlysine/create_connected/blob/main/CHANGELOG.md"
-    type = STABLE
-    file = jar.archiveFile
-    modLoaders.add("neoforge")
-
-    github {
-        accessToken = secrets.GITHUB_TOKEN
-        repository = "hlysine/create_connected"
-        commitish = "main"
-    }
-
-    modrinth {
-        accessToken = secrets.MODRINTH_TOKEN
-        projectId = "Vg5TIO6d"
-        minecraftVersions.add(minecraft_version)
-
-        requires {
-            id = "LNytGWDc"
-        }
-        optional {
-            id = "u6dRKJwZ"
-        }
-    }
-
-    curseforge {
-        accessToken = secrets.CURSEFORGE_TOKEN
-        projectId = "947914"
-        client = true
-        server = true
-        minecraftVersions.add(minecraft_version)
-    }
-}
-
 idea {
     module {
         downloadSources = true
@@ -318,6 +250,6 @@ idea {
 }
 
 wrapper {
-    gradleVersion = '8.10.1'
+    gradleVersion = '9.5.0'
     distributionType = Wrapper.DistributionType.BIN
 }

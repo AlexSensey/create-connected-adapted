@@ -11,6 +11,7 @@ import net.createmod.catnip.api.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -106,7 +107,7 @@ public class CrossConnectorBlock extends Block implements IWrenchable, IConnecti
         if (player.isShiftKeyDown() || !player.mayBuild())
             return InteractionResult.TRY_WITH_EMPTY_HAND;
 
-        return tryEncase(state, level, pos, stack, player, hand, hitResult);
+        return tryEncase(state, level, pos, stack, player, hand, hitResult).asInteractionResult();
     }
 
     @Override
@@ -122,11 +123,14 @@ public class CrossConnectorBlock extends Block implements IWrenchable, IConnecti
                     continue;
                 BlockPos sourcePos = pos;
                 BlockPos neighborPos = pos.relative(direction);
-                while (sourcePos != neighborPos && level.getBlockState(neighborPos).getBlock() instanceof IConnectionForwardingBlock forwardingBlock) {
+                while (!sourcePos.equals(neighborPos) && level.isLoaded(neighborPos)
+                        && level.getBlockState(neighborPos).getBlock() instanceof IConnectionForwardingBlock forwardingBlock) {
                     BlockPos tempSource = sourcePos;
                     sourcePos = neighborPos;
                     neighborPos = forwardingBlock.forwardConnection(level, tempSource, tempSource.equals(pos) ? state : level.getBlockState(tempSource), neighborPos);
                 }
+                if (!level.isLoaded(neighborPos))
+                    continue;
                 BlockEntity neighbourTE = level.getBlockEntity(neighborPos);
                 if (neighbourTE instanceof KineticBlockEntity kineticTE) {
                     KineticHelper.updateKineticBlock(kineticTE);
@@ -142,9 +146,9 @@ public class CrossConnectorBlock extends Block implements IWrenchable, IConnecti
     }
 
     @Override
-    protected void onRemove(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState newState, boolean movedByPiston) {
+    protected void affectNeighborsAfterRemoval(@NotNull BlockState state, @NotNull ServerLevel level, @NotNull BlockPos pos, boolean movedByPiston) {
         updateConnections(level, pos, state);
-        super.onRemove(state, level, pos, newState, movedByPiston);
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
     }
 
     @Override

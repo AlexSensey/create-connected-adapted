@@ -11,12 +11,8 @@
   ],
   "type": "create:item_application",
   "ingredients": [
-    {
-      "item": "create_connected:empty_fan_catalyst"
-    },
-    {
-      "item": "minecraft:sculk_catalyst"
-    }
+    "create_connected:empty_fan_catalyst",
+    "minecraft:sculk_catalyst"
   ],
   "results": [
     {

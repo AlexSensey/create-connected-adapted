@@ -11,17 +11,10 @@
   ],
   "type": "create:filling",
   "ingredients": [
+    "create_connected:empty_fan_catalyst",
     {
-      "item": "create_connected:empty_fan_catalyst"
-    },
-    {
-      "type": "neoforge:compound",
-      "amount": 1000,
-      "ingredients": [
-        {
-          "fluid": "create_dragons_plus:magenta_dye"
-        }
-      ]
+      "ingredient": "create_dragons_plus:magenta_dye",
+      "amount": 1000
     }
   ],
   "results": [

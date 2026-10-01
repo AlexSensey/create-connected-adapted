@@ -2,6 +2,7 @@ package com.hlysine.create_connected.content.kineticbridge;
 
 import com.hlysine.create_connected.content.KineticHelper;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
+import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -11,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 public class KineticBridgeDestinationBlockEntity extends GeneratingKineticBlockEntity {
 
@@ -21,10 +23,22 @@ public class KineticBridgeDestinationBlockEntity extends GeneratingKineticBlockE
         super(type, pos, state);
     }
 
-    private KineticBridgeBlockEntity getSource() {
+    @Override
+    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
+        super.addBehaviours(behaviours);
+        behaviours.add(new KineticBridgeDestinationSettings(this));
+    }
+
+    protected KineticBridgeBlockEntity getSource() {
+        if (getLevel() == null || !(getBlockState().getBlock() instanceof KineticBridgeDestinationBlock destination)
+                || !destination.stillValid(getLevel(), getBlockPos(), getBlockState())) {
+            sourceBE.clear();
+            return null;
+        }
         KineticBridgeBlockEntity source = sourceBE.get();
         BlockPos sourcePos = KineticBridgeDestinationBlock.getSource(getBlockPos(), getBlockState());
-        if (source != null && !source.isRemoved() && source.getBlockPos().equals(sourcePos)) {
+        if (source != null && !source.isRemoved() && source.getLevel() == getLevel()
+                && source.getBlockPos().equals(sourcePos)) {
             return source;
         }
         if (getLevel() == null) {
@@ -39,12 +53,19 @@ public class KineticBridgeDestinationBlockEntity extends GeneratingKineticBlockE
     }
 
     @Override
+    public void initialize() {
+        super.initialize();
+        if (getLevel() != null && !getLevel().isClientSide())
+            updateGeneratedRotation();
+    }
+
+    @Override
     public void tick() {
         super.tick();
         if (!getLevel().isClientSide()) {
             if (updateKineticsNextTick) {
-                KineticHelper.updateKineticBlock(this);
                 updateKineticsNextTick = false;
+                KineticHelper.updateKineticBlock(this);
             }
         }
     }

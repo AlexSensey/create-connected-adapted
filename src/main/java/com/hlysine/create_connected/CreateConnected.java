@@ -4,6 +4,7 @@ import com.hlysine.create_connected.compat.AdditionalPlacementsCompat;
 import com.hlysine.create_connected.compat.CopycatsManager;
 import com.hlysine.create_connected.compat.Mods;
 import com.hlysine.create_connected.config.CCConfigs;
+import com.hlysine.create_connected.content.fancatalyst.FanCatalystInteraction;
 import com.hlysine.create_connected.datagen.CCDatagen;
 import com.hlysine.create_connected.datagen.advancements.CCAdvancements;
 import com.hlysine.create_connected.datagen.advancements.CCTriggers;
@@ -66,6 +67,7 @@ public class CreateConnected {
         CCArmInteractionPointTypes.register(modEventBus);
 
         CCConfigs.register(modContainer);
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, FanCatalystInteraction::onRightClickBlock);
 
         if (Mods.COPYCATS.isLoaded())
             NeoForge.EVENT_BUS.addListener(CopycatsManager::onLevelTick);

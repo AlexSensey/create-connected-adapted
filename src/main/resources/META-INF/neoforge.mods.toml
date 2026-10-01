@@ -7,7 +7,6 @@ issueTrackerURL="https://github.com/hlysine/create_connected/issues"
     modId="${mod_id}"
     version="${mod_version}"
     displayName="${mod_name}"
-    updateJSONURL="https://raw.githubusercontent.com/hlysine/create_connected/main/update.json"
     displayURL="https://github.com/hlysine/create_connected"
     logoFile="create_connected_icon.png"
     credits="GitHub contributors, the Create mod Discord and redditors"
@@ -16,21 +15,21 @@ issueTrackerURL="https://github.com/hlysine/create_connected/issues"
 
 [[dependencies.${mod_id}]]
     modId="neoforge"
-    mandatory=true
+    type="required"
     versionRange="${neoforge_version_range}"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
     modId="minecraft"
-    mandatory=true
+    type="required"
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
     modId="create"
-    mandatory=true
+    type="required"
     versionRange="${create_version_range}"
     ordering="NONE"
     side="BOTH"

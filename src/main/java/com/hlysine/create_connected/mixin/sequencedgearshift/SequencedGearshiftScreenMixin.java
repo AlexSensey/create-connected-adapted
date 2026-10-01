@@ -5,11 +5,13 @@ import com.simibubi.create.content.kinetics.transmission.sequencer.Instruction;
 import com.simibubi.create.content.kinetics.transmission.sequencer.SequencedGearshiftScreen;
 import com.simibubi.create.content.kinetics.transmission.sequencer.SequencerInstructions;
 import com.simibubi.create.foundation.gui.widget.ScrollInput;
+import com.simibubi.create.foundation.gui.AllGuiTextures;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Vector;
 
@@ -21,13 +23,20 @@ public class SequencedGearshiftScreenMixin {
     private Vector<Vector<ScrollInput>> inputs;
 
     @Inject(
+            method = "backgroundFor(Lcom/simibubi/create/content/kinetics/transmission/sequencer/SequencerInstructions;)Lcom/simibubi/create/foundation/gui/AllGuiTextures;",
+            at = @At("HEAD"), cancellable = true
+    )
+    private static void create_connected$backgroundFor(SequencerInstructions instruction,
+                                                       CallbackInfoReturnable<AllGuiTextures> cir) {
+        if (instruction == CCSequencerInstructions.TURN_AWAIT || instruction == CCSequencerInstructions.TURN_TIME)
+            cir.setReturnValue(AllGuiTextures.SEQUENCER_INSTRUCTION);
+        else if (instruction == CCSequencerInstructions.LOOP)
+            cir.setReturnValue(AllGuiTextures.SEQUENCER_END);
+    }
+
+    @Inject(
             method = "updateParamsOfRow(I)V",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lcom/simibubi/create/foundation/gui/widget/ScrollInput;standardStep()Ljava/util/function/Function;",
-                    shift = At.Shift.BY,
-                    by = 2
-            )
+            at = @At("RETURN")
     )
     public void updateParamsOfRow(int row, CallbackInfo ci) {
         if (((InstructionAccessor) instructions.get(row)).getInstruction() == CCSequencerInstructions.TURN_TIME) {
@@ -55,7 +64,8 @@ public class SequencedGearshiftScreenMixin {
             for (int i = instructions.size() - 1; i > index; i--) {
                 instructions.remove(i);
                 Vector<ScrollInput> rowInputs = inputs.get(i);
-                ((AbstractSimiScreenAccessor) this).callRemoveWidgets(rowInputs);
+                for (ScrollInput widget : rowInputs)
+                    ((AbstractSimiScreenAccessor) this).callRemoveWidget(widget);
                 rowInputs.clear();
             }
             ci.cancel();

@@ -8,12 +8,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "create:copper_sheet"
-    },
-    "C": {
-      "tag": "c:barrels/wooden"
-    }
+    "B": "create:copper_sheet",
+    "C": "#c:barrels/wooden"
   },
   "pattern": [
     "BCB"

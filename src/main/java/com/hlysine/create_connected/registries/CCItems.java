@@ -12,7 +12,7 @@ import com.hlysine.create_connected.content.parallelgearbox.VerticalParallelGear
 import com.hlysine.create_connected.content.redstonelinkwildcard.RedstoneLinkWildcardItem;
 import com.hlysine.create_connected.content.sixwaygearbox.VerticalSixWayGearboxItem;
 import com.simibubi.create.content.processing.sequenced.SequencedAssemblyItem;
-import com.simibubi.create.foundation.data.AssetLookup;
+import com.hlysine.create_connected.datagen.CCSimpleModelGen;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.tags.ItemTags;
@@ -30,33 +30,39 @@ public class CCItems {
 
     public static final ItemEntry<Item> CONTROL_CHIP =
             REGISTRATE.item("control_chip", Item::new)
+                    .onRegister(CCSimpleModelGen::registerGeneratedItem)
                     .register();
 
     public static final ItemEntry<SequencedAssemblyItem> INCOMPLETE_CONTROL_CHIP =
             REGISTRATE.item("incomplete_control_chip", SequencedAssemblyItem::new)
+                    .onRegister(CCSimpleModelGen::registerGeneratedItem)
                     .register();
 
     public static final ItemEntry<RedstoneLinkWildcardItem> REDSTONE_LINK_WILDCARD =
             REGISTRATE.item("redstone_link_wildcard", RedstoneLinkWildcardItem::new)
+                    .onRegister(CCSimpleModelGen::registerGeneratedItem)
                     .transform(FeatureToggle.register(FeatureCategory.REDSTONE))
                     .register();
 
     public static final ItemEntry<VerticalParallelGearboxItem> VERTICAL_PARALLEL_GEARBOX =
             REGISTRATE.item("vertical_parallel_gearbox", VerticalParallelGearboxItem::new)
-                    .model(AssetLookup.customBlockItemModel("parallel_gearbox", "item_vertical"))
+                    .onRegister(item -> CCSimpleModelGen.registerStandaloneItem(item,
+                            CreateConnected.asResource("block/parallel_gearbox/item_vertical")))
                     .transform(FeatureToggle.registerDependent(CCBlocks.PARALLEL_GEARBOX))
                     .register();
 
     public static final ItemEntry<VerticalSixWayGearboxItem> VERTICAL_SIX_WAY_GEARBOX =
             REGISTRATE.item("vertical_six_way_gearbox", VerticalSixWayGearboxItem::new)
-                    .model(AssetLookup.customBlockItemModel("six_way_gearbox", "item_vertical"))
+                    .onRegister(item -> CCSimpleModelGen.registerStandaloneItem(item,
+                            CreateConnected.asResource("block/six_way_gearbox/item_vertical")))
                     .transform(FeatureToggle.registerDependent(CCBlocks.SIX_WAY_GEARBOX))
                     .lang("Vertical 6-way Gearbox")
                     .register();
 
     public static final ItemEntry<VerticalBrassGearboxItem> VERTICAL_BRASS_GEARBOX =
             REGISTRATE.item("vertical_brass_gearbox", VerticalBrassGearboxItem::new)
-                    .model(AssetLookup.customBlockItemModel("brass_gearbox", "item_vertical"))
+                    .onRegister(item -> CCSimpleModelGen.registerStandaloneItem(item,
+                            CreateConnected.asResource("block/brass_gearbox/item_vertical")))
                     .transform(FeatureToggle.registerDependent(CCBlocks.BRASS_GEARBOX))
                     .register();
 
@@ -64,30 +70,35 @@ public class CCItems {
     @Deprecated(forRemoval = true, since = "1.3.0")
     public static final ItemEntry<ChargedKineticBatteryItem> CHARGED_KINETIC_BATTERY =
             REGISTRATE.item("charged_kinetic_battery", ChargedKineticBatteryItem::new)
-                    .model(AssetLookup.customBlockItemModel("kinetic_battery", "item_charged"))
+                    .onRegister(item -> CCSimpleModelGen.registerStandaloneItem(item,
+                            CreateConnected.asResource("block/kinetic_battery/item_charged")))
                     .transform(FeatureToggle.registerDependent(CCBlocks.KINETIC_BATTERY))
                     .register();
 
     public static final ItemEntry<LinkedTransmitterItem> LINKED_TRANSMITTER =
             REGISTRATE.item("linked_transmitter", LinkedTransmitterItem::new)
-                    .model(AssetLookup.customGenericItemModel("linked_transmitter", "item"))
+                    .onRegister(item -> CCSimpleModelGen.registerStandaloneItem(item,
+                            CreateConnected.asResource("block/linked_transmitter/item")))
                     .transform(FeatureToggle.register(FeatureCategory.REDSTONE))
                     .register();
 
     public static final ItemEntry<CopycatBoxItem> COPYCAT_BOX =
             REGISTRATE.item("copycat_box", CopycatBoxItem::new)
-                    .model(AssetLookup.customBlockItemModel("copycat_base", "box"))
+                    .onRegister(item -> CCSimpleModelGen.registerStandaloneItem(item,
+                            CreateConnected.asResource("block/copycat_base/box")))
                     .transform(FeatureToggle.registerDependent(CCBlocks.COPYCAT_BOARD))
                     .register();
 
     public static final ItemEntry<CopycatCatwalkItem> COPYCAT_CATWALK =
             REGISTRATE.item("copycat_catwalk", CopycatCatwalkItem::new)
-                    .model(AssetLookup.customBlockItemModel("copycat_base", "catwalk"))
+                    .onRegister(item -> CCSimpleModelGen.registerStandaloneItem(item,
+                            CreateConnected.asResource("block/copycat_base/catwalk")))
                     .transform(FeatureToggle.registerDependent(CCBlocks.COPYCAT_BOARD))
                     .register();
 
     public static final ItemEntry<Item> MUSIC_DISC_ELEVATOR =
             REGISTRATE.item("music_disc_elevator", Item::new)
+                    .onRegister(CCSimpleModelGen::registerGeneratedItem)
                     .properties(p -> p.stacksTo(1).rarity(Rarity.RARE).jukeboxPlayable(CCJukeboxSongs.ELEVATOR))
                     .tag(Tags.Items.MUSIC_DISCS, ItemTags.CREEPER_DROP_MUSIC_DISCS)
                     .lang("Music Disc")
@@ -95,6 +106,7 @@ public class CCItems {
 
     public static final ItemEntry<Item> MUSIC_DISC_INTERLUDE =
             REGISTRATE.item("music_disc_interlude", Item::new)
+                    .onRegister(CCSimpleModelGen::registerGeneratedItem)
                     .properties(p -> p.stacksTo(1).rarity(Rarity.RARE).jukeboxPlayable(CCJukeboxSongs.INTERLUDE))
                     .tag(Tags.Items.MUSIC_DISCS, ItemTags.CREEPER_DROP_MUSIC_DISCS)
                     .lang("Music Disc")

@@ -46,7 +46,7 @@ public class CServer extends ConfigBase {
         static String stress = "Fine tune the kinetic stats of individual components";
         static String brakeActiveStress = "Stress impact of a powered brake [in Stress Units]";
         static String schematicsNestingDepth = "Number of sub-folders allowed for schematics";
-        static String applicationRemainingItemFix = "Enable the fix that gives remaining items after manual application";
+        static String applicationRemainingItemFix = "Legacy setting retained for config compatibility. Create Adapted 26.2 already returns recipe remainder items; this setting has no effect.";
         static String vesselBoilerStressMultiplier = "Modify the stress output when a Fluid Vessel is used as a boiler";
         static String vesselHeatMultiplier = "Modify the heat level when a Fluid Vessel is used as a boiler";
         static String vesselMaxLevel = "Limit the max boiler level achievable with a Fluid Vessel";

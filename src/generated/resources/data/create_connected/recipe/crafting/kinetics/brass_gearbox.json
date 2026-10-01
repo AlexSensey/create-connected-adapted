@@ -8,12 +8,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "c": {
-      "item": "create:cogwheel"
-    },
-    "s": {
-      "item": "create:rotation_speed_controller"
-    }
+    "c": "create:cogwheel",
+    "s": "create:rotation_speed_controller"
   },
   "pattern": [
     " c ",

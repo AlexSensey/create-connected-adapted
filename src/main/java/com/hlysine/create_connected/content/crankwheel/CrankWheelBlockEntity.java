@@ -1,16 +1,12 @@
 package com.hlysine.create_connected.content.crankwheel;
 
-import com.hlysine.create_connected.registries.CCPartialModels;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.content.kinetics.base.IRotate;
 import com.simibubi.create.content.kinetics.crank.HandCrankBlock;
 import com.simibubi.create.content.kinetics.crank.HandCrankBlockEntity;
 import com.simibubi.create.content.kinetics.simpleRelays.ICogWheel;
 import net.createmod.catnip.api.client.animation.AnimationTickHolder;
-import net.createmod.catnip.api.client.render.CachedBuffers;
-import net.createmod.catnip.api.client.render.SuperByteBuffer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
@@ -34,16 +30,6 @@ public class CrankWheelBlockEntity extends HandCrankBlockEntity {
                         neighbours.add(worldPosition.offset(offset));
                 });
         return neighbours;
-    }
-
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public SuperByteBuffer getRenderedHandle() {
-        BlockState blockState = getBlockState();
-        Direction facing = blockState.getOptionalValue(HandCrankBlock.FACING)
-                .orElse(Direction.UP);
-        boolean isLarge = blockState.getBlock() instanceof CrankWheelBlock block && block.largeCog;
-        return CachedBuffers.partialFacing(isLarge ? CCPartialModels.LARGE_CRANK_WHEEL_HANDLE : CCPartialModels.CRANK_WHEEL_HANDLE, blockState, facing.getOpposite());
     }
 
     @Override

@@ -57,7 +57,7 @@ public class ItemApplicationRecipeGen extends com.simibubi.create.api.data.recip
             new ModLoadedCondition(Mods.DRAGONS_PLUS.id()));
     GeneratedRecipe WITHERING_CATALYST = fanCatalystFromEmpty(
             "withering_catalyst", Items.WITHER_ROSE, CCBlocks.FAN_WITHERING_CATALYST::asItem,
-            FalseCondition.INSTANCE);
+            NeverCondition.INSTANCE);
     GeneratedRecipe CHOCOLATE_COATING_CATALYST = fanCatalystFromEmpty(
             "chocolate_coating_catalyst", AllFluids.CHOCOLATE.getBucket().get(), CCBlocks.FAN_CHOCOLATE_COATING_CATALYST::asItem,
             new ModLoadedCondition(Mods.MORE_CATALYSTS.id()));

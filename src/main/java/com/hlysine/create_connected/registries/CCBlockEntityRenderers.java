@@ -1,5 +1,6 @@
 package com.hlysine.create_connected.registries;
 
+import com.hlysine.create_connected.content.ClutchRenderer;
 import com.simibubi.create.content.kinetics.simpleRelays.BracketedKineticBlockEntityRenderer;
 import com.hlysine.create_connected.content.brassgearbox.BrassGearboxRenderer;
 import com.simibubi.create.content.logistics.chute.ChuteRenderer;
@@ -7,7 +8,7 @@ import com.hlysine.create_connected.content.dashboard.DashboardRenderer;
 import com.simibubi.create.content.kinetics.simpleRelays.encased.EncasedCogRenderer;
 import com.hlysine.create_connected.content.fancatalyst.FanCatalystRotatingHeadRenderer;
 import com.hlysine.create_connected.content.fluidvessel.FluidVesselRenderer;
-import com.simibubi.create.content.kinetics.crank.HandCrankRenderer;
+import com.hlysine.create_connected.content.crankwheel.CrankWheelRenderer;
 import com.hlysine.create_connected.content.kineticbattery.KineticBatteryRenderer;
 import com.hlysine.create_connected.content.kineticbridge.KineticBridgeRenderer;
 import com.hlysine.create_connected.content.linkedtransmitter.LinkedAnalogLeverRenderer;
@@ -22,16 +23,19 @@ public final class CCBlockEntityRenderers {
     private CCBlockEntityRenderers() {}
 
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
+        com.hlysine.create_connected.compat.SimulatedCompat.invoke(
+                "com.hlysine.create_connected.compat.SimulatedClientRegistration", "registerRenderers",
+                EntityRenderersEvent.RegisterRenderers.class, event);
         event.registerBlockEntityRenderer(CCBlockEntityTypes.ENCASED_CHAIN_COGWHEEL.get(), EncasedCogRenderer::small);
-        event.registerBlockEntityRenderer(CCBlockEntityTypes.CRANK_WHEEL.get(), HandCrankRenderer::new);
+        event.registerBlockEntityRenderer(CCBlockEntityTypes.CRANK_WHEEL.get(), CrankWheelRenderer::new);
         event.registerBlockEntityRenderer(CCBlockEntityTypes.PARALLEL_GEARBOX.get(), ParallelGearboxRenderer::new);
         event.registerBlockEntityRenderer(CCBlockEntityTypes.SIX_WAY_GEARBOX.get(), SixWayGearboxRenderer::new);
-        event.registerBlockEntityRenderer(CCBlockEntityTypes.OVERSTRESS_CLUTCH.get(), SplitShaftRenderer::new);
+        event.registerBlockEntityRenderer(CCBlockEntityTypes.OVERSTRESS_CLUTCH.get(), ClutchRenderer::new);
         event.registerBlockEntityRenderer(CCBlockEntityTypes.SHEAR_PIN.get(), BracketedKineticBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(CCBlockEntityTypes.INVERTED_CLUTCH.get(), SplitShaftRenderer::new);
         event.registerBlockEntityRenderer(CCBlockEntityTypes.INVERTED_GEARSHIFT.get(), SplitShaftRenderer::new);
-        event.registerBlockEntityRenderer(CCBlockEntityTypes.CENTRIFUGAL_CLUTCH.get(), SplitShaftRenderer::new);
-        event.registerBlockEntityRenderer(CCBlockEntityTypes.FREEWHEEL_CLUTCH.get(), SplitShaftRenderer::new);
+        event.registerBlockEntityRenderer(CCBlockEntityTypes.CENTRIFUGAL_CLUTCH.get(), ClutchRenderer::new);
+        event.registerBlockEntityRenderer(CCBlockEntityTypes.FREEWHEEL_CLUTCH.get(), ClutchRenderer::new);
         event.registerBlockEntityRenderer(CCBlockEntityTypes.KINETIC_BRIDGE.get(), KineticBridgeRenderer::source);
         event.registerBlockEntityRenderer(CCBlockEntityTypes.KINETIC_BRIDGE_DESTINATION.get(), KineticBridgeRenderer::destination);
         event.registerBlockEntityRenderer(CCBlockEntityTypes.BRASS_GEARBOX.get(), BrassGearboxRenderer::new);

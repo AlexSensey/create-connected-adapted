@@ -19,9 +19,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "s": {
-      "item": "create_connected:copycat_slab"
-    }
+    "s": "create_connected:copycat_slab"
   },
   "pattern": [
     "s",

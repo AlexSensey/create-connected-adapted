@@ -15,9 +15,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "p": {
-      "item": "create:copycat_panel"
-    }
+    "p": "create:copycat_panel"
   },
   "pattern": [
     "p",

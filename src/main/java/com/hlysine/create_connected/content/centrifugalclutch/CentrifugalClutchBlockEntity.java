@@ -54,6 +54,8 @@ public class CentrifugalClutchBlockEntity extends SplitShaftBlockEntity {
     }
 
     private void onKineticUpdate() {
+        if (level == null || level.isClientSide())
+            return;
         boolean coupled = !getBlockState().getValue(UNCOUPLED);
         boolean thresholdReached = Mth.abs(getSpeed()) > 0;
         if (speedThreshold.getValue() < 0)
@@ -84,7 +86,7 @@ public class CentrifugalClutchBlockEntity extends SplitShaftBlockEntity {
     @Override
     public void tick() {
         super.tick();
-        if (reattachNextTick && level != null) {
+        if (reattachNextTick && level != null && !level.isClientSide()) {
             reattachNextTick = false;
             RotationPropagator.handleAdded(level, getBlockPos(), this);
         }

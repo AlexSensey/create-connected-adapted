@@ -66,7 +66,7 @@ public class InventoryBridgeScenes {
 
         for (int i = 0; i < 4; i++) {
             scene.idle(20);
-            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK.weathering().unaffected(), 64));
+            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK, 64));
         }
         scene.idle(20);
 
@@ -76,7 +76,7 @@ public class InventoryBridgeScenes {
                 .pointAt(util.vector().topOf(mainBridge));
 
         for (int i = 0; i < 4; i++) {
-            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK.weathering().unaffected(), 16));
+            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK, 16));
             scene.idle(20);
         }
 
@@ -84,11 +84,11 @@ public class InventoryBridgeScenes {
 
         scene.world().showSection(util.select().position(vault1Funnel), Direction.EAST);
         scene.overlay().chaseBoundingBoxOutline(PonderPalette.INPUT, vault1, new AABB(3, 1, 0, 5, 3, 2), 60);
-        ItemStack vault1Stack = new ItemStack(Items.COPPER_BLOCK.weathering().unaffected());
+        ItemStack vault1Stack = new ItemStack(Items.COPPER_BLOCK);
         ElementLink<EntityElement> vault1Item =
                 scene.world().createItemEntity(util.vector().centerOf(vault1Funnel), util.vector().of(0, 0, 0), vault1Stack);
 
-        scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK.weathering().unaffected(), 16));
+        scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK, 16));
         scene.idle(20);
 
 
@@ -98,7 +98,7 @@ public class InventoryBridgeScenes {
                 .pointAt(util.vector().centerOf(vault1Funnel));
 
         for (int i = 0; i < 5; i++) {
-            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK.weathering().unaffected(), 16));
+            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK, 16));
             scene.idle(20);
         }
 
@@ -121,13 +121,13 @@ public class InventoryBridgeScenes {
         scene.idle(20);
 
         for (int i = 0; i < 3; i++) {
-            ItemStack stack = new ItemStack(Items.COPPER_BLOCK.weathering().unaffected());
+            ItemStack stack = new ItemStack(Items.COPPER_BLOCK);
             ElementLink<EntityElement> funnelItem =
                     scene.world().createItemEntity(util.vector().topOf(secondFunnel).add(0, 2, 0), util.vector().of(0, 0, 0), stack);
             scene.idle(10);
             scene.world().modifyEntity(funnelItem, Entity::discard);
             scene.idle(5);
-            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK.weathering().unaffected(), 16));
+            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK, 16));
             scene.idle(5);
         }
 
@@ -181,7 +181,7 @@ public class InventoryBridgeScenes {
 
         for (int i = 0; i < 3; i++) {
             scene.idle(20);
-            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK.weathering().unaffected(), 16));
+            scene.world().createItemOnBelt(beltStart, Direction.DOWN, new ItemStack(Items.COPPER_BLOCK, 16));
         }
     }
 

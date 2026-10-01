@@ -8,12 +8,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create:transmitter"
-    },
-    {
-      "item": "create:crafter_slot_cover"
-    }
+    "create:transmitter",
+    "create:crafter_slot_cover"
   ],
   "result": {
     "count": 1,

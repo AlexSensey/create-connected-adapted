@@ -3,14 +3,13 @@ package com.hlysine.create_connected.content.redstonelinkwildcard;
 import com.hlysine.create_connected.registries.CCItems;
 import com.hlysine.create_connected.CreateConnected;
 import com.hlysine.create_connected.config.CServer;
+import com.hlysine.create_connected.compat.Mods;
 import com.hlysine.create_connected.config.FeatureToggle;
 import com.simibubi.create.content.redstone.link.IRedstoneLinkable;
 import com.simibubi.create.content.redstone.link.LinkBehaviour;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler;
 import com.simibubi.create.content.redstone.link.RedstoneLinkNetworkHandler.Frequency;
 import com.simibubi.create.infrastructure.config.AllConfigs;
-import dev.ryanhcode.sable.companion.SableCompanion;
-import dev.ryanhcode.sable.companion.SubLevelAccess;
 import net.createmod.catnip.api.data.Couple;
 import net.createmod.catnip.api.level.WorldHelper;
 import net.minecraft.core.BlockPos;
@@ -21,10 +20,11 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 @EventBusSubscriber(modid = CreateConnected.MODID)
 public class LinkWildcardNetworkHandler {
@@ -35,8 +35,10 @@ public class LinkWildcardNetworkHandler {
 
     @SubscribeEvent
     public static void onLoadWorld(LevelEvent.Load event) {
-        transmitter_connections.put(event.getLevel(), new HashMap<>());
-        receiver_connections.put(event.getLevel(), new HashMap<>());
+        if (!(event.getLevel() instanceof Level level) || level.isClientSide())
+            return;
+        transmittersIn(level);
+        receiversIn(level);
         CreateConnected.LOGGER.debug("Link-Wildcard: Prepared Redstone Network Wildcards for {}", WorldHelper.getDimensionID(event.getLevel()));
     }
 
@@ -48,23 +50,19 @@ public class LinkWildcardNetworkHandler {
     }
 
     public static Map<Couple<Frequency>, Set<Couple<Frequency>>> transmittersIn(LevelAccessor world) {
-        if (!transmitter_connections.containsKey(world)) {
-            CreateConnected.LOGGER.warn("Link-Wildcard: Tried to Access unprepared network transmitters of {}", WorldHelper.getDimensionID(world));
-            return new HashMap<>();
-        }
-        return transmitter_connections.get(world);
+        return transmitter_connections.computeIfAbsent(world, ignored -> new HashMap<>());
     }
 
     public static Map<Couple<Frequency>, Set<Couple<Frequency>>> receiversIn(LevelAccessor world) {
-        if (!receiver_connections.containsKey(world)) {
-            CreateConnected.LOGGER.warn("Link-Wildcard: Tried to Access unprepared network receivers of {}", WorldHelper.getDimensionID(world));
-            return new HashMap<>();
-        }
-        return receiver_connections.get(world);
+        return receiver_connections.computeIfAbsent(world, ignored -> new HashMap<>());
+    }
+
+    private static boolean isServerWorld(LevelAccessor world) {
+        return world instanceof Level level && !level.isClientSide();
     }
 
     public static boolean updateNetworkOf(RedstoneLinkNetworkHandler handler, LevelAccessor world, IRedstoneLinkable actor) {
-        if (!FeatureToggle.isEnabled(CCItems.REDSTONE_LINK_WILDCARD.getId()))
+        if (!isServerWorld(world) || !FeatureToggle.isEnabled(CCItems.REDSTONE_LINK_WILDCARD.getId()))
             return false;
 
         Couple<Frequency> key = actor.getNetworkKey();
@@ -82,58 +80,62 @@ public class LinkWildcardNetworkHandler {
     }
 
     private static void updateNetworkForReceiver(RedstoneLinkNetworkHandler handler, LevelAccessor world, IRedstoneLinkable actor, Couple<Frequency> key) {
-        Map<Couple<Frequency>, Set<IRedstoneLinkable>> networksInWorld = handler.networksIn(world);
-        Map<Couple<Frequency>, Set<Couple<Frequency>>> receiversInWorld = receiversIn(world);
-        Set<IRedstoneLinkable> network = networksInWorld.get(key);
-        Set<Couple<Frequency>> receivers = receiversInWorld.get(key);
-
+        var networks = handler.networksIn(world);
+        var network = networks.get(key);
         handler.globalPowerVersion.incrementAndGet();
-        AtomicInteger power = new AtomicInteger(0);
+        if (network == null)
+            return;
 
-        Consumer<Set<IRedstoneLinkable>> updatePower = (set) -> {
-            if (set == null || set.isEmpty())
-                return;
-            for (Iterator<IRedstoneLinkable> iterator = set.iterator(); iterator.hasNext(); ) {
-                IRedstoneLinkable other = iterator.next();
-                if (!other.isAlive()) {
-                    iterator.remove();
-                    continue;
+        Set<IRedstoneLinkable> transmitters = Collections.newSetFromMap(new IdentityHashMap<>());
+        if (hasAllowedWildcards(key)) {
+            collectTransmitters(network, transmitters);
+            var wildcardKeys = receiversIn(world).get(key);
+            if (wildcardKeys != null) {
+                for (var wildcardKey : wildcardKeys) {
+                    // Recheck the rule before using a retained route.
+                    if (test(wildcardKey, key))
+                        collectTransmitters(networks.get(wildcardKey), transmitters);
                 }
-
-                if (other.isListening())
-                    continue;
-
-                if (!withinRange(actor, other, world))
-                    continue;
-
-                if (power.get() < 15)
-                    power.accumulateAndGet(other.getTransmittedStrength(), Math::max);
             }
-        };
-
-        updatePower.accept(network);
-        if (receivers != null)
-            for (Couple<Frequency> wildcard : receivers) {
-                Set<IRedstoneLinkable> wildcardNetwork = networksInWorld.get(wildcard);
-                updatePower.accept(wildcardNetwork);
-            }
-
-        if (actor instanceof LinkBehaviour linkBehaviour) {
-            // fix one-to-one loading order problem
-            if (linkBehaviour.isListening()) {
-                linkBehaviour.newPosition = true;
-                linkBehaviour.setReceivedStrength(power.get());
-            }
+        } else {
+            network.removeIf(node -> !node.isAlive());
         }
 
-        if (network != null && !network.isEmpty())
-            for (IRedstoneLinkable other : network) {
-                if (other != actor && other.isListening() && withinRange(actor, other, world))
-                    other.setReceivedStrength(power.get());
+        // A frequency may contain receivers at different positions. Each needs
+        // the strongest transmitter within its own range, including zero after a move.
+        for (IRedstoneLinkable receiver : List.copyOf(network)) {
+            if (!receiver.isAlive() || !receiver.isListening())
+                continue;
+            int power = 0;
+            for (IRedstoneLinkable transmitter : transmitters) {
+                if (!transmitter.isAlive() || !withinRange(receiver, transmitter, world))
+                    continue;
+                power = Math.max(power, Math.clamp(transmitter.getTransmittedStrength(), 0, 15));
+                if (power == 15)
+                    break;
             }
+            if (receiver == actor && receiver instanceof LinkBehaviour link)
+                link.newPosition = true;
+            receiver.setReceivedStrength(power);
+        }
+    }
+
+    private static void collectTransmitters(Set<IRedstoneLinkable> network, Set<IRedstoneLinkable> transmitters) {
+        if (network == null)
+            return;
+        for (var iterator = network.iterator(); iterator.hasNext();) {
+            var node = iterator.next();
+            if (!node.isAlive()) {
+                iterator.remove();
+            } else if (!node.isListening()) {
+                transmitters.add(node);
+            }
+        }
     }
 
     public static void addToNetwork(RedstoneLinkNetworkHandler handler, LevelAccessor world, IRedstoneLinkable actor) {
+        if (!isServerWorld(world))
+            return;
         Couple<Frequency> key = actor.getNetworkKey();
         Map<Couple<Frequency>, Set<Couple<Frequency>>> wildcards = actor.isListening() ? receiversIn(world) : transmittersIn(world);
 //        CreateConnected.LOGGER.debug("Link-Wildcard: New {}: {}", actor.isListening() ? "receiver" : "transmitter", keyToString(key));
@@ -160,9 +162,13 @@ public class LinkWildcardNetworkHandler {
     }
 
     public static void removeFromNetwork(RedstoneLinkNetworkHandler handler, LevelAccessor world, IRedstoneLinkable actor) {
+        if (!isServerWorld(world))
+            return;
         Couple<Frequency> key = actor.getNetworkKey();
         Map<Couple<Frequency>, Set<IRedstoneLinkable>> networks = handler.networksIn(world);
-        if (networks.containsKey(key) && !networks.get(key).isEmpty())
+        var remaining = networks.get(key);
+        if (remaining != null && remaining.stream().anyMatch(other ->
+                other.isAlive() && other.isListening() == actor.isListening()))
             return;
 //        CreateConnected.LOGGER.debug("Link-Wildcard: Removing {} {}", actor.isListening() ? "receiver" : "transmitter", keyToString(key));
         Map<Couple<Frequency>, Set<Couple<Frequency>>> wildcards = actor.isListening() ? receiversIn(world) : transmittersIn(world);
@@ -215,13 +221,19 @@ public class LinkWildcardNetworkHandler {
         );
     }
 
+    private static boolean hasAllowedWildcards(Couple<Frequency> key) {
+        return CServer.AllowDualWildcardLink.get()
+                || !(key.getFirst().getStack().getItem() instanceof ILinkWildcard
+                && key.getSecond().getStack().getItem() instanceof ILinkWildcard);
+    }
+
     private static boolean test(Couple<Frequency> transmitter, Couple<Frequency> receiver) {
-        if (!CServer.AllowDualWildcardLink.get() && transmitter.getFirst().getStack().getItem() instanceof ILinkWildcard && transmitter.getSecond().getStack().getItem() instanceof ILinkWildcard)
+        if (!hasAllowedWildcards(transmitter) || !hasAllowedWildcards(receiver))
             return false;
-        if (!CServer.AllowDualWildcardLink.get() && receiver.getFirst().getStack().getItem() instanceof ILinkWildcard && receiver.getSecond().getStack().getItem() instanceof ILinkWildcard)
-            return false;
-        return wildcardTransmit(transmitter.getFirst(), receiver.getFirst()) && wildcardTransmit(transmitter.getSecond(), receiver.getSecond()) ||
-                wildcardReceive(transmitter.getFirst(), receiver.getFirst()) && wildcardReceive(transmitter.getSecond(), receiver.getSecond());
+        return (wildcardTransmit(transmitter.getFirst(), receiver.getFirst())
+                || wildcardReceive(transmitter.getFirst(), receiver.getFirst()))
+                && (wildcardTransmit(transmitter.getSecond(), receiver.getSecond())
+                || wildcardReceive(transmitter.getSecond(), receiver.getSecond()));
     }
 
     private static boolean wildcardTransmit(Frequency transmitter, Frequency receiver) {
@@ -246,23 +258,50 @@ public class LinkWildcardNetworkHandler {
 
         if (from == to) return true;
 
-        final BlockPos fromLocation = from.getLocation();
-        final Vector3d fromPos = new Vector3d(fromLocation.getX(), fromLocation.getY(), fromLocation.getZ());
-        final BlockPos toLocation = to.getLocation();
-        final Vector3d toPos = new Vector3d(toLocation.getX(), toLocation.getY(), toLocation.getZ());
+        final Vector3d fromPos = linkPosition(from.getLocation());
+        final Vector3d toPos = linkPosition(to.getLocation());
 
-        final SableCompanion helper = SableCompanion.INSTANCE;
-        final SubLevelAccess fromSublevel = helper.getContaining(level, fromPos);
-        if (fromSublevel != null) {
-            fromSublevel.logicalPose().transformPosition(fromPos);
-        }
-
-        final SubLevelAccess toSublevel = helper.getContaining(level, toPos);
-        if (toSublevel != null) {
-            toSublevel.logicalPose().transformPosition(toPos);
-        }
-
+        final double distance = Mods.SABLE.isLoaded()
+                ? SableRange.API.distanceSquared(level, fromPos, toPos)
+                : fromPos.distanceSquared(toPos);
         final int linkRange = AllConfigs.server().logistics.linkRange.get();
-        return fromPos.distanceSquared(toPos) < linkRange * linkRange;
+        return distance < (double) linkRange * linkRange;
+    }
+
+    /** No Companion classes are loaded when Sable is absent. */
+    private static class SableRange {
+        private static final RangeApi API = RangeApi.load();
+    }
+
+    private record RangeApi(Object companion, Method distance) {
+        private static RangeApi load() {
+            try {
+                Class<?> api = Class.forName("dev.ryanhcode.sable.companion.SableCompanion");
+                Method method = api.getMethod("distanceSquaredWithSubLevels", Level.class, Vector3dc.class, Vector3dc.class);
+                if (method.getReturnType() != double.class)
+                    throw new NoSuchMethodException("Expected double distanceSquaredWithSubLevels(Level, Vector3dc, Vector3dc)");
+                return new RangeApi(api.getField("INSTANCE").get(null), method);
+            } catch (ReflectiveOperationException e) {
+                throw new IllegalStateException("Sable Companion range API is incompatible with Minecraft 26.2", e);
+            }
+        }
+
+        private double distanceSquared(Level level, Vector3dc from, Vector3dc to) {
+            try {
+                return (double) distance.invoke(companion, level, from, to);
+            } catch (InvocationTargetException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof RuntimeException runtime) throw runtime;
+                if (cause instanceof Error error) throw error;
+                throw new IllegalStateException("Sable Companion range check failed", cause);
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException("Sable Companion range API is inaccessible", e);
+            }
+        }
+    }
+
+    private static Vector3d linkPosition(BlockPos pos) {
+        // Transform block centers, matching Sable's Create link comparison.
+        return new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 }

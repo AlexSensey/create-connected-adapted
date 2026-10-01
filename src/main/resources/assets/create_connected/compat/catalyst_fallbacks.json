@@ -1,0 +1,157 @@
+{
+  "replacements": {
+    "create_dragons_plus:fluid/dragon_breath_flow": "minecraft:block/water_flow",
+    "createnuclear:block/enriched_soul_soil": "minecraft:block/soul_soil",
+    "createnuclear:block/enriching/campfire/enriching_flame": "minecraft:block/soul_fire_0",
+    "twilightforest:block/deadrock": "minecraft:block/bedrock",
+    "create_shimmer:block/ominous_campfire_fire": "minecraft:block/soul_fire_0",
+    "createnetherindustry:block/soul_stripping_block": "minecraft:block/soul_sand",
+    "create_shimmer:fluid/shimmer_flow": "minecraft:block/water_flow",
+    "dye_depot:block/forest_concrete_powder": "minecraft:block/green_concrete_powder",
+    "dye_depot:block/beige_concrete_powder": "minecraft:block/white_concrete_powder",
+    "dye_depot:block/olive_concrete_powder": "minecraft:block/green_concrete_powder",
+    "dye_depot:block/maroon_concrete_powder": "minecraft:block/red_concrete_powder",
+    "dye_depot:block/amber_concrete_powder": "minecraft:block/orange_concrete_powder",
+    "dye_depot:block/slate_concrete_powder": "minecraft:block/gray_concrete_powder",
+    "dye_depot:block/mint_concrete_powder": "minecraft:block/lime_concrete_powder",
+    "dye_depot:block/indigo_concrete_powder": "minecraft:block/purple_concrete_powder",
+    "dye_depot:block/navy_concrete_powder": "minecraft:block/blue_concrete_powder",
+    "dye_depot:block/tan_concrete_powder": "minecraft:block/brown_concrete_powder",
+    "dye_depot:block/rose_concrete_powder": "minecraft:block/pink_concrete_powder",
+    "dye_depot:block/ginger_concrete_powder": "minecraft:block/orange_concrete_powder",
+    "dye_depot:block/aqua_concrete_powder": "minecraft:block/cyan_concrete_powder",
+    "dye_depot:block/teal_concrete_powder": "minecraft:block/cyan_concrete_powder",
+    "dye_depot:block/coral_concrete_powder": "minecraft:block/orange_concrete_powder",
+    "dye_depot:block/verdant_concrete_powder": "minecraft:block/green_concrete_powder"
+  },
+  "models": {
+    "models/block/dye_depot_amber_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/amber_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_aqua_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/aqua_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_beige_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/beige_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_coral_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/coral_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_forest_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/forest_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_ginger_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/ginger_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_indigo_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/indigo_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_maroon_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/maroon_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_mint_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/mint_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_navy_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/navy_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_olive_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/olive_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_rose_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/rose_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_slate_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/slate_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_tan_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/tan_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_teal_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/teal_concrete_powder"
+      }
+    },
+    "models/block/dye_depot_verdant_fan_dyeing_catalyst.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "dye_depot:block/verdant_concrete_powder"
+      }
+    },
+    "models/block/fan_ending_catalyst_dragons_breath/block.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "create_dragons_plus:fluid/dragon_breath_flow"
+      }
+    },
+    "models/block/fan_enriched_catalyst/block.json": {
+      "parent": "create_connected:block/fan_catalyst/with_fire",
+      "textures": {
+        "base": "createnuclear:block/enriched_soul_soil",
+        "fire": "createnuclear:block/enriching/campfire/enriching_flame"
+      }
+    },
+    "models/block/fan_glooming_catalyst/block.json": {
+      "parent": "create_connected:block/fan_catalyst/with_fire",
+      "textures": {
+        "base": "twilightforest:block/deadrock",
+        "fire": "create_shimmer:block/ominous_campfire_fire"
+      }
+    },
+    "models/block/fan_soul_stripping_catalyst/block.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "createnetherindustry:block/soul_stripping_block"
+      }
+    },
+    "models/block/fan_transmutation_catalyst/block.json": {
+      "parent": "create_connected:block/fan_catalyst/with_content",
+      "textures": {
+        "content": "create_shimmer:fluid/shimmer_flow"
+      }
+    }
+  }
+}

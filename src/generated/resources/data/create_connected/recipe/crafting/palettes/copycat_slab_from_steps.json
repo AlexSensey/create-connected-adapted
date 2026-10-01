@@ -15,9 +15,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "s": {
-      "item": "create:copycat_step"
-    }
+    "s": "create:copycat_step"
   },
   "pattern": [
     "ss"

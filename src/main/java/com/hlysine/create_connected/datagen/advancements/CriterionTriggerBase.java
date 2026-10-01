@@ -1,7 +1,7 @@
 package com.hlysine.create_connected.datagen.advancements;
 
 import com.hlysine.create_connected.CreateConnected;
-import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
+import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
