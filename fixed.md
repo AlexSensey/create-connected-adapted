@@ -1,10 +1,11 @@
 # Create: Connected (Adapted) - Minecraft 26.3
 
-Version: 1.3.3-adapted-26.3-0.2
+Version: 1.3.3-adapted-26.3-0.3
 Branch: adapted/26.3
 NeoForge: 26.3.0.40-beta or newer within Minecraft 26.3.
 Create dependency: 6.0.11-adapted-1.26 or newer.
 
+- Replaced the mod icon with the supplied Logo_ico.png for Minecraft and Prism mod lists. Code and gameplay resources are unchanged from 0.2.
 - Adapted inventory/fluid bridges, block item NBT hooks, immutable sign text, rendering, redstone, config registration and data generation to 26.3. Migrated shipped advancements and loot tables to the new data format.
 - Preserved the 26.2 adaptation's kinetic, bridge, copycat, fluid, recipe and linked-control fixes.
 - REI respects feature toggles and optional-mod requirements. Unsupported catalysts are hidden.
