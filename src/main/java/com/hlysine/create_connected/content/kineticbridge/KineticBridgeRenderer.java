@@ -2,7 +2,6 @@ package com.hlysine.create_connected.content.kineticbridge;
 
 import com.hlysine.create_connected.CreateConnected;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
@@ -126,11 +125,7 @@ public class KineticBridgeRenderer extends SafeBlockEntityRenderer<KineticBlockE
             if (!slot.shouldRender(be.getLevel(), be.getBlockPos(), be.getBlockState())) continue;
             Vec3 offset = slot.getLocalOffset(be.getLevel(), be.getBlockPos(), be.getBlockState());
             if (offset == null) continue;
-            // Place the label on the solid panel, one voxel farther from the outer casing trim.
-            Direction facing = be.getBlockState().getValue(KineticBridgeBlock.FACING);
-            double panelShift = be instanceof KineticBridgeDestinationBlockEntity ? 3 / 16d : -3 / 16d;
-            offset = offset.add(facing.getStepX() * panelShift, facing.getStepY() * panelShift,
-                    facing.getStepZ() * panelShift);
+            // The shared slot anchors both the standard Create frame and this label.
             String value = scroll.formatValue(); // Includes the multiplier suffix and decimal separator.
             if (value.isEmpty()) continue;
             Direction side = hit.getDirection();
@@ -147,8 +142,6 @@ public class KineticBridgeRenderer extends SafeBlockEntityRenderer<KineticBlockE
                 case DOWN -> pose.mulPose(com.mojang.math.Axis.XP.rotationDegrees(90));
                 case SOUTH -> {}
             }
-            collector.submitCustomGeometry(pose, RenderTypes.debugQuads(),
-                    KineticBridgeRenderer::renderSettingCorners);
             float scale = Math.min(1 / 96f, .24f / Math.max(1, mc.font.width(value)));
             pose.scale(scale, -scale, scale);
             mc.font.prepareText(net.minecraft.network.chat.Component.literal(value).getVisualOrderText(),
@@ -162,35 +155,6 @@ public class KineticBridgeRenderer extends SafeBlockEntityRenderer<KineticBlockE
             });
             pose.popPose();
         }
-    }
-
-    private static void renderSettingCorners(PoseStack.Pose pose, VertexConsumer consumer) {
-        // Keep the five-voxel frame size; its anchor supplies the casing-trim clearance.
-        float half = 5 / 32f;
-        float length = 1 / 16f;
-        float thickness = 1.5f / 128f;
-        for (int xSign : new int[] {-1, 1}) {
-            for (int ySign : new int[] {-1, 1}) {
-                float x0 = xSign < 0 ? -half : half - length;
-                float y0 = ySign < 0 ? -half : half - thickness;
-                settingQuad(pose, consumer, x0, y0, x0 + length, y0 + thickness);
-                x0 = xSign < 0 ? -half : half - thickness;
-                y0 = ySign < 0 ? -half : half - length;
-                settingQuad(pose, consumer, x0, y0, x0 + thickness, y0 + length);
-            }
-        }
-    }
-
-    private static void settingQuad(PoseStack.Pose pose, VertexConsumer consumer,
-                                    float x0, float y0, float x1, float y1) {
-        consumer.addVertex(pose, x0, y0, 0).setColor(0xFFFFFFFF);
-        consumer.addVertex(pose, x1, y0, 0).setColor(0xFFFFFFFF);
-        consumer.addVertex(pose, x1, y1, 0).setColor(0xFFFFFFFF);
-        consumer.addVertex(pose, x0, y1, 0).setColor(0xFFFFFFFF);
-        consumer.addVertex(pose, x0, y1, 0).setColor(0xFFFFFFFF);
-        consumer.addVertex(pose, x1, y1, 0).setColor(0xFFFFFFFF);
-        consumer.addVertex(pose, x1, y0, 0).setColor(0xFFFFFFFF);
-        consumer.addVertex(pose, x0, y0, 0).setColor(0xFFFFFFFF);
     }
 
     @Override

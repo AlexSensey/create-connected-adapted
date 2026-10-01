@@ -1,11 +1,11 @@
 # Create: Connected (Adapted) - Minecraft 26.1.2
 
-Version: 1.3.3-adapted-26.1.2-0.3
+Version: 1.3.3-adapted-26.1.2-0.4
 Branch: adapted/26.1.2
 NeoForge: 26.1.2.109 or newer within Minecraft 26.1.2.
 Create dependency: 6.0.11-adapted-1.27 or newer.
 
-- Replaced the mod icon with the supplied Logo_ico.png for Minecraft and Prism mod lists. Code and gameplay resources are unchanged from 0.2.
+- Replaced the mod icon with the supplied Logo_ico.png for Minecraft and Prism mod lists. The supplied custom icon is retained.
 - Adapted Flywheel namespaces, GUI rendering, advancement imports and tag generation to 26.1.2.
 - Preserved the 26.2 adaptation's kinetic, bridge, copycat, fluid, recipe and linked-control fixes.
 - REI respects feature toggles and optional-mod requirements. Unsupported catalysts are hidden.
@@ -18,3 +18,9 @@ Validation: a disposable Minecraft world passed 42 native recipe, resource and d
 The optional Simulated companion is excluded because a matching 26.x API is unavailable. Optional fan processing requires its corresponding addon; fallback textures do not enable it.
 
 License: AGPL-3.0 with the additional terms in LICENSE. Corresponding source is included alongside the release. Retained upstream assets keep their original licenses and attribution.
+
+## Changes in 0.4
+
+- Moved the standard thick Kinetic Bridge setting corners to the solid panel beside the multiplier label, on both bridge halves. Removed the duplicate thin frame. Hit testing and setting synchronization are preserved.
+
+Validation of 0.4: 96 native panel-position and side hit-test assertions passed for all six bridge orientations. Both bridge halves were rendered and captured in-game.

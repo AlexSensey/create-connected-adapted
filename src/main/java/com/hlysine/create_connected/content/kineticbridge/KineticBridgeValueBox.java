@@ -2,6 +2,7 @@ package com.hlysine.create_connected.content.kineticbridge;
 
 import com.hlysine.create_connected.content.kineticbattery.KineticBatteryValueBox;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -10,6 +11,15 @@ import net.minecraft.world.phys.Vec3;
 public class KineticBridgeValueBox extends KineticBatteryValueBox {
     public KineticBridgeValueBox() {
         super(8);
+    }
+
+    @Override
+    public Vec3 getLocalOffset(LevelAccessor level, BlockPos pos, BlockState state) {
+        Vec3 offset = super.getLocalOffset(level, pos, state);
+        Direction facing = state.getValue(KineticBridgeBlock.FACING);
+        double panelShift = state.getBlock() instanceof KineticBridgeDestinationBlock ? 3 / 16d : -3 / 16d;
+        return offset.add(facing.getStepX() * panelShift, facing.getStepY() * panelShift,
+                facing.getStepZ() * panelShift);
     }
 
     @Override
