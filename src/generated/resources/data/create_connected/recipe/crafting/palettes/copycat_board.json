@@ -13,9 +13,7 @@
     }
   ],
   "type": "minecraft:stonecutting",
-  "ingredient": {
-    "tag": "c:ingots/zinc"
-  },
+  "ingredient": "#c:ingots/zinc",
   "result": {
     "count": 8,
     "id": "create_connected:copycat_board"

@@ -54,14 +54,14 @@ public class BrassChuteBlock extends ChuteBlock {
         if (level.isClientSide())
             return InteractionResult.SUCCESS;
 
-        return onBlockEntityUseItemOn(level, pos, be -> {
+        return getBlockEntityOptional(level, pos).<InteractionResult>map(be -> {
             if (be.getItem().isEmpty())
                 return InteractionResult.TRY_WITH_EMPTY_HAND;
             player.getInventory()
-                    .placeItemBackInInventory(be.getItem());
+                    .placeItemBackInInventory(be.getItem(), net.minecraft.util.Prediction.PREDICTED);
             be.setItem(ItemStack.EMPTY);
             return InteractionResult.SUCCESS;
-        });
+        }).orElse(InteractionResult.TRY_WITH_EMPTY_HAND);
     }
 
     @Override

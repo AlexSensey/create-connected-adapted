@@ -2,7 +2,6 @@ package com.hlysine.create_connected.content.kineticbridge;
 
 import com.hlysine.create_connected.ConnectedLang;
 import com.hlysine.create_connected.content.KineticHelper;
-import com.hlysine.create_connected.content.kineticbattery.KineticBatteryValueBox;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
@@ -30,7 +29,7 @@ public class KineticBridgeBlockEntity extends KineticBlockEntity {
         stressMultiplier = new StressImpactScrollValueBehaviour(
                 ConnectedLang.translateDirect("kinetic_bridge.stress_impact"),
                 this,
-                new KineticBatteryValueBox(8)
+                new KineticBridgeValueBox()
         );
         stressMultiplier.between(0, 2048);
         stressMultiplier.value = 40;

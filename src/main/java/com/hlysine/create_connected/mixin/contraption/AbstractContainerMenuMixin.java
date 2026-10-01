@@ -20,8 +20,8 @@ public class AbstractContainerMenuMixin {
             cancellable = true
     )
     private static void stillValid(ContainerLevelAccess pAccess, Player pPlayer, Block pTargetBlock, CallbackInfoReturnable<Boolean> cir) {
-        if (pAccess instanceof TrackingContainerLevelAccess) {
-            cir.setReturnValue(pAccess.evaluate((level, pos) -> pPlayer.distanceToSqr((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D) <= 64.0D, true));
+        if (pAccess instanceof TrackingContainerLevelAccess tracking) {
+            cir.setReturnValue(tracking.stillValid(pPlayer, state -> state.is(pTargetBlock)));
         }
     }
 }

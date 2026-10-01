@@ -8,12 +8,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create:hand_crank"
-    },
-    {
-      "item": "create:large_cogwheel"
-    }
+    "create:hand_crank",
+    "create:large_cogwheel"
   ],
   "result": {
     "count": 1,

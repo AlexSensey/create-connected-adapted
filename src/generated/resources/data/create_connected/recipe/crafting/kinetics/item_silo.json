@@ -8,12 +8,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "create:iron_sheet"
-    },
-    "C": {
-      "tag": "c:barrels/wooden"
-    }
+    "B": "create:iron_sheet",
+    "C": "#c:barrels/wooden"
   },
   "pattern": [
     "BCB"

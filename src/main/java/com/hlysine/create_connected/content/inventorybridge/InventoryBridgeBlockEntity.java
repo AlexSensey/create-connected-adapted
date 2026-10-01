@@ -3,6 +3,8 @@ package com.hlysine.create_connected.content.inventorybridge;
 import com.hlysine.create_connected.registries.CCBlockEntityTypes;
 import com.hlysine.create_connected.CreateConnected;
 import com.hlysine.create_connected.content.inventoryaccessport.WrappedItemHandler;
+import com.hlysine.create_connected.content.inventoryaccessport.ConnectedInventoryLookup;
+import com.hlysine.create_connected.content.inventoryaccessport.RoutedResourceHandler;
 import com.simibubi.create.api.packager.InventoryIdentifier;
 import com.simibubi.create.content.logistics.packager.IdentifiedInventory;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
@@ -23,7 +25,9 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.items.IItemHandler;
+import com.simibubi.create.compat.neoforge263.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,6 +48,24 @@ public class InventoryBridgeBlockEntity extends SmartBlockEntity {
     public FilteringBehaviour positiveFilter;
 
     private boolean powered;
+    private final ResourceHandler<ItemResource> itemTransfer = new RoutedResourceHandler<>(ItemResource.EMPTY,
+        List.of(() -> getConnectedTransfer(negativeInventory), () -> getConnectedTransfer(positiveInventory)),
+        this::acceptsTransfer);
+
+    private ResourceHandler<ItemResource> getConnectedTransfer(InvManipulationBehaviour inventory) {
+        if (powered || isRemoved() || inventory == null) return null;
+        return ConnectedInventoryLookup.find(level, inventory.getTarget());
+    }
+
+    private boolean acceptsTransfer(int route, ItemResource resource, int amount) {
+        if (negativeFilter == null || positiveFilter == null) return false;
+        ItemStack stack = resource.toStack(amount);
+        boolean negative = negativeFilter.test(stack);
+        boolean positive = positiveFilter.test(stack);
+        if (route == 0)
+            return negative && !(positive && !positiveFilter.getFilter().isEmpty() && negativeFilter.getFilter().isEmpty());
+        return positive && !(negative && !negativeFilter.getFilter().isEmpty() && positiveFilter.getFilter().isEmpty());
+    }
 
     private IItemHandler cachedNegativeHandler;
     private IItemHandler cachedPositiveHandler;
@@ -66,13 +88,9 @@ public class InventoryBridgeBlockEntity extends SmartBlockEntity {
     @SubscribeEvent
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
+                Capabilities.Item.BLOCK,
                 CCBlockEntityTypes.INVENTORY_BRIDGE.get(),
-                (be, context) -> {
-                    if (be.itemCapability == null)
-                        be.refreshCapability();
-                    return be.itemCapability;
-                }
+                (be, context) -> be.itemTransfer
         );
     }
 
@@ -100,11 +118,11 @@ public class InventoryBridgeBlockEntity extends SmartBlockEntity {
     }
 
     public boolean isAttachedNegative() {
-        return !powered && negativeInventory.hasInventory() && !(negativeInventory.getInventory() instanceof WrappedItemHandler);
+        return getConnectedTransfer(negativeInventory) != null;
     }
 
     public boolean isAttachedPositive() {
-        return !powered && positiveInventory.hasInventory() && !(positiveInventory.getInventory() instanceof WrappedItemHandler);
+        return getConnectedTransfer(positiveInventory) != null;
     }
 
     public @Nullable BlockState getNegativeAttachedBlock() {

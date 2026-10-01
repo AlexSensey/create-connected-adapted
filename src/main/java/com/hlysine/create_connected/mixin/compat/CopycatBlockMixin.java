@@ -1,15 +1,20 @@
 package com.hlysine.create_connected.mixin.compat;
 
-import com.copycatsplus.copycats.content.copycat.board.CopycatBoardBlock;
-import com.copycatsplus.copycats.content.copycat.slab.CopycatSlabBlock;
 import com.hlysine.create_connected.compat.CopycatsManager;
+import com.hlysine.create_connected.compat.ModMixin;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin({CopycatSlabBlock.class, CopycatBoardBlock.class})
+@Pseudo
+@ModMixin(mods = {"copycats"})
+@Mixin(targets = {
+        "com.copycatsplus.copycats.content.copycat.slab.CopycatSlabBlock",
+        "com.copycatsplus.copycats.content.copycat.board.CopycatBoardBlock"
+})
 public class CopycatBlockMixin {
     @Redirect(
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;is(Lnet/minecraft/world/item/Item;)Z"),

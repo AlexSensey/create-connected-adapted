@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/freewheel_clutch"
+        "recipes": "create_connected:crafting/kinetics/freewheel_clutch"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

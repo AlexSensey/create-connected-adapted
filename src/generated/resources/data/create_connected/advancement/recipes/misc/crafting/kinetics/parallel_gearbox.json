@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/parallel_gearbox"
+        "recipes": "create_connected:crafting/kinetics/parallel_gearbox"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

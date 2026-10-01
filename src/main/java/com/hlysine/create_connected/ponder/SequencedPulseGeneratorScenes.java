@@ -10,7 +10,7 @@ import net.createmod.ponder.api.client.scene.SceneBuildingUtil;
 import net.createmod.ponder.api.client.scene.Selection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RedstoneWireBlock;
 
 public class SequencedPulseGeneratorScenes {
     public static void pulseGenerator(SceneBuilder builder, SceneBuildingUtil util) {
@@ -111,7 +111,7 @@ public class SequencedPulseGeneratorScenes {
         scene.world().toggleRedstonePower(output);
         scene.world().cycleBlockProperty(pulseGenerator, SequencedPulseGeneratorBlock.POWERING);
         scene.world().toggleRedstonePower(util.select().position(comparator));
-        scene.world().cycleBlockProperty(wire, RedStoneWireBlock.POWER);
+        scene.world().cycleBlockProperty(wire, RedstoneWireBlock.POWER);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 1));
         scene.idle(18);
         scene.world().toggleRedstonePower(input);
@@ -127,27 +127,27 @@ public class SequencedPulseGeneratorScenes {
         scene.idle(12);
         scene.world().toggleRedstonePower(output);
         scene.world().cycleBlockProperty(pulseGenerator, SequencedPulseGeneratorBlock.POWERING);
-        scene.world().cycleBlockProperty(wire, RedStoneWireBlock.POWER);
+        scene.world().cycleBlockProperty(wire, RedstoneWireBlock.POWER);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 2));
         scene.idle(20);
         scene.world().toggleRedstonePower(output);
         scene.world().cycleBlockProperty(pulseGenerator, SequencedPulseGeneratorBlock.POWERING);
-        scene.world().cycleBlockProperty(wire, RedStoneWireBlock.POWER);
+        scene.world().cycleBlockProperty(wire, RedstoneWireBlock.POWER);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 3));
         scene.idle(30);
         scene.world().toggleRedstonePower(output);
         scene.world().cycleBlockProperty(pulseGenerator, SequencedPulseGeneratorBlock.POWERING);
-        scene.world().cycleBlockProperty(wire, RedStoneWireBlock.POWER);
+        scene.world().cycleBlockProperty(wire, RedstoneWireBlock.POWER);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 4));
         scene.idle(20);
         scene.world().toggleRedstonePower(output);
         scene.world().cycleBlockProperty(pulseGenerator, SequencedPulseGeneratorBlock.POWERING);
-        scene.world().cycleBlockProperty(wire, RedStoneWireBlock.POWER);
+        scene.world().cycleBlockProperty(wire, RedstoneWireBlock.POWER);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 5));
         scene.idle(10);
         scene.world().toggleRedstonePower(output);
         scene.world().cycleBlockProperty(pulseGenerator, SequencedPulseGeneratorBlock.POWERING);
-        scene.world().modifyBlock(wire, state -> state.setValue(RedStoneWireBlock.POWER, 0), false);
+        scene.world().modifyBlock(wire, state -> state.setValue(RedstoneWireBlock.POWER, 0), false);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 0));
 
         scene.idle(40);
@@ -164,7 +164,7 @@ public class SequencedPulseGeneratorScenes {
         scene.world().toggleRedstonePower(output);
         scene.world().cycleBlockProperty(pulseGenerator, SequencedPulseGeneratorBlock.POWERING);
         scene.world().toggleRedstonePower(util.select().position(comparator));
-        scene.world().cycleBlockProperty(wire, RedStoneWireBlock.POWER);
+        scene.world().cycleBlockProperty(wire, RedstoneWireBlock.POWER);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 1));
         scene.idle(18);
 
@@ -180,12 +180,12 @@ public class SequencedPulseGeneratorScenes {
         scene.idle(12);
         scene.world().toggleRedstonePower(output);
         scene.world().cycleBlockProperty(pulseGenerator, SequencedPulseGeneratorBlock.POWERING);
-        scene.world().cycleBlockProperty(wire, RedStoneWireBlock.POWER);
+        scene.world().cycleBlockProperty(wire, RedstoneWireBlock.POWER);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 2));
         scene.idle(20);
         scene.world().toggleRedstonePower(output);
         scene.world().cycleBlockProperty(pulseGenerator, SequencedPulseGeneratorBlock.POWERING);
-        scene.world().cycleBlockProperty(wire, RedStoneWireBlock.POWER);
+        scene.world().cycleBlockProperty(wire, RedstoneWireBlock.POWER);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 3));
         scene.idle(10);
 
@@ -194,7 +194,7 @@ public class SequencedPulseGeneratorScenes {
         scene.world().cycleBlockProperty(pulseGenerator, SequencedPulseGeneratorBlock.POWERED_SIDE);
         scene.world().toggleRedstonePower(output);
         scene.world().cycleBlockProperty(pulseGenerator, SequencedPulseGeneratorBlock.POWERING);
-        scene.world().modifyBlock(wire, state -> state.setValue(RedStoneWireBlock.POWER, 0), false);
+        scene.world().modifyBlock(wire, state -> state.setValue(RedstoneWireBlock.POWER, 0), false);
         scene.world().modifyBlockEntityNBT(nixie, NixieTubeBlockEntity.class, nbt -> nbt.putInt("RedstoneStrength", 0));
 
         scene.idle(18);

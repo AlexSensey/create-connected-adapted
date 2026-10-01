@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/palettes/copycat_wall_compat"
+        "recipes": "create_connected:crafting/palettes/copycat_wall_compat"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

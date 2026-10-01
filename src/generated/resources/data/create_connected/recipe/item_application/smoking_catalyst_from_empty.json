@@ -7,12 +7,8 @@
   ],
   "type": "create:item_application",
   "ingredients": [
-    {
-      "item": "create_connected:empty_fan_catalyst"
-    },
-    {
-      "item": "minecraft:netherrack"
-    }
+    "create_connected:empty_fan_catalyst",
+    "minecraft:netherrack"
   ],
   "results": [
     {

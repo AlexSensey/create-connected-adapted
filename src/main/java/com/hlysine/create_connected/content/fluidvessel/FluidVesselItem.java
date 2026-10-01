@@ -27,7 +27,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
 
-public class FluidVesselItem extends BlockItem {
+public class FluidVesselItem extends BlockItem implements com.simibubi.create.foundation.item.CustomBlockEntityTagItem {
 
 	public FluidVesselItem(Block p_i48527_1_, Properties p_i48527_2_) {
 		super(p_i48527_1_, p_i48527_2_);
@@ -43,7 +43,7 @@ public class FluidVesselItem extends BlockItem {
 	}
 
 	@Override
-	protected boolean updateCustomBlockEntityTag(BlockPos blockPos, Level level, Player player,
+	public boolean updateCustomBlockEntityTag(BlockPos blockPos, Level level, Player player,
 												 ItemStack itemStack, BlockState blockState) {
 		MinecraftServer minecraftserver = level.getServer();
 		if (minecraftserver == null)
@@ -72,7 +72,7 @@ public class FluidVesselItem extends BlockItem {
 
 			itemStack.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(((IBE<?>) this.getBlock()).getBlockEntityType(), nbt));
 		}
-		return super.updateCustomBlockEntityTag(blockPos, level, player, itemStack, blockState);
+		return BlockItem.updateCustomBlockEntityTag(level, player, blockPos, itemStack);
 	}
 
 	private void tryMultiPlace(BlockPlaceContext ctx) {

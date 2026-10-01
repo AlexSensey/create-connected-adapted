@@ -20,7 +20,9 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.items.IItemHandler;
+import com.simibubi.create.compat.neoforge263.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +36,13 @@ public class InventoryAccessPortBlockEntity extends SmartBlockEntity {
     protected IItemHandler itemCapability;
     private InvManipulationBehaviour observedInventory;
     private boolean powered;
+    private final ResourceHandler<ItemResource> itemTransfer = new RoutedResourceHandler<>(
+        ItemResource.EMPTY, List.of(this::getConnectedTransfer), (route, resource, amount) -> true);
+
+    private ResourceHandler<ItemResource> getConnectedTransfer() {
+        if (powered || isRemoved() || observedInventory == null) return null;
+        return ConnectedInventoryLookup.find(level, observedInventory.getTarget());
+    }
 
     private IItemHandler cachedHandler;
     private boolean handlerDirty = true;
@@ -54,13 +63,9 @@ public class InventoryAccessPortBlockEntity extends SmartBlockEntity {
     @SubscribeEvent
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
+                Capabilities.Item.BLOCK,
                 CCBlockEntityTypes.INVENTORY_ACCESS_PORT.get(),
-                (be, context) -> {
-                    if (be.itemCapability == null)
-                        be.refreshCapability();
-                    return be.itemCapability;
-                }
+                (be, context) -> be.itemTransfer
         );
     }
 
@@ -72,7 +77,7 @@ public class InventoryAccessPortBlockEntity extends SmartBlockEntity {
     }
 
     public boolean isAttached() {
-        return !powered && observedInventory.hasInventory() && !(observedInventory.getInventory() instanceof WrappedItemHandler);
+        return getConnectedTransfer() != null;
     }
 
     public @Nullable BlockState getAttachedBlock() {

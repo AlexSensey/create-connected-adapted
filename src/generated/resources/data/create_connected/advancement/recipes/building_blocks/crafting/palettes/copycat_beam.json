@@ -26,7 +26,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/palettes/copycat_beam"
+        "recipes": "create_connected:crafting/palettes/copycat_beam"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

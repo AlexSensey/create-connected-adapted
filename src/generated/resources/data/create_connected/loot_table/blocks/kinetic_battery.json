@@ -3,27 +3,25 @@
   "pools": [
     {
       "bonus_rolls": 0.0,
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
-      ],
       "entries": [
         {
           "type": "minecraft:item",
-          "functions": [
+          "name": "create_connected:kinetic_battery",
+          "modifier": [
             {
-              "function": "minecraft:copy_components",
               "include": [
                 "create_connected:kinetic_battery_charge"
               ],
-              "source": "block_entity"
+              "source": "block_entity",
+              "type": "minecraft:copy_components"
             }
-          ],
-          "name": "create_connected:kinetic_battery"
+          ]
         }
       ],
-      "rolls": 1.0
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      }
     }
   ],
   "random_sequence": "create_connected:blocks/kinetic_battery"

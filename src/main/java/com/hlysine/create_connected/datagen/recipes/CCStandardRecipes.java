@@ -35,6 +35,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
@@ -343,7 +344,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
     GeneratedRecipe EMPTY_CATALYST_FROM_ENDING_DRAGON_HEAD = clearFanCatalyst("ending_dragon_head", CCBlocks.FAN_ENDING_CATALYST_DRAGON_HEAD,
             new ModLoadedCondition(Mods.DRAGONS_PLUS.id()));
     GeneratedRecipe EMPTY_CATALYST_FROM_WITHERING = clearFanCatalyst("withering", CCBlocks.FAN_WITHERING_CATALYST,
-            FalseCondition.INSTANCE);
+            NeverCondition.INSTANCE);
     GeneratedRecipe EMPTY_CATALYST_FROM_CHOCOLATE_COATING = clearFanCatalyst("chocolate_coating", CCBlocks.FAN_CHOCOLATE_COATING_CATALYST,
             new ModLoadedCondition(Mods.MORE_CATALYSTS.id()));
     GeneratedRecipe EMPTY_CATALYST_FROM_HONEY_COATING = clearFanCatalyst("honey_coating", CCBlocks.FAN_HONEY_COATING_CATALYST,
@@ -482,7 +483,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
                                   String path) {
         Identifier location = CreateConnected.asResource(recipeType + "/" + currentFolder + "/" + path);
         return register(consumer -> {
-            SpecialRecipeBuilder b = SpecialRecipeBuilder.special(builder);
+            SpecialRecipeBuilder b = SpecialRecipeBuilder.special(() -> builder.apply(CraftingBookCategory.MISC));
             b.save(consumer, location.toString());
         });
     }
@@ -551,7 +552,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
                 .unlockedBy(AllItems.ZINC_INGOT::get)
                 .requiresResultFeature()
                 .disabledInCopycats()
-                .viaStonecutting(Ingredient.of(TagKey.create(BuiltInRegistries.ITEM.key(), Identifier.fromNamespaceAndPath("c", "ingots/zinc"))), resultCount);
+                .viaStonecutting(Ingredient.of(items.getOrThrow(TagKey.create(BuiltInRegistries.ITEM.key(), Identifier.fromNamespaceAndPath("c", "ingots/zinc")))), resultCount);
     }
 
     protected static class Marker {
@@ -601,14 +602,14 @@ public class CCStandardRecipes extends BaseRecipeProvider {
 
         GeneratedRecipeBuilder unlockedBy(Supplier<? extends ItemLike> item) {
             this.unlockedBy = () -> ItemPredicate.Builder.item()
-                    .of(item.get())
+                    .of(items, item.get())
                     .build();
             return this;
         }
 
         GeneratedRecipeBuilder unlockedByTag(Supplier<TagKey<Item>> tag) {
             this.unlockedBy = () -> ItemPredicate.Builder.item()
-                    .of(tag.get())
+                    .of(items, tag.get())
                     .build();
             return this;
         }
@@ -660,25 +661,25 @@ public class CCStandardRecipes extends BaseRecipeProvider {
         // FIXME 5.1 refactor - recipe categories as markers instead of sections?
         GeneratedRecipe viaShaped(UnaryOperator<ShapedRecipeBuilder> builder) {
             return register(consumer -> {
-                ShapedRecipeBuilder b = builder.apply(ShapedRecipeBuilder.shaped(category == null ? RecipeCategory.MISC : category, stackModifier.apply(new ItemStack(result.get(), amount))));
+                ShapedRecipeBuilder b = builder.apply(ShapedRecipeBuilder.shaped(items, category == null ? RecipeCategory.MISC : category, ItemStackTemplate.fromNonEmptyStack(stackModifier.apply(new ItemStack(result.get(), amount)))));
                 if (unlockedBy != null)
                     b.unlockedBy("has_item", inventoryTrigger(unlockedBy.get()));
                 if (!recipeConditions.isEmpty()) {
                     consumer = consumer.withConditions(recipeConditions.toArray(new ICondition[0]));
                 }
-                b.save(consumer, createLocation("crafting"));
+                b.save(consumer, ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, createLocation("crafting")));
             });
         }
 
         GeneratedRecipe viaShapeless(UnaryOperator<ShapelessRecipeBuilder> builder) {
             return register(consumer -> {
-                ShapelessRecipeBuilder b = builder.apply(ShapelessRecipeBuilder.shapeless(category == null ? RecipeCategory.MISC : category, stackModifier.apply(new ItemStack(result.get(), amount))));
+                ShapelessRecipeBuilder b = builder.apply(ShapelessRecipeBuilder.shapeless(items, category == null ? RecipeCategory.MISC : category, ItemStackTemplate.fromNonEmptyStack(stackModifier.apply(new ItemStack(result.get(), amount)))));
                 if (unlockedBy != null)
                     b.unlockedBy("has_item", inventoryTrigger(unlockedBy.get()));
                 if (!recipeConditions.isEmpty()) {
                     consumer = consumer.withConditions(recipeConditions.toArray(new ICondition[0]));
                 }
-                b.save(consumer, createLocation("crafting"));
+                b.save(consumer, ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, createLocation("crafting")));
             });
         }
 
@@ -690,7 +691,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
                 if (!recipeConditions.isEmpty()) {
                     consumer = consumer.withConditions(recipeConditions.toArray(new ICondition[0]));
                 }
-                b.save(consumer, createLocation("crafting"));
+                b.save(consumer, ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, createLocation("crafting")));
             });
         }
 
@@ -705,12 +706,12 @@ public class CCStandardRecipes extends BaseRecipeProvider {
                                 Ingredient.of(base.get()), upgradeMaterial, category == null ? RecipeCategory.COMBAT : category, result.get()
                                         .asItem());
                 b.unlocks("has_item", inventoryTrigger(ItemPredicate.Builder.item()
-                        .of(base.get())
+                        .of(items, base.get())
                         .build()));
                 if (!recipeConditions.isEmpty()) {
                     consumer = consumer.withConditions(recipeConditions.toArray(new ICondition[0]));
                 }
-                b.save(consumer, createLocation("crafting"));
+                b.save(consumer, ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, createLocation("crafting")));
             });
         }
 
@@ -732,7 +733,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
         }
 
         GeneratedRecipeBuilder.GeneratedCookingRecipeBuilder viaCookingTag(Supplier<TagKey<Item>> tag) {
-            return unlockedByTag(tag).viaCookingIngredient(() -> Ingredient.of(tag.get()));
+            return unlockedByTag(tag).viaCookingIngredient(() -> Ingredient.of(items.getOrThrow(tag.get())));
         }
 
         GeneratedRecipeBuilder.GeneratedCookingRecipeBuilder viaCookingIngredient(Supplier<Ingredient> ingredient) {
@@ -766,7 +767,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
             }
 
             GeneratedRecipe inFurnace(UnaryOperator<SimpleCookingRecipeBuilder> builder) {
-                return create(RecipeSerializer.SMELTING_RECIPE, builder, SmeltingRecipe::new, 1);
+                return create(SmeltingRecipe.SERIALIZER, builder, SmeltingRecipe::new, 1);
             }
 
             GeneratedRecipe inSmoker() {
@@ -774,9 +775,9 @@ public class CCStandardRecipes extends BaseRecipeProvider {
             }
 
             GeneratedRecipe inSmoker(UnaryOperator<SimpleCookingRecipeBuilder> builder) {
-                create(RecipeSerializer.SMELTING_RECIPE, builder, SmeltingRecipe::new, 1);
-                create(RecipeSerializer.CAMPFIRE_COOKING_RECIPE, builder, CampfireCookingRecipe::new, 3);
-                return create(RecipeSerializer.SMOKING_RECIPE, builder, SmokingRecipe::new, .5f);
+                create(SmeltingRecipe.SERIALIZER, builder, SmeltingRecipe::new, 1);
+                create(CampfireCookingRecipe.SERIALIZER, builder, CampfireCookingRecipe::new, 3);
+                return create(SmokingRecipe.SERIALIZER, builder, SmokingRecipe::new, .5f);
             }
 
             GeneratedRecipe inBlastFurnace() {
@@ -784,18 +785,29 @@ public class CCStandardRecipes extends BaseRecipeProvider {
             }
 
             GeneratedRecipe inBlastFurnace(UnaryOperator<SimpleCookingRecipeBuilder> builder) {
-                create(RecipeSerializer.SMELTING_RECIPE, builder, SmeltingRecipe::new, 1);
-                return create(RecipeSerializer.BLASTING_RECIPE, builder, BlastingRecipe::new, .5f);
+                create(SmeltingRecipe.SERIALIZER, builder, SmeltingRecipe::new, 1);
+                return create(BlastingRecipe.SERIALIZER, builder, BlastingRecipe::new, .5f);
             }
 
             private <T extends AbstractCookingRecipe> GeneratedRecipe create(RecipeSerializer<T> serializer,
                                                                              UnaryOperator<SimpleCookingRecipeBuilder> builder, AbstractCookingRecipe.Factory<T> factory, float cookingTimeModifier) {
                 return register(recipeOutput -> {
                     boolean isOtherMod = compatDatagenOutput != null;
+                    ItemLike cookingResult = isOtherMod ? Items.DIRT : result.get();
+                    CookingBookCategory cookingCategory;
+                    if (serializer == SmokingRecipe.SERIALIZER || serializer == CampfireCookingRecipe.SERIALIZER)
+                        cookingCategory = CookingBookCategory.FOOD;
+                    else if (serializer == SmeltingRecipe.SERIALIZER &&
+                            new ItemStack(cookingResult).has(net.minecraft.core.component.DataComponents.FOOD))
+                        cookingCategory = CookingBookCategory.FOOD;
+                    else if (cookingResult.asItem() instanceof net.minecraft.world.item.BlockItem)
+                        cookingCategory = CookingBookCategory.BLOCKS;
+                    else
+                        cookingCategory = CookingBookCategory.MISC;
 
                     SimpleCookingRecipeBuilder b = builder.apply(SimpleCookingRecipeBuilder.generic(ingredient.get(),
-                            RecipeCategory.MISC, isOtherMod ? Items.DIRT : result.get(), exp,
-                            (int) (cookingTime * cookingTimeModifier), serializer, factory));
+                            RecipeCategory.MISC, cookingCategory, cookingResult, exp,
+                            (int) (cookingTime * cookingTimeModifier), factory));
                     if (unlockedBy != null)
                         b.unlockedBy("has_item", inventoryTrigger(unlockedBy.get()));
 
@@ -804,7 +816,8 @@ public class CCStandardRecipes extends BaseRecipeProvider {
 
                     b.save(
                             isOtherMod ? new ModdedCookingRecipeOutput(recipeOutput, compatDatagenOutput) : recipeOutput,
-                            createSimpleLocation(RegisteredObjectsHelper.getKeyOrThrow(serializer).getPath())
+                            ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE,
+                                    createSimpleLocation(RegisteredObjectsHelper.getKeyOrThrow(serializer).getPath()))
                     );
                 });
             }
@@ -816,13 +829,13 @@ public class CCStandardRecipes extends BaseRecipeProvider {
         return "Create: Connected's Standard Recipes";
     }
 
-    public CCStandardRecipes(HolderLookup.Provider registries, net.minecraft.data.recipes.RecipeOutput output) {
+    public CCStandardRecipes(net.minecraft.data.worldgen.BootstrapContext<net.minecraft.world.item.crafting.Recipe<?>> registries, net.minecraft.data.worldgen.BootstrapContext<net.minecraft.advancements.Advancement> output) {
         super(registries, output, CreateConnected.MODID);
     }
 
-            private static class ModdedCookingRecipeOutputShim implements Recipe<RecipeInput> {
+    private static class ModdedCookingRecipeOutputShim implements Recipe<RecipeInput> {
 
-        private static final Map<RecipeType<?>, Serializer> serializers = new ConcurrentHashMap<>();
+        private static final Map<RecipeType<?>, RecipeSerializer<ModdedCookingRecipeOutputShim>> serializers = new ConcurrentHashMap<>();
 
         private final Recipe<?> wrapped;
         private final Identifier overrideID;
@@ -838,39 +851,65 @@ public class CCStandardRecipes extends BaseRecipeProvider {
         }
 
         @Override
-        public ItemStack assemble(RecipeInput input, HolderLookup.Provider registries) {
+        public ItemStack assemble(RecipeInput input) {
             throw new AssertionError("Only for datagen output");
         }
 
         @Override
-        public boolean canCraftInDimensions(int pWidth, int pHeight) {
-            throw new AssertionError("Only for datagen output");
+        public boolean showNotification() {
+            return wrapped.showNotification();
         }
 
         @Override
-        public ItemStack getResultItem(HolderLookup.Provider registries) {
-            throw new AssertionError("Only for datagen output");
+        public String group() {
+            return wrapped.group();
         }
 
         @Override
-        public RecipeSerializer<?> getSerializer() {
-            return serializers.computeIfAbsent(
-                    getType(),
-                    t -> Serializer.create(wrapped)
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        public RecipeSerializer<? extends Recipe<RecipeInput>> getSerializer() {
+            return (RecipeSerializer) serializers.computeIfAbsent(
+                getType(),
+                t -> Serializer.create(wrapped)
             );
         }
 
         @Override
-        public RecipeType<?> getType() {
-            return wrapped.getType();
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        public RecipeType<? extends Recipe<RecipeInput>> getType() {
+            return (RecipeType) wrapped.getType();
         }
 
-        private record Serializer(
-                MapCodec<Recipe<?>> wrappedCodec) implements RecipeSerializer<ModdedCookingRecipeOutputShim> {
-            private static Serializer create(Recipe<?> wrapped) {
+        @Override
+        public PlacementInfo placementInfo() {
+            return wrapped.placementInfo();
+        }
+
+        @Override
+        public RecipeBookCategory recipeBookCategory() {
+            return wrapped.recipeBookCategory();
+        }
+
+        private static class Serializer {
+            private static RecipeSerializer<ModdedCookingRecipeOutputShim> create(Recipe<?> wrapped) {
                 RecipeSerializer<?> wrappedSerializer = wrapped.getSerializer();
                 @SuppressWarnings("unchecked")
-                Serializer serializer = new Serializer((MapCodec<Recipe<?>>) wrappedSerializer.codec());
+                MapCodec<Recipe<?>> wrappedCodec = (MapCodec<Recipe<?>>) wrappedSerializer.codec();
+                MapCodec<ModdedCookingRecipeOutputShim> codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    wrappedCodec.forGetter(i -> i.wrapped),
+                    FakeItemStack.CODEC.fieldOf("result").forGetter(i -> new FakeItemStack(i.overrideID))
+                ).apply(instance, (wrappedRecipe, fakeItemStack) -> {
+                    throw new AssertionError("Only for datagen output");
+                }));
+                StreamCodec<RegistryFriendlyByteBuf, ModdedCookingRecipeOutputShim> streamCodec = StreamCodec.of(
+                    (buffer, value) -> {
+                        throw new AssertionError("Only for datagen output");
+                    },
+                    buffer -> {
+                        throw new AssertionError("Only for datagen output");
+                    }
+                );
+                RecipeSerializer<ModdedCookingRecipeOutputShim> serializer = new RecipeSerializer<>(codec, streamCodec);
 
                 // Need to do some registry injection to get the Recipe/Registry#byNameCodec to encode the right type for this
                 // getResourceKey and getId
@@ -888,39 +927,34 @@ public class CCStandardRecipes extends BaseRecipeProvider {
                     mra$.getByValue().put(serializer, Holder.Reference.createStandAlone(null, wrappedKey));
                 } else {
                     throw new AssertionError("ModdedCookingRecipeOutputShim will not be able to" +
-                            " serialize without injecting into a registry. Expected" +
-                            " BuiltInRegistries.RECIPE_SERIALIZER to be of class MappedRegistry, is of class " +
-                            BuiltInRegistries.RECIPE_SERIALIZER.getClass()
+                        " serialize without injecting into a registry. Expected" +
+                        " BuiltInRegistries.RECIPE_SERIALIZER to be of class MappedRegistry, is of class " +
+                        BuiltInRegistries.RECIPE_SERIALIZER.getClass()
                     );
                 }
                 return serializer;
-            }
-
-            @Override
-            public MapCodec<ModdedCookingRecipeOutputShim> codec() {
-                return RecordCodecBuilder.mapCodec(instance -> instance.group(
-                        wrappedCodec.forGetter(i -> i.wrapped),
-                        FakeItemStack.CODEC.fieldOf("result").forGetter(i -> new FakeItemStack(i.overrideID))
-                ).apply(instance, (wrappedRecipe, fakeItemStack) -> {
-                    throw new AssertionError("Only for datagen output");
-                }));
-            }
-
-            @Override
-            public StreamCodec<RegistryFriendlyByteBuf, ModdedCookingRecipeOutputShim> streamCodec() {
-                throw new AssertionError("Only for datagen output");
             }
         }
 
         private record FakeItemStack(Identifier id) {
             public static Codec<FakeItemStack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                    Identifier.CODEC.fieldOf("id").forGetter(FakeItemStack::id)
+                Identifier.CODEC.fieldOf("id").forGetter(FakeItemStack::id)
             ).apply(instance, FakeItemStack::new));
         }
     }
 
-            private record ModdedCookingRecipeOutput(RecipeOutput wrapped,
+    private record ModdedCookingRecipeOutput(RecipeOutput wrapped,
                                              Identifier outputOverride) implements RecipeOutput {
+
+        @Override
+        public <S> net.minecraft.core.HolderGetter<S> lookup(ResourceKey<? extends net.minecraft.core.Registry<? extends S>> key) {
+            return wrapped.lookup(key);
+        }
+
+        @Override
+        public <S> java.util.stream.Stream<Holder.Reference<S>> listContextElements(ResourceKey<? extends net.minecraft.core.Registry<? extends S>> key) {
+            return wrapped.listContextElements(key);
+        }
 
         @Override
         public Advancement.Builder advancement() {
@@ -928,7 +962,7 @@ public class CCStandardRecipes extends BaseRecipeProvider {
         }
 
         @Override
-        public void accept(Identifier id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
+        public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
             wrapped.accept(id, new ModdedCookingRecipeOutputShim(recipe, outputOverride), advancement, conditions);
         }
     }

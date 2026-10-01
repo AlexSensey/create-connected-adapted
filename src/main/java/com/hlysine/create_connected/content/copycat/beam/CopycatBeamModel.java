@@ -1,20 +1,16 @@
 package com.hlysine.create_connected.content.copycat.beam;
 
-import com.simibubi.create.content.decoration.copycat.CopycatModel;
-import com.simibubi.create.foundation.model.BakedModelHelper;
-import com.simibubi.create.foundation.model.BakedQuadHelper;
+import com.hlysine.create_connected.content.copycat.ConnectedCopycatModel;
+import com.hlysine.create_connected.content.copycat.CopycatQuadGeometry;
 import net.createmod.catnip.api.data.Iterate;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.model.data.ModelData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,20 +18,17 @@ import java.util.List;
 import static net.minecraft.core.Direction.Axis;
 import static net.minecraft.core.Direction.AxisDirection;
 
-public class CopycatBeamModel extends CopycatModel {
+public class CopycatBeamModel extends ConnectedCopycatModel {
     protected static final AABB CUBE_AABB = new AABB(BlockPos.ZERO);
 
-    public CopycatBeamModel(BakedModel originalModel) {
+    public CopycatBeamModel(BlockStateModel originalModel) {
         super(originalModel);
     }
 
     @Override
-    protected List<BakedQuad> getCroppedQuads(BlockState state, Direction side, RandomSource rand, BlockState material,
-                                              ModelData wrappedData, RenderType renderType) {
+    protected List<BakedQuad> getCroppedQuads(BlockState state, List<BakedQuad> templateQuads) {
         Axis axis = state.getOptionalValue(CopycatBeamBlock.AXIS).orElse(Axis.Y);
 
-        BakedModel model = getModelOf(material);
-        List<BakedQuad> templateQuads = model.getQuads(material, side, rand, wrappedData, renderType);
         int size = templateQuads.size();
 
         List<BakedQuad> quads = new ArrayList<>();
@@ -68,15 +61,14 @@ public class CopycatBeamModel extends CopycatModel {
 
                 for (int i = 0; i < size; i++) {
                     BakedQuad quad = templateQuads.get(i);
-                    Direction direction = quad.getDirection();
+                    Direction direction = quad.direction();
 
                     if (rowShiftNormal.equals(direction.getUnitVec3i()))
                         continue;
                     if (columnShiftNormal.equals(direction.getUnitVec3i()))
                         continue;
 
-                    quads.add(BakedQuadHelper.cloneWithCustomGeometry(quad,
-                            BakedModelHelper.cropAndMove(quad.getVertices(), quad.getSprite(), bb1, offset)));
+                    quads.add(CopycatQuadGeometry.cropAndMove(quad, bb1, offset));
                 }
 
             }

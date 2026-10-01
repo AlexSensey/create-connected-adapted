@@ -17,7 +17,7 @@ import java.util.Map;
 
 import static com.hlysine.create_connected.content.copycat.board.CopycatBoardBlock.byDirection;
 
-public class CopycatBoxItem extends BlockItem {
+public class CopycatBoxItem extends BlockItem implements com.simibubi.create.foundation.item.CustomBlockEntityTagItem {
 
     public CopycatBoxItem(Properties builder) {
         super(CCBlocks.COPYCAT_BOARD.get(), builder.overrideDescription("item.create_connected.copycat_box"));
@@ -30,12 +30,12 @@ public class CopycatBoxItem extends BlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(@NotNull BlockPos pos, @NotNull Level world, Player player, @NotNull ItemStack stack, @NotNull BlockState state) {
+    public boolean updateCustomBlockEntityTag(@NotNull BlockPos pos, @NotNull Level world, Player player, @NotNull ItemStack stack, @NotNull BlockState state) {
         for (Direction direction : Iterate.directions) {
             state = state.setValue(byDirection(direction), true);
         }
         world.setBlockAndUpdate(pos, state);
-        return super.updateCustomBlockEntityTag(pos, world, player, stack, state);
+        return BlockItem.updateCustomBlockEntityTag(world, player, pos, stack);
     }
 
 }

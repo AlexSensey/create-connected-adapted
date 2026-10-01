@@ -8,12 +8,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create:encased_chain_drive"
-    },
-    {
-      "item": "create:cogwheel"
-    }
+    "create:encased_chain_drive",
+    "create:cogwheel"
   ],
   "result": {
     "count": 1,

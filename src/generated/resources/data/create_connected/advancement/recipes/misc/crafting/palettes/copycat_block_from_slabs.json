@@ -30,7 +30,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/palettes/copycat_block_from_slabs"
+        "recipes": "create_connected:crafting/palettes/copycat_block_from_slabs"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

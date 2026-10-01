@@ -56,7 +56,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.DeferredSoundType;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import com.simibubi.create.compat.neoforge263.fluids.capability.IFluidHandler;
 
 public class FluidVesselBlock extends Block implements IWrenchable, IBE<FluidVesselBlockEntity> {
 

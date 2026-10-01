@@ -1,8 +1,6 @@
 {
   "type": "create:sequenced_assembly",
-  "ingredient": {
-    "item": "create:golden_sheet"
-  },
+  "ingredient": "create:golden_sheet",
   "loops": 3,
   "results": [
     {
@@ -44,12 +42,8 @@
     {
       "type": "create:deploying",
       "ingredients": [
-        {
-          "item": "create_connected:incomplete_control_chip"
-        },
-        {
-          "item": "create:electron_tube"
-        }
+        "create_connected:incomplete_control_chip",
+        "create:electron_tube"
       ],
       "results": [
         {
@@ -60,12 +54,8 @@
     {
       "type": "create:deploying",
       "ingredients": [
-        {
-          "item": "create_connected:incomplete_control_chip"
-        },
-        {
-          "item": "minecraft:redstone"
-        }
+        "create_connected:incomplete_control_chip",
+        "minecraft:redstone"
       ],
       "results": [
         {
@@ -76,9 +66,7 @@
     {
       "type": "create:pressing",
       "ingredients": [
-        {
-          "item": "create_connected:incomplete_control_chip"
-        }
+        "create_connected:incomplete_control_chip"
       ],
       "results": [
         {

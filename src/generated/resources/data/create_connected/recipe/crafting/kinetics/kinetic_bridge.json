@@ -8,15 +8,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "b": {
-      "item": "create:brass_casing"
-    },
-    "c": {
-      "item": "create:clutch"
-    },
-    "s": {
-      "item": "create:shaft"
-    }
+    "b": "create:brass_casing",
+    "c": "create:clutch",
+    "s": "create:shaft"
   },
   "pattern": [
     " b ",

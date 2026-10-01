@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 @Deprecated(forRemoval = true, since = "1.3.0")
-public class ChargedKineticBatteryItem extends BlockItem {
+public class ChargedKineticBatteryItem extends BlockItem implements com.simibubi.create.foundation.item.CustomBlockEntityTagItem {
 
     public ChargedKineticBatteryItem(Properties builder) {
         super(CCBlocks.KINETIC_BATTERY.get(), builder.overrideDescription("item.create_connected.charged_kinetic_battery"));
@@ -29,8 +29,8 @@ public class ChargedKineticBatteryItem extends BlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(@NotNull BlockPos pos, @NotNull Level world, Player player, @NotNull ItemStack stack, @NotNull BlockState state) {
-        boolean ret = super.updateCustomBlockEntityTag(pos, world, player, stack, state);
+    public boolean updateCustomBlockEntityTag(@NotNull BlockPos pos, @NotNull Level world, Player player, @NotNull ItemStack stack, @NotNull BlockState state) {
+        boolean ret = BlockItem.updateCustomBlockEntityTag(world, player, pos, stack);
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (!(blockEntity instanceof KineticBatteryBlockEntity batteryBE))
             return ret;

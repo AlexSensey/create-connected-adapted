@@ -82,9 +82,9 @@ public class CopycatStairsBlock extends WaterloggedCopycatWrappedBlock {
     }
 
     @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
-        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        ICopycatWithWrappedBlock.wrappedState(stairs, pState).onRemove(pLevel, pPos, pNewState, pIsMoving);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean isMoving) {
+        super.affectNeighborsAfterRemoval(state, level, pos, isMoving);
+        ICopycatWithWrappedBlock.wrappedState(stairs, state).affectNeighborsAfterRemoval(level, pos, isMoving);
     }
 
     @Override

@@ -8,9 +8,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:fan_haunting_catalyst"
-    }
+    "create_connected:fan_haunting_catalyst"
   ],
   "result": {
     "count": 1,

@@ -39,7 +39,6 @@ public class SequencedPulseGeneratorBlock extends AbstractDiodeBlock implements 
     public static final BooleanProperty POWERING = BrassDiodeBlock.POWERING;
     public static final BooleanProperty POWERED_SIDE = PoweredLatchBlock.POWERED_SIDE;
 
-    public static final MapCodec<SequencedPulseGeneratorBlock> CODEC = simpleCodec(SequencedPulseGeneratorBlock::new);
 
     public SequencedPulseGeneratorBlock(Properties properties) {
         super(properties);
@@ -50,10 +49,6 @@ public class SequencedPulseGeneratorBlock extends AbstractDiodeBlock implements 
         );
     }
 
-    @Override
-    protected @NotNull MapCodec<? extends DiodeBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
@@ -118,7 +113,7 @@ public class SequencedPulseGeneratorBlock extends AbstractDiodeBlock implements 
     }
 
     @Override
-    public boolean canConnectRedstone(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, Direction side) {
+    public boolean shouldRedstoneWireConnectTo(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, Direction side) {
         if (side == null)
             return false;
         return side.getAxis().isHorizontal();

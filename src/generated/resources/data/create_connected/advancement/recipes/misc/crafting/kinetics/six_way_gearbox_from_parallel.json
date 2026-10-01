@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/six_way_gearbox_from_parallel"
+        "recipes": "create_connected:crafting/kinetics/six_way_gearbox_from_parallel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

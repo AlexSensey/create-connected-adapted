@@ -67,7 +67,7 @@ public class FanCatalystRotatingHeadRenderer extends SafeBlockEntityRenderer<Fan
         skullType.translate(ms);
         skullType.scale(ms);
         collector.submitModel(model, head.modelState, ms, getRenderType(), state.lightCoords,
-                OverlayTexture.NO_OVERLAY, -1, null);
+                OverlayTexture.NO_OVERLAY, -1);
         ms.popPose();
     }
 

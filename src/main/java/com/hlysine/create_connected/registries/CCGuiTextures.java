@@ -1,11 +1,10 @@
 package com.hlysine.create_connected.registries;
 
 import com.hlysine.create_connected.CreateConnected;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.createmod.catnip.api.client.gui.UIRenderHelper;
 import net.createmod.catnip.api.client.gui.element.ScreenElement;
 import net.createmod.catnip.api.theme.Color;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -49,19 +48,14 @@ public enum CCGuiTextures implements ScreenElement {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void bind() {
-        RenderSystem.setShaderTexture(0, location);
+    public void render(GuiGraphicsExtractor graphics, int x, int y) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, location, x, y, startX, startY, width, height, 256, 256);
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void render(GuiGraphics graphics, int x, int y) {
-        graphics.blit(location, x, y, startX, startY, width, height);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public void render(GuiGraphics graphics, int x, int y, Color c) {
-        bind();
-        UIRenderHelper.drawColoredTexture(graphics, c, x, y, startX, startY, width, height);
+    public void render(GuiGraphicsExtractor graphics, int x, int y, Color c) {
+        int argb = (c.getAlpha() << 24) | (c.getRGB() & 0xFFFFFF);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, location, x, y, startX, startY, width, height, 256, 256, argb);
     }
 
 }

@@ -3,19 +3,23 @@
   "pools": [
     {
       "bonus_rolls": 0.0,
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
-      ],
       "entries": [
         {
           "type": "minecraft:item",
           "name": "create_connected:dye_depot_aqua_fan_dyeing_catalyst"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      }
     }
   ],
-  "random_sequence": "create_connected:blocks/dye_depot_aqua_fan_dyeing_catalyst"
+  "random_sequence": "create_connected:blocks/dye_depot_aqua_fan_dyeing_catalyst",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "dye_depot"
+    }
+  ]
 }

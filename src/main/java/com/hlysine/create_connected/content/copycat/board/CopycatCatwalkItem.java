@@ -17,7 +17,7 @@ import java.util.Map;
 
 import static com.hlysine.create_connected.content.copycat.board.CopycatBoardBlock.*;
 
-public class CopycatCatwalkItem extends BlockItem {
+public class CopycatCatwalkItem extends BlockItem implements com.simibubi.create.foundation.item.CustomBlockEntityTagItem {
 
     public CopycatCatwalkItem(Properties builder) {
         super(CCBlocks.COPYCAT_BOARD.get(), builder.overrideDescription("item.create_connected.copycat_catwalk"));
@@ -30,7 +30,7 @@ public class CopycatCatwalkItem extends BlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(@NotNull BlockPos pos, @NotNull Level world, Player player, @NotNull ItemStack stack, @NotNull BlockState state) {
+    public boolean updateCustomBlockEntityTag(@NotNull BlockPos pos, @NotNull Level world, Player player, @NotNull ItemStack stack, @NotNull BlockState state) {
         Direction facing = player == null ? Direction.SOUTH : player.getDirection();
         for (Direction direction : Iterate.horizontalDirections) {
             state = state.setValue(byDirection(direction), direction.getAxis() != facing.getAxis());
@@ -38,7 +38,7 @@ public class CopycatCatwalkItem extends BlockItem {
         state = state.setValue(DOWN, true);
         state = state.setValue(UP, false);
         world.setBlockAndUpdate(pos, state);
-        return super.updateCustomBlockEntityTag(pos, world, player, stack, state);
+        return BlockItem.updateCustomBlockEntityTag(world, player, pos, stack);
     }
 
 }

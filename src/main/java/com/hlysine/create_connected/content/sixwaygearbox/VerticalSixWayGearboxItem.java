@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public class VerticalSixWayGearboxItem extends BlockItem {
+public class VerticalSixWayGearboxItem extends BlockItem implements com.simibubi.create.foundation.item.CustomBlockEntityTagItem {
 
     public VerticalSixWayGearboxItem(Properties builder) {
         super(CCBlocks.SIX_WAY_GEARBOX.get(), builder.overrideDescription("item.create_connected.vertical_six_way_gearbox"));
@@ -30,7 +30,7 @@ public class VerticalSixWayGearboxItem extends BlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(@NotNull BlockPos pos,
+    public boolean updateCustomBlockEntityTag(@NotNull BlockPos pos,
                                                  @NotNull Level world,
                                                  Player player,
                                                  @NotNull ItemStack stack,
@@ -54,7 +54,7 @@ public class VerticalSixWayGearboxItem extends BlockItem {
                 .getClockWise()
                 .getAxis() : prefferedAxis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
         world.setBlockAndUpdate(pos, state.setValue(BlockStateProperties.AXIS, axis));
-        return super.updateCustomBlockEntityTag(pos, world, player, stack, state);
+        return BlockItem.updateCustomBlockEntityTag(world, player, pos, stack);
     }
 
 }

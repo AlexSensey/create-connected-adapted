@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/inverted_clutch_from_conversion"
+        "recipes": "create_connected:crafting/kinetics/inverted_clutch_from_conversion"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

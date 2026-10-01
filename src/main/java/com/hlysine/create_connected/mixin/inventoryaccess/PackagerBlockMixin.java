@@ -25,7 +25,7 @@ public class PackagerBlockMixin {
             at = @At("RETURN"),
             cancellable = true
     )
-    private static void rejectInventoryAccessBlocks(BlockPlaceContext context, CallbackInfoReturnable<BlockState> cir) {
+    private void rejectInventoryAccessBlocks(BlockPlaceContext context, CallbackInfoReturnable<BlockState> cir) {
         if (cir.getReturnValue() == null) return;
         Player player = context.getPlayer();
         Direction preferredFacing = cir.getReturnValue().getValue(PackagerBlock.FACING);
@@ -38,8 +38,7 @@ public class PackagerBlockMixin {
                 if (targetBlockEntity instanceof InventoryAccessPortBlockEntity inventoryAccess) {
                     BlockState attached = inventoryAccess.getAttachedBlock();
                     if (attached != null && attached.is(AllBlocks.PORTABLE_STORAGE_INTERFACE)) {
-                        CreateLang.translate("packager.no_portable_storage")
-                                .sendStatus(player);
+                        player.sendOverlayMessage(CreateLang.translate("packager.no_portable_storage").component());
                         cir.setReturnValue(null);
                         return;
                     }
@@ -47,15 +46,13 @@ public class PackagerBlockMixin {
                 if (targetBlockEntity instanceof InventoryBridgeBlockEntity bridge) {
                     BlockState attached = bridge.getPositiveAttachedBlock();
                     if (attached != null && attached.is(AllBlocks.PORTABLE_STORAGE_INTERFACE)) {
-                        CreateLang.translate("packager.no_portable_storage")
-                                .sendStatus(player);
+                        player.sendOverlayMessage(CreateLang.translate("packager.no_portable_storage").component());
                         cir.setReturnValue(null);
                         return;
                     }
                     attached = bridge.getNegativeAttachedBlock();
                     if (attached != null && attached.is(AllBlocks.PORTABLE_STORAGE_INTERFACE)) {
-                        CreateLang.translate("packager.no_portable_storage")
-                                .sendStatus(player);
+                        player.sendOverlayMessage(CreateLang.translate("packager.no_portable_storage").component());
                         cir.setReturnValue(null);
                         return;
                     }

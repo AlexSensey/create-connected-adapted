@@ -1,0 +1,5 @@
+{
+  "type": "minecraft:block",
+  "pools": [],
+  "random_sequence": "create_connected:blocks/linked_pale_oak_button"
+}

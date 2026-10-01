@@ -3,8 +3,8 @@ package com.hlysine.create_connected.content.fluidvessel;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
+import com.simibubi.create.compat.neoforge263.fluids.capability.IFluidHandler;
+import com.simibubi.create.compat.neoforge263.fluids.capability.IFluidHandler.FluidAction;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;

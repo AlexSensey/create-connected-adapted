@@ -14,6 +14,15 @@ import net.neoforged.neoforge.fluids.FluidStack;
 public final class StorageSerialization {
     private StorageSerialization() {}
 
+    public static <E extends Enum<E>> E readEnum(CompoundTag tag, String key, E fallback) {
+        String name = tag.getStringOr(key, fallback.name());
+        try {
+            return Enum.valueOf(fallback.getDeclaringClass(), name.toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException invalidValue) {
+            return fallback;
+        }
+    }
+
     public static void read(ValueIOSerializable storage, HolderLookup.Provider registries, CompoundTag tag) {
         try (var problems = new ProblemReporter.ScopedCollector(CreateConnected.LOGGER)) {
             storage.deserialize(TagValueInput.create(problems, registries, tag));

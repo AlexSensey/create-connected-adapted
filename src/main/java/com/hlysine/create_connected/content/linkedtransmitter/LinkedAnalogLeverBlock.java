@@ -110,35 +110,54 @@ public class LinkedAnalogLeverBlock extends AnalogLeverBlock implements SpecialB
 
     @Override
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
-        onWrenched(state, context);
+        if (context.getPlayer() == null)
+            return InteractionResult.PASS;
+        if (context.getLevel().isClientSide())
+            return InteractionResult.SUCCESS;
+        InteractionResult result = onWrenched(state, context);
+        if (result != InteractionResult.SUCCESS)
+            return result;
         return IWrenchable.super.onSneakWrenched(state, context);
     }
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         Player player = context.getPlayer();
-        if (!player.isCreative()) {
-            player.getInventory().placeItemBackInInventory(new ItemStack(CCItems.LINKED_TRANSMITTER.get()));
-        }
+        if (player == null)
+            return InteractionResult.PASS;
+        if (context.getLevel().isClientSide())
+            return InteractionResult.SUCCESS;
         withBlockEntityDo(context.getLevel(), context.getClickedPos(), be -> ((LinkedAnalogLeverBlockEntity) be).containsBase = false);
         replaceWithBase(state, context.getLevel(), context.getClickedPos());
+        if (!context.getLevel().getBlockState(context.getClickedPos()).is(getBase())) {
+            withBlockEntityDo(context.getLevel(), context.getClickedPos(), be -> ((LinkedAnalogLeverBlockEntity) be).containsBase = true);
+            return InteractionResult.FAIL;
+        }
+        if (!player.isCreative()) {
+            player.getInventory().placeItemBackInInventory(new ItemStack(CCItems.LINKED_TRANSMITTER.get()), net.minecraft.util.Prediction.PREDICTED);
+        }
         return InteractionResult.SUCCESS;
     }
 
     @Override
     public void replaceBase(BlockState baseState, Level world, BlockPos pos) {
-        world.setBlockAndUpdate(pos, defaultBlockState()
+        if (!replacePreservingData(defaultBlockState()
                 .setValue(FACING, baseState.getValue(FACING))
-                .setValue(FACE, baseState.getValue(FACE))
-        );
+                .setValue(FACE, baseState.getValue(FACE)), world, pos))
+            return;
+        withBlockEntityDo(world, pos, be -> {
+            var linked = (LinkedAnalogLeverBlockEntity) be;
+            world.setBlock(pos, world.getBlockState(pos).setValue(POWERED, linked.getState() > 0), Block.UPDATE_ALL);
+            linked.transmit();
+        });
         AllSoundEvents.CONTROLLER_PUT.playOnServer(world, pos);
     }
 
     public void replaceWithBase(BlockState state, Level world, BlockPos pos) {
-        AllSoundEvents.CONTROLLER_TAKE.playOnServer(world, pos);
-        world.setBlockAndUpdate(pos, getBase().defaultBlockState()
+        if (replacePreservingData(getBase().defaultBlockState()
                 .setValue(FACING, state.getValue(FACING))
-                .setValue(FACE, state.getValue(FACE)));
+                .setValue(FACE, state.getValue(FACE)), world, pos))
+            AllSoundEvents.CONTROLLER_TAKE.playOnServer(world, pos);
     }
 
     @Override

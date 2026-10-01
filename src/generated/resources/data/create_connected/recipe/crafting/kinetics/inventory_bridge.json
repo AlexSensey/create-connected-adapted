@@ -8,12 +8,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:inventory_access_port"
-    },
-    {
-      "item": "create_connected:inventory_access_port"
-    }
+    "create_connected:inventory_access_port",
+    "create_connected:inventory_access_port"
   ],
   "result": {
     "count": 1,

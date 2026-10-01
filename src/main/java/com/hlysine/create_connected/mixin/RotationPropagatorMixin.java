@@ -14,11 +14,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mixin(RotationPropagator.class)
+@Mixin(value = RotationPropagator.class, remap = false)
 public abstract class RotationPropagatorMixin {
 
     @Inject(
-            method = "getAxisModifier",
+            method = "getAxisModifier(Lcom/simibubi/create/content/kinetics/base/KineticBlockEntity;Lnet/minecraft/core/Direction;)F",
             at = @At("HEAD"),
             cancellable = true
     )
@@ -32,8 +32,9 @@ public abstract class RotationPropagatorMixin {
     }
 
     @Inject(
-            method = "getPotentialNeighbourLocations",
-            at = @At("RETURN")
+            method = "getPotentialNeighbourLocations(Lcom/simibubi/create/content/kinetics/base/KineticBlockEntity;)Ljava/util/List;",
+            at = @At("RETURN"),
+            cancellable = true
     )
     private static void forwardConnection(KineticBlockEntity be, CallbackInfoReturnable<List<BlockPos>> cir) {
         List<BlockPos> originalPositions = cir.getReturnValue();
@@ -44,15 +45,19 @@ public abstract class RotationPropagatorMixin {
             if (neighborPos.getClass() != BlockPos.class)
                 continue;
 
-            while (!sourcePos.equals(neighborPos) && be.getLevel().getBlockState(neighborPos).getBlock() instanceof IConnectionForwardingBlock forwardingBlock) {
+            while (!sourcePos.equals(neighborPos) && be.getLevel().isLoaded(neighborPos)
+                    && be.getLevel().getBlockState(neighborPos).getBlock() instanceof IConnectionForwardingBlock forwardingBlock) {
                 BlockPos tempSource = sourcePos;
                 sourcePos = neighborPos;
                 neighborPos = forwardingBlock.forwardConnection(be.getLevel(), tempSource, be.getLevel().getBlockState(tempSource), neighborPos);
             }
 
+            if (!be.getLevel().isLoaded(neighborPos)) {
+                positions.remove(i--);
+                continue;
+            }
             positions.set(i, neighborPos);
         }
-        originalPositions.clear();
-        originalPositions.addAll(positions);
+        cir.setReturnValue(positions);
     }
 }

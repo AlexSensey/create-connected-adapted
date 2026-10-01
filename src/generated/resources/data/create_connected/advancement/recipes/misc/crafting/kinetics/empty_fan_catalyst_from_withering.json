@@ -1,7 +1,7 @@
 {
   "neoforge:conditions": [
     {
-      "type": "neoforge:false"
+      "type": "neoforge:never"
     },
     {
       "type": "create_connected:feature_enabled",
@@ -22,7 +22,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/empty_fan_catalyst_from_withering"
+        "recipes": "create_connected:crafting/kinetics/empty_fan_catalyst_from_withering"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

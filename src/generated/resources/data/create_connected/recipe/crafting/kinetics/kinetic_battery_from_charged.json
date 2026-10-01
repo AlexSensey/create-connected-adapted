@@ -8,13 +8,11 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:charged_kinetic_battery"
-    }
+    "create_connected:charged_kinetic_battery"
   ],
   "result": {
     "components": {
-      "create_connected:kinetic_battery_charge": 3.6864E7
+      "create_connected:kinetic_battery_charge": 36864000.0
     },
     "count": 1,
     "id": "create_connected:kinetic_battery"

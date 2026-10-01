@@ -41,7 +41,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/empty_fan_catalyst_from_dye_depot_maroon_dye"
+        "recipes": "create_connected:crafting/kinetics/empty_fan_catalyst_from_dye_depot_maroon_dye"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

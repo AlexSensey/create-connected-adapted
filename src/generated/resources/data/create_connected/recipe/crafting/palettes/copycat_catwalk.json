@@ -15,9 +15,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "s": {
-      "item": "create_connected:copycat_board"
-    }
+    "s": "create_connected:copycat_board"
   },
   "pattern": [
     "s s",

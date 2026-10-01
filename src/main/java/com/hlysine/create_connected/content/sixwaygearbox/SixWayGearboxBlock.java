@@ -27,7 +27,7 @@ public class SixWayGearboxBlock extends RotatedPillarKineticBlock implements IBE
 
     @Override
     public PushReaction getPistonPushReaction(@NotNull BlockState state) {
-        return PushReaction.PUSH_ONLY;
+        return PushReaction.PUSH;
     }
 
     @Override

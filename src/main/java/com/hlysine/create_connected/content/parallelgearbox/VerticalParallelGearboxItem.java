@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public class VerticalParallelGearboxItem extends BlockItem {
+public class VerticalParallelGearboxItem extends BlockItem implements com.simibubi.create.foundation.item.CustomBlockEntityTagItem {
 
     public VerticalParallelGearboxItem(Properties builder) {
         super(CCBlocks.PARALLEL_GEARBOX.get(), builder.overrideDescription("item.create_connected.vertical_parallel_gearbox"));
@@ -30,7 +30,7 @@ public class VerticalParallelGearboxItem extends BlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(@NotNull BlockPos pos, @NotNull Level world, Player player, @NotNull ItemStack stack, @NotNull BlockState state) {
+    public boolean updateCustomBlockEntityTag(@NotNull BlockPos pos, @NotNull Level world, Player player, @NotNull ItemStack stack, @NotNull BlockState state) {
         Direction.Axis prefferedAxis = null;
         for (Direction side : Iterate.horizontalDirections) {
             BlockState blockState = world.getBlockState(pos.relative(side));
@@ -50,7 +50,7 @@ public class VerticalParallelGearboxItem extends BlockItem {
                 .getClockWise()
                 .getAxis() : prefferedAxis == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X;
         world.setBlockAndUpdate(pos, state.setValue(BlockStateProperties.AXIS, axis));
-        return super.updateCustomBlockEntityTag(pos, world, player, stack, state);
+        return BlockItem.updateCustomBlockEntityTag(world, player, pos, stack);
     }
 
 }

@@ -1,35 +1,18 @@
 package com.hlysine.create_connected.datagen.recipes;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.RecipeOutput;
+import com.hlysine.create_connected.CreateConnected;
+import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.recipes.RecipeProvider;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 public final class CreateConnectedProcessingRecipeGen {
-    public static void registerAllProcessing(DataGenerator gen, PackOutput output,
-                                             CompletableFuture<HolderLookup.Provider> registries) {
-        add(gen, output, registries, "standard", CCStandardRecipes::new);
-        add(gen, output, registries, "sequenced assembly", SequencedAssemblyGen::new);
-        add(gen, output, registries, "cutting", CuttingRecipeGen::new);
-        add(gen, output, registries, "filling", FillingRecipeGen::new);
-        add(gen, output, registries, "item application", ItemApplicationRecipeGen::new);
-    }
-
-    private static void add(DataGenerator gen, PackOutput output, CompletableFuture<HolderLookup.Provider> registries,
-                            String name, BiFunction<HolderLookup.Provider, RecipeOutput, RecipeProvider> factory) {
-        gen.addProvider(true, new RecipeProvider.Runner(output, registries) {
-            @Override
-            protected RecipeProvider createRecipeProvider(HolderLookup.Provider lookup, RecipeOutput recipes) {
-                return factory.apply(lookup, recipes);
-            }
-
-            @Override
-            public String getName() {
-                return "Create: Connected " + name + " recipes";
-            }
-        });
+    public static void registerAllProcessing(GatherDataEvent.Server event) {
+        RegistrySetBuilder recipes = new RegistrySetBuilder();
+        recipes.add(RecipeProvider.asBootstrap(CCStandardRecipes::new));
+        recipes.add(RecipeProvider.asBootstrap(SequencedAssemblyGen::new));
+        recipes.add(RecipeProvider.asBootstrap(CuttingRecipeGen::new));
+        recipes.add(RecipeProvider.asBootstrap(FillingRecipeGen::new));
+        recipes.add(RecipeProvider.asBootstrap(ItemApplicationRecipeGen::new));
+        event.createReloadableRegistryObjects(recipes, java.util.Set.of(CreateConnected.MODID), "Connected recipes");
     }
 }

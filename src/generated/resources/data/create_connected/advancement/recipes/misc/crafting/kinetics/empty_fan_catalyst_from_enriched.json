@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/empty_fan_catalyst_from_enriched"
+        "recipes": "create_connected:crafting/kinetics/empty_fan_catalyst_from_enriched"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

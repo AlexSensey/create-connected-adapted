@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/sequenced_pulse_generator"
+        "recipes": "create_connected:crafting/kinetics/sequenced_pulse_generator"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

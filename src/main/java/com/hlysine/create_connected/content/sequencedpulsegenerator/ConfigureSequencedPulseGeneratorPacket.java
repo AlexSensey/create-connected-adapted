@@ -22,7 +22,9 @@ public class ConfigureSequencedPulseGeneratorPacket extends BlockEntityConfigura
 
     public ConfigureSequencedPulseGeneratorPacket(BlockPos pos, Tag instructions) {
         super(pos);
-        this.instructions = (ListTag) instructions;
+        if (!(instructions instanceof ListTag list))
+            throw new IllegalArgumentException("Pulse generator instructions must be an NBT list");
+        this.instructions = list.copy();
     }
 
     @Override

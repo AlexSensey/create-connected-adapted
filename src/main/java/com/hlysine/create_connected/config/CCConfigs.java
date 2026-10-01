@@ -61,15 +61,24 @@ public class CCConfigs {
     }
 
     public static void register(ModContainer container) {
-        common = register(CCommon::new, ModConfig.Type.COMMON);
-        server = register(CServer::new, ModConfig.Type.SERVER);
+        common = register(CCommon::new, compatType("LOCAL", "COMMON"));
+        server = register(CServer::new, compatType("SYNCED", "SERVER"));
 
         for (Map.Entry<ModConfig.Type, ConfigBase> pair : CONFIGS.entrySet())
-            container.registerConfig(pair.getKey(), pair.getValue().specification);
+            container.registerConfig(pair.getKey(), pair.getValue().specification,
+                    "create_connected-" + (pair.getKey() == compatType("LOCAL", "COMMON") ? "common" : "server") + ".toml");
 
         CStress stress = server().stressValues;
         BlockStressValues.IMPACTS.registerProvider(stress::getImpact);
         BlockStressValues.CAPACITIES.registerProvider(stress::getCapacity);
+    }
+
+    private static ModConfig.Type compatType(String current, String legacy) {
+        try {
+            return ModConfig.Type.valueOf(current);
+        } catch (IllegalArgumentException ignored) {
+            return ModConfig.Type.valueOf(legacy);
+        }
     }
 
     @SubscribeEvent

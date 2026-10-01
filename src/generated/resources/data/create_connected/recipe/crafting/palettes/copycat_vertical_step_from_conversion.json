@@ -19,9 +19,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create:copycat_step"
-    }
+    "create:copycat_step"
   ],
   "result": {
     "count": 1,

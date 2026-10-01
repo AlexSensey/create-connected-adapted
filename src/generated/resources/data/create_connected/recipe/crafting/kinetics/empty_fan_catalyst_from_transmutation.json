@@ -12,9 +12,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:fan_transmutation_catalyst"
-    }
+    "create_connected:fan_transmutation_catalyst"
   ],
   "result": {
     "count": 1,

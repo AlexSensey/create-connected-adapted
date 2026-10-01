@@ -12,9 +12,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create:gearshift"
-    }
+    "create:gearshift"
   ],
   "result": {
     "count": 1,

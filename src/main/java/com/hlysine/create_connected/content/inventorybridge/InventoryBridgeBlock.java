@@ -20,7 +20,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.NotNull;
 
 public class InventoryBridgeBlock extends Block implements IBE<InventoryBridgeBlockEntity>, IWrenchable {
@@ -46,7 +47,7 @@ public class InventoryBridgeBlock extends Block implements IBE<InventoryBridgeBl
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = defaultBlockState();
-        BlockCapability<IItemHandler, Direction> itemCap = Capabilities.ItemHandler.BLOCK;
+        BlockCapability<ResourceHandler<ItemResource>, Direction> itemCap = Capabilities.Item.BLOCK;
 
         Direction preferredFacing = null;
         for (Direction face : context.getNearestLookingDirections()) {

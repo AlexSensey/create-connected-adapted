@@ -26,9 +26,9 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import com.simibubi.create.compat.neoforge263.fluids.capability.IFluidHandler;
+import com.simibubi.create.compat.neoforge263.fluids.capability.IFluidHandler.FluidAction;
+import com.simibubi.create.compat.neoforge263.fluids.capability.templates.FluidTank;
 
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
@@ -439,7 +439,7 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
 
         if (isController()) {
             window = compound.getBooleanOr("Window", false);
-            windowType = NBTHelper.readEnum(compound, "WindowType", WindowType.class);
+            windowType = StorageSerialization.readEnum(compound, "WindowType", WindowType.SIDE_WIDE);
             width = compound.getIntOr("Size", 0);
             height = compound.getIntOr("Height", 0);
             tankInventory.setCapacity(getTotalTankSize() * getCapacityMultiplier());
@@ -496,7 +496,7 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
             compound.put("Controller", writeStoredPosition(controller));
         if (isController()) {
             compound.putBoolean("Window", window);
-            NBTHelper.writeEnum(compound, "WindowType", windowType);
+            compound.putString("WindowType", windowType.name());
             StorageSerialization.writeFluid(registries, compound, "TankContent", tankInventory.getFluid());
             compound.putInt("Size", width);
             compound.putInt("Height", height);

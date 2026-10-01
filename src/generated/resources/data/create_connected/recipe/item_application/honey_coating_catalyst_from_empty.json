@@ -11,12 +11,8 @@
   ],
   "type": "create:item_application",
   "ingredients": [
-    {
-      "item": "create_connected:empty_fan_catalyst"
-    },
-    {
-      "item": "create:honey_bucket"
-    }
+    "create_connected:empty_fan_catalyst",
+    "create:honey_bucket"
   ],
   "results": [
     {

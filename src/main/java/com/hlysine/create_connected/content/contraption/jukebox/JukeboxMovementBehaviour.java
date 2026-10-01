@@ -11,11 +11,26 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class JukeboxMovementBehaviour extends AutoPlayMovementBehaviour {
 
+    @Override
+    public void tick(MovementContext context) {
+        if (context.world.isClientSide() || context.contraption == null
+                || context.contraption.entity == null || context.contraption.entity.isRemoved())
+            return;
+        super.tick(context);
+        if (context.disabled)
+            return;
+        MovingInteractionBehaviour interactor = context.contraption.getInteractors().get(context.localPos);
+        if (interactor instanceof JukeboxInteractionBehaviour jukeboxInteraction)
+            jukeboxInteraction.tickPlaying(context.contraption, context.localPos);
+    }
+
     private void stopPlaying(MovementContext context) {
-        if (context.world.isClientSide()) return;
+        if (context.world.isClientSide() || context.contraption == null) return;
         MovingInteractionBehaviour interactor = context.contraption.getInteractors().get(context.localPos);
         if (!(interactor instanceof JukeboxInteractionBehaviour jukeboxInteraction)) return;
-        BlockState currentState = context.contraption.getBlocks().get(context.localPos).state();
+        var info = context.contraption.getBlocks().get(context.localPos);
+        if (info == null) return;
+        BlockState currentState = info.state();
         jukeboxInteraction.withTempBlockEntity(
                 context.contraption,
                 context.localPos,

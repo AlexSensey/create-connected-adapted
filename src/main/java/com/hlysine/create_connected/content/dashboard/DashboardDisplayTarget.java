@@ -28,7 +28,7 @@ public class DashboardDisplayTarget extends DisplayTarget {
                 break;
 
             String content = text.get(i).getString(dashboard.getMaxTextLineWidth());
-            signText = signText.setMessage(i + line, Component.literal(content));
+            signText = signText.asMutable().setLine(i + line, Component.literal(content)).asImmutable();
             changed = true;
         }
 

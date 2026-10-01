@@ -30,7 +30,7 @@ import java.util.List;
 
 public class DashboardBlockEntity extends SmartBlockEntity {
 
-    SignText text = new SignText().setColor(DyeColor.WHITE);
+    SignText text = SignText.EMPTY.withColor(DyeColor.WHITE);
     int cycleTimer = 0;
     boolean wasDisplaying;
     private static final int LAZY_TICK_RATE = 4;
@@ -55,13 +55,13 @@ public class DashboardBlockEntity extends SmartBlockEntity {
     }
 
     public void setLine(int line, Component text) {
-        this.setText(this.getText().setMessage(line, text));
+        this.setText(this.getText().asMutable().setLine(line, text).asImmutable());
     }
 
     public void clearText() {
         SignText text = this.getText();
         for (int i = 0; i < SignText.LINES; i++) {
-            text = text.setMessage(i, Component.empty());
+            text = text.asMutable().setLine(i, Component.empty()).asImmutable();
         }
         this.setText(text);
     }
@@ -84,7 +84,7 @@ public class DashboardBlockEntity extends SmartBlockEntity {
         MutableComponent status = Component.empty();
         boolean needSpacer = false;
         for (int i = 0; i < SignText.LINES; i++) {
-            Component line = this.text.getMessage(i, false);
+            Component line = this.text.getMessages(false).get(i);
             if (line.getString().isEmpty()) continue;
             if (needSpacer)
                 status.append("   ");
@@ -173,7 +173,7 @@ public class DashboardBlockEntity extends SmartBlockEntity {
     public void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
         super.write(tag, registries, clientPacket);
         DynamicOps<Tag> ops = registries.createSerializationContext(NbtOps.INSTANCE);
-        DataResult<Tag> result = SignText.DIRECT_CODEC.encodeStart(ops, this.text);
+        DataResult<Tag> result = SignText.CODEC.encodeStart(ops, this.text);
         result.result().ifPresent((tagResult) -> tag.put("text", tagResult));
     }
 
@@ -182,7 +182,7 @@ public class DashboardBlockEntity extends SmartBlockEntity {
         super.read(tag, registries, clientPacket);
         DynamicOps<Tag> ops = registries.createSerializationContext(NbtOps.INSTANCE);
         if (tag.contains("text")) {
-            DataResult<SignText> result = SignText.DIRECT_CODEC.parse(ops, tag.getCompoundOrEmpty("text"));
+            DataResult<SignText> result = SignText.CODEC.parse(ops, tag.getCompoundOrEmpty("text"));
             result.result().ifPresent((signText) -> this.text = signText);
         }
     }

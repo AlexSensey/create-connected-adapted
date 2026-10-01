@@ -12,9 +12,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:copycat_beam"
-    }
+    "create_connected:copycat_beam"
   ],
   "result": {
     "count": 1,

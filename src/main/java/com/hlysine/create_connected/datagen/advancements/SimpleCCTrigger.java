@@ -9,7 +9,8 @@ import org.jetbrains.annotations.Nullable;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancements.predicates.ContextAwarePredicate;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.advancements.predicates.entity.EntityPredicate;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -34,16 +35,16 @@ public class SimpleCCTrigger extends CriterionTriggerBase<SimpleCCTrigger.Instan
 
     public static class Instance extends CriterionTriggerBase.Instance {
         private static final Codec<SimpleCCTrigger.Instance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(SimpleCCTrigger.Instance::player)
+                LootItemCondition.CODEC.optionalFieldOf("player").forGetter(SimpleCCTrigger.Instance::player)
         ).apply(instance, SimpleCCTrigger.Instance::new));
 
-        private final Optional<ContextAwarePredicate> player;
+        private final Optional<Holder<LootItemCondition>> player;
 
         public Instance() {
             player = Optional.empty();
         }
 
-        public Instance(Optional<ContextAwarePredicate> player) {
+        public Instance(Optional<Holder<LootItemCondition>> player) {
             this.player = player;
         }
 
@@ -53,7 +54,7 @@ public class SimpleCCTrigger extends CriterionTriggerBase<SimpleCCTrigger.Instan
         }
 
         @Override
-        public Optional<ContextAwarePredicate> player() {
+        public Optional<Holder<LootItemCondition>> player() {
             return player;
         }
     }

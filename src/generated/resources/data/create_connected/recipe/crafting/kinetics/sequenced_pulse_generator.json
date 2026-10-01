@@ -8,21 +8,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": {
-      "item": "create:brass_sheet"
-    },
-    "C": {
-      "item": "create_connected:control_chip"
-    },
-    "E": {
-      "item": "create:electron_tube"
-    },
-    "S": {
-      "tag": "c:stones"
-    },
-    "T": {
-      "item": "minecraft:redstone_torch"
-    }
+    "B": "create:brass_sheet",
+    "C": "create_connected:control_chip",
+    "E": "create:electron_tube",
+    "S": "#c:stones",
+    "T": "minecraft:redstone_torch"
   },
   "pattern": [
     "EC ",

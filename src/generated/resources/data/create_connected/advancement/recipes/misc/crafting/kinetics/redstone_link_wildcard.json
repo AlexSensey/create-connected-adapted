@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/redstone_link_wildcard"
+        "recipes": "create_connected:crafting/kinetics/redstone_link_wildcard"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

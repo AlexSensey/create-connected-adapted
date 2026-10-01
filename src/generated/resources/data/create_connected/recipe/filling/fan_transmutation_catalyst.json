@@ -11,17 +11,10 @@
   ],
   "type": "create:filling",
   "ingredients": [
+    "create_connected:empty_fan_catalyst",
     {
-      "item": "create_connected:empty_fan_catalyst"
-    },
-    {
-      "type": "neoforge:compound",
-      "amount": 1000,
-      "ingredients": [
-        {
-          "fluid": "create_shimmer:shimmer"
-        }
-      ]
+      "ingredient": "create_shimmer:shimmer",
+      "amount": 1000
     }
   ],
   "results": [

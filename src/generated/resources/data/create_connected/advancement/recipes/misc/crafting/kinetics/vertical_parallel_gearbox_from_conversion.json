@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/vertical_parallel_gearbox_from_conversion"
+        "recipes": "create_connected:crafting/kinetics/vertical_parallel_gearbox_from_conversion"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

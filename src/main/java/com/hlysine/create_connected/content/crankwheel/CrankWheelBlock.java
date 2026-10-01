@@ -13,6 +13,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -33,6 +34,13 @@ public class CrankWheelBlock extends HandCrankBlock implements ICogWheel {
     public CrankWheelBlock(Properties properties, boolean largeCog) {
         super(properties);
         this.largeCog = largeCog;
+    }
+
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        // The renderer/visual owns the whole wheel and its independently rotating handle.
+        // Baking the same wheel into the chunk leaves a stationary overlapping copy.
+        return RenderShape.INVISIBLE;
     }
 
     @Override

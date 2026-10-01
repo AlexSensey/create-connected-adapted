@@ -15,7 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import com.simibubi.create.compat.neoforge263.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemSiloMountedStorage extends WrapperMountedItemStorage<ItemStackHandler> {

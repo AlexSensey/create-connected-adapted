@@ -56,7 +56,7 @@ public class BrassGearboxBlock extends RotatedPillarKineticBlock implements IBE<
 
     @Override
     public PushReaction getPistonPushReaction(BlockState state) {
-        return PushReaction.PUSH_ONLY;
+        return PushReaction.PUSH;
     }
 
     @SuppressWarnings("deprecation")

@@ -29,7 +29,7 @@ public class SequencedAssemblyGen extends SequencedAssemblyRecipeGen {
             .addStep(DeployerApplicationRecipe::new, rb -> rb.require(Items.REDSTONE))
             .addStep(PressingRecipe::new, rb -> rb));
 
-    public SequencedAssemblyGen(HolderLookup.Provider registries, net.minecraft.data.recipes.RecipeOutput output) {
+    public SequencedAssemblyGen(net.minecraft.data.worldgen.BootstrapContext<net.minecraft.world.item.crafting.Recipe<?>> registries, net.minecraft.data.worldgen.BootstrapContext<net.minecraft.advancements.Advancement> output) {
         super(registries, output, CreateConnected.MODID);
     }
 }

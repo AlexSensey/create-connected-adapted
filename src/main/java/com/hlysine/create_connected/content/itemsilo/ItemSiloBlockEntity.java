@@ -29,10 +29,10 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import com.simibubi.create.compat.neoforge263.items.IItemHandler;
+import com.simibubi.create.compat.neoforge263.items.IItemHandlerModifiable;
+import com.simibubi.create.compat.neoforge263.items.ItemStackHandler;
+import com.simibubi.create.compat.neoforge263.items.wrapper.CombinedInvWrapper;
 
 import java.util.List;
 

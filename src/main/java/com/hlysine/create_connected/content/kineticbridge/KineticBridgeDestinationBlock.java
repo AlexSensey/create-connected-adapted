@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 
 public class KineticBridgeDestinationBlock extends DirectionalKineticBlock implements IBE<KineticBridgeDestinationBlockEntity> {
 
@@ -60,7 +59,7 @@ public class KineticBridgeDestinationBlock extends DirectionalKineticBlock imple
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         return CCBlocks.KINETIC_BRIDGE.asStack();
     }
 

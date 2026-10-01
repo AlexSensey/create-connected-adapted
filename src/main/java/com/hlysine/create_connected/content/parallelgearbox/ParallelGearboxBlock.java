@@ -27,7 +27,7 @@ public class ParallelGearboxBlock extends RotatedPillarKineticBlock implements I
 
     @Override
     public PushReaction getPistonPushReaction(@NotNull BlockState state) {
-        return PushReaction.PUSH_ONLY;
+        return PushReaction.PUSH;
     }
 
     @Override

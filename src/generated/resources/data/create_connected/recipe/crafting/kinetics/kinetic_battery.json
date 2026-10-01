@@ -8,18 +8,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "b": {
-      "item": "create:brass_casing"
-    },
-    "i": {
-      "item": "create:iron_sheet"
-    },
-    "p": {
-      "item": "create:precision_mechanism"
-    },
-    "r": {
-      "item": "minecraft:redstone"
-    }
+    "b": "create:brass_casing",
+    "i": "create:iron_sheet",
+    "p": "create:precision_mechanism",
+    "r": "minecraft:redstone"
   },
   "pattern": [
     " p ",

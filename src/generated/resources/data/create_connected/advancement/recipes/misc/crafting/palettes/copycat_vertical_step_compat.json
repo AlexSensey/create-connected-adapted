@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/palettes/copycat_vertical_step_compat"
+        "recipes": "create_connected:crafting/palettes/copycat_vertical_step_compat"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

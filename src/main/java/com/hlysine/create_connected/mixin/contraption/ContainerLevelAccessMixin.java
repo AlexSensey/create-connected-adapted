@@ -23,7 +23,7 @@ public interface ContainerLevelAccessMixin {
     @Overwrite
     static ContainerLevelAccess create(final Level pLevel, final BlockPos pPos) {
         if (pLevel instanceof TrackingContraptionWorld world) {
-            return new TrackingContainerLevelAccess(world.getLevel(), world.contraption.entity, world.localPos);
+            return new TrackingContainerLevelAccess(world.getLevel(), world.contraption.entity, pPos);
         }
         return new ContainerLevelAccess() {
             public <T> @NotNull Optional<T> evaluate(@NotNull BiFunction<Level, BlockPos, T> pLevelPosConsumer) {

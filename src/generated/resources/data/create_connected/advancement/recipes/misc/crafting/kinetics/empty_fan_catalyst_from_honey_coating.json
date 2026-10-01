@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/empty_fan_catalyst_from_honey_coating"
+        "recipes": "create_connected:crafting/kinetics/empty_fan_catalyst_from_honey_coating"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

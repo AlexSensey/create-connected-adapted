@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/brake"
+        "recipes": "create_connected:crafting/kinetics/brake"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

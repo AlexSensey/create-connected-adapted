@@ -25,7 +25,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeverBlock;
-import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RedstoneWireBlock;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.RedstoneSide;
 import net.minecraft.world.phys.Vec3;
@@ -310,7 +310,7 @@ public class KineticBatteryScene {
         scene.world().setBlocks(casings2, AllBlocks.ANDESITE_CASING.getDefaultState(), false);
         scene.world().showSection(casings2, Direction.DOWN);
         scene.idle(15);
-        scene.world().setBlocks(redstone2, Blocks.REDSTONE_WIRE.defaultBlockState().setValue(RedStoneWireBlock.NORTH, RedstoneSide.SIDE).setValue(RedStoneWireBlock.SOUTH, RedstoneSide.SIDE), false);
+        scene.world().setBlocks(redstone2, Blocks.REDSTONE_WIRE.defaultBlockState().setValue(RedstoneWireBlock.NORTH, RedstoneSide.SIDE).setValue(RedstoneWireBlock.SOUTH, RedstoneSide.SIDE), false);
         scene.world().showSection(redstone2, Direction.DOWN);
         scene.idle(15);
         scene.world().setBlock(lever2, Blocks.LEVER.defaultBlockState().setValue(LeverBlock.FACING, Direction.WEST), false);

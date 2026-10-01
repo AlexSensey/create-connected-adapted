@@ -8,9 +8,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:kinetic_battery"
-    }
+    "create_connected:kinetic_battery"
   ],
   "result": {
     "count": 1,

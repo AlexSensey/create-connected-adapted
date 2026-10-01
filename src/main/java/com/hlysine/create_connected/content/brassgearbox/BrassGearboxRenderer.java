@@ -47,13 +47,13 @@ public class BrassGearboxRenderer extends KineticBlockEntityRenderer<BrassGearbo
             angle += getRotationOffsetForPosition(be, pos, axis);
             pose.pushPose();
             pose.translate(.5, .5, .5);
-            pose.mulPose(rotation(axis, angle / 180f * (float) Math.PI));
+            pose.rotate(rotation(axis, angle / 180f * (float) Math.PI));
             switch (direction) {
-                case NORTH -> pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180));
-                case EAST -> pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(90));
-                case WEST -> pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-90));
-                case UP -> pose.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-90));
-                case DOWN -> pose.mulPose(com.mojang.math.Axis.XP.rotationDegrees(90));
+                case NORTH -> pose.rotate(com.mojang.math.Axis.YP.rotationDegrees(180));
+                case EAST -> pose.rotate(com.mojang.math.Axis.YP.rotationDegrees(90));
+                case WEST -> pose.rotate(com.mojang.math.Axis.YP.rotationDegrees(-90));
+                case UP -> pose.rotate(com.mojang.math.Axis.XP.rotationDegrees(-90));
+                case DOWN -> pose.rotate(com.mojang.math.Axis.XP.rotationDegrees(90));
                 case SOUTH -> {}
             }
             pose.translate(-.5, -.5, -.5);

@@ -173,7 +173,7 @@ public class KineticBatteryBlock extends DirectionalKineticBlock implements IBE<
             if (stack.isEmpty()) {
                 player.setItemInHand(hand, leftover);
             } else if (!player.getInventory().add(leftover)) {
-                player.drop(leftover, false);
+                player.drop(leftover, false, net.minecraft.util.Prediction.PREDICTED);
             }
         }
 

@@ -78,7 +78,7 @@ public class FillingRecipeGen extends com.simibubi.create.api.data.recipe.Fillin
         return null;
     }
 
-    public FillingRecipeGen(HolderLookup.Provider registries, net.minecraft.data.recipes.RecipeOutput output) {
+    public FillingRecipeGen(net.minecraft.data.worldgen.BootstrapContext<net.minecraft.world.item.crafting.Recipe<?>> registries, net.minecraft.data.worldgen.BootstrapContext<net.minecraft.advancements.Advancement> output) {
         super(registries, output, CreateConnected.MODID);
     }
 }

@@ -159,6 +159,7 @@ public class FeatureToggle {
                 CreativeModeTabsAccessor.callBuildAllTabContents(cachedParameters);
             }
             Mods.JEI.executeIfInstalled(() -> CreateConnectedJEI::refreshItemList);
+            Mods.REI.executeIfInstalled(() -> com.hlysine.create_connected.compat.CreateConnectedREI::refreshItemList);
         });
     }
 }

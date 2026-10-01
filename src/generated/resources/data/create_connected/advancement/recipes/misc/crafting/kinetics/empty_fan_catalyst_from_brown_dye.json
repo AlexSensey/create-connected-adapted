@@ -32,7 +32,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/empty_fan_catalyst_from_brown_dye"
+        "recipes": "create_connected:crafting/kinetics/empty_fan_catalyst_from_brown_dye"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

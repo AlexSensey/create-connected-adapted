@@ -1,0 +1,10 @@
+{
+  "minecraft": "26.3",
+  "version": "1.3.3-adapted-26.3-0.2",
+  "sha256": "9e92837e6ad6315078f4ec5af8bd0976998015402f5d1a74ddcd8f860c3afd64",
+  "native_core_assertions": 44,
+  "native_rei_assertions": 161,
+  "world_test": "C:\\Users\\alexn\\RiderProjects\\Create\\build\\cross-version-compat\\26.3\\tests\\absence\\20261002-021345",
+  "rei_test": "C:\\Users\\alexn\\RiderProjects\\Create\\build\\cross-version-compat\\26.3\\tests\\rei\\20261002-021426",
+  "coverage": "Isolated client and integrated server with Create; not the complete installed modpack."
+}

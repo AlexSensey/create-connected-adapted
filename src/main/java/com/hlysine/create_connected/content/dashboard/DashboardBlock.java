@@ -46,7 +46,6 @@ public class DashboardBlock extends HorizontalDirectionalBlock implements IWrenc
 
     public static final BooleanProperty OPEN = BooleanProperty.create("open");
 
-    public static final MapCodec<DashboardBlock> CODEC = simpleCodec(DashboardBlock::new);
 
     public DashboardBlock(Properties properties) {
         super(properties);
@@ -82,7 +81,7 @@ public class DashboardBlock extends HorizontalDirectionalBlock implements IWrenc
                     for (ClipboardEntry entry : entries) {
                         for (String string : entry.text.getString()
                                 .split("\n")) {
-                            text = text.setMessage(line++, Component.literal(string));
+                            text = text.asMutable().setLine(line++, Component.literal(string)).asImmutable();
                         }
                     }
                     be.setText(text);
@@ -103,11 +102,11 @@ public class DashboardBlock extends HorizontalDirectionalBlock implements IWrenc
             this.withBlockEntityDo(level, blockPos, be -> {
                 final SignBlockEntity dummySign = new SignBlockEntity(blockPos, Blocks.OAK_SIGN.defaultBlockState());
                 dummySign.setLevel(be.getLevel());
-                dummySign.setText(be.text, true);
+                dummySign.setText(be.text, net.minecraft.world.level.block.entity.SignTextSlot.FRONT);
                 dummySign.setWaxed(true);
 
-                if (signApplicator.canApplyToSign(be.text, heldItem, player) && signApplicator.tryApplyToSign(be.getLevel(), dummySign, true, heldItem, player)) {
-                    be.setText(dummySign.getText(true));
+                if (signApplicator.canApplyToSign(be.text, heldItem, player) && signApplicator.tryApplyToSign(be.getLevel(), dummySign, net.minecraft.world.level.block.entity.SignTextSlot.FRONT, heldItem, player)) {
+                    be.setText(dummySign.getText(net.minecraft.world.level.block.entity.SignTextSlot.FRONT));
                     success.setTrue();
                 }
             });
@@ -164,10 +163,6 @@ public class DashboardBlock extends HorizontalDirectionalBlock implements IWrenc
         return AllShapes.CONTROLS_COLLISION.get(pState.getValue(FACING));
     }
 
-    @Override
-    protected @NotNull MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     public Class<DashboardBlockEntity> getBlockEntityClass() {

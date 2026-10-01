@@ -57,7 +57,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     private static boolean anyModsLoaded(List<String> mods) {
         for (String mod : mods) {
-            if (FMLLoader.getLoadingModList().getMods().stream().anyMatch(m -> m.getModId().equals(mod))) return true;
+            if (FMLLoader.getCurrent().getLoadingModList().getMods().stream().anyMatch(m -> m.getModId().equals(mod))) return true;
         }
         return false;
     }

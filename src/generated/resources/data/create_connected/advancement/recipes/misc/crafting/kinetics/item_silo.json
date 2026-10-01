@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "create_connected:crafting/kinetics/item_silo"
+        "recipes": "create_connected:crafting/kinetics/item_silo"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

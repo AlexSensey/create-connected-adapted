@@ -112,38 +112,59 @@ public class LinkedLeverBlock extends LeverBlock implements IBE<LinkedTransmitte
 
     @Override
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
-        onWrenched(state, context);
+        if (context.getPlayer() == null)
+            return InteractionResult.PASS;
+        if (context.getLevel().isClientSide())
+            return InteractionResult.SUCCESS;
+        InteractionResult result = onWrenched(state, context);
+        if (result != InteractionResult.SUCCESS)
+            return result;
         return IWrenchable.super.onSneakWrenched(state, context);
     }
 
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         Player player = context.getPlayer();
-        if (!player.isCreative()) {
-            player.getInventory().placeItemBackInInventory(new ItemStack(CCItems.LINKED_TRANSMITTER.get()));
-        }
+        if (player == null)
+            return InteractionResult.PASS;
+        if (context.getLevel().isClientSide())
+            return InteractionResult.SUCCESS;
         withBlockEntityDo(context.getLevel(), context.getClickedPos(), be -> be.containsBase = false);
         replaceWithBase(state, context.getLevel(), context.getClickedPos());
+        if (!context.getLevel().getBlockState(context.getClickedPos()).is(base)) {
+            withBlockEntityDo(context.getLevel(), context.getClickedPos(), be -> be.containsBase = true);
+            updateTransmittedSignal(context.getLevel(), context.getClickedPos());
+            return InteractionResult.FAIL;
+        }
+        if (!player.isCreative()) {
+            player.getInventory().placeItemBackInInventory(new ItemStack(CCItems.LINKED_TRANSMITTER.get()), net.minecraft.util.Prediction.PREDICTED);
+        }
         return InteractionResult.SUCCESS;
     }
 
     @Override
     public void replaceBase(BlockState baseState, Level world, BlockPos pos) {
-        world.setBlockAndUpdate(pos, defaultBlockState()
+        if (world.isClientSide())
+            return;
+        if (!world.setBlockAndUpdate(pos, defaultBlockState()
                 .setValue(FACING, baseState.getValue(FACING))
                 .setValue(FACE, baseState.getValue(FACE))
                 .setValue(POWERED, baseState.getValue(POWERED))
-        );
+        ))
+            return;
         AllSoundEvents.CONTROLLER_PUT.playOnServer(world, pos);
     }
 
     public void replaceWithBase(BlockState state, Level world, BlockPos pos) {
-        AllSoundEvents.CONTROLLER_TAKE.playOnServer(world, pos);
+        if (world.isClientSide())
+            return;
         withBlockEntityDo(world, pos, be -> be.transmit(0));
-        world.setBlockAndUpdate(pos, base.defaultBlockState()
+        if (!world.setBlockAndUpdate(pos, base.defaultBlockState()
                 .setValue(FACING, state.getValue(FACING))
                 .setValue(FACE, state.getValue(FACE))
-                .setValue(POWERED, state.getValue(POWERED)));
+                .setValue(POWERED, state.getValue(POWERED))))
+            return;
+        AllSoundEvents.CONTROLLER_TAKE.playOnServer(world, pos);
     }
 
     @Override

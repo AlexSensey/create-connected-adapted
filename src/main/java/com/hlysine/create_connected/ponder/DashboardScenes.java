@@ -101,7 +101,7 @@ public class DashboardScenes {
                 .rightClick();
         scene.idle(6);
         scene.world().modifyBlockEntity(boardPos, DashboardBlockEntity.class,
-                be -> be.setText(be.getText().setHasGlowingText(true))
+                be -> be.setText(be.getText().withGlowingText(true))
         );
         scene.idle(25);
 

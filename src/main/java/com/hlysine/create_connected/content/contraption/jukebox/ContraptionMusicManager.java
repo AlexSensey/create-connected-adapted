@@ -4,6 +4,7 @@ import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import net.createmod.catnip.api.data.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,14 +16,54 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ContraptionMusicManager {
-    private static final Map<Pair<Integer, BlockPos>, SoundInstance> playingContraptionRecords = new HashMap<>();
+    private static final Map<Pair<Integer, BlockPos>, ContraptionRecordSoundInstance> playingContraptionRecords = new HashMap<>();
+
+    private static ClientLevel playingLevel;
+
+    public static void clear() {
+        var sounds = Minecraft.getInstance().getSoundManager();
+        playingContraptionRecords.values().forEach(sounds::stop);
+        playingContraptionRecords.clear();
+        playingLevel = null;
+    }
+
+    public static void tick() {
+        var minecraft = Minecraft.getInstance();
+        if (playingLevel != minecraft.level) {
+            clear();
+            playingLevel = minecraft.level;
+        }
+        playingContraptionRecords.entrySet().removeIf(entry -> {
+            var sound = entry.getValue();
+            if (!sound.isStopped() && minecraft.getSoundManager().isActive(sound))
+                return false;
+            minecraft.getSoundManager().stop(sound);
+            notifyNearby(BlockPos.containing(sound.getX(), sound.getY(), sound.getZ()), false);
+            return true;
+        });
+    }
+
+    private static void notifyNearby(BlockPos pos, boolean playing) {
+        var level = Minecraft.getInstance().level;
+        if (level != null) {
+            for (LivingEntity nearby : level.getEntitiesOfClass(LivingEntity.class, new AABB(pos).inflate(3)))
+                nearby.setRecordPlayingNearby(pos, playing);
+        }
+    }
 
     public static void playContraptionMusic(@Nullable JukeboxSong song,
                                             AbstractContraptionEntity entity,
                                             BlockPos localPos,
                                             BlockPos worldPos,
                                             boolean silent) {
-        Pair<Integer, BlockPos> contraption = Pair.of(entity.getId(), localPos);
+        var level = Minecraft.getInstance().level;
+        if (level == null || entity.isRemoved() || entity.level() != level)
+            return;
+        if (playingLevel != level) {
+            clear();
+            playingLevel = level;
+        }
+        Pair<Integer, BlockPos> contraption = Pair.of(entity.getId(), localPos.immutable());
         SoundInstance soundInstance = playingContraptionRecords.get(contraption);
         if (soundInstance != null) {
             Minecraft.getInstance().getSoundManager().stop(soundInstance);
@@ -34,7 +75,7 @@ public class ContraptionMusicManager {
                 Minecraft.getInstance().gui.hud.setNowPlaying(song.description());
             }
 
-            SoundInstance newInstance = new ContraptionRecordSoundInstance(
+            ContraptionRecordSoundInstance newInstance = new ContraptionRecordSoundInstance(
                     song.soundEvent().value(),
                     SoundSource.RECORDS,
                     4.0F,
@@ -49,11 +90,6 @@ public class ContraptionMusicManager {
             playingContraptionRecords.put(contraption, newInstance);
             Minecraft.getInstance().getSoundManager().play(newInstance);
         }
-        // Match 26.2 LevelEventHandler without requiring access to its private helper.
-        var level = Minecraft.getInstance().level;
-        if (level != null) {
-            for (LivingEntity nearby : level.getEntitiesOfClass(LivingEntity.class, new AABB(worldPos).inflate(3)))
-                nearby.setRecordPlayingNearby(worldPos, song != null);
-        }
+        notifyNearby(worldPos, song != null);
     }
 }

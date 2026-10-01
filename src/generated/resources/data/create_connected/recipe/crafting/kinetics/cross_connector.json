@@ -8,12 +8,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "g": {
-      "item": "create:gearbox"
-    },
-    "s": {
-      "item": "create:shaft"
-    }
+    "g": "create:gearbox",
+    "s": "create:shaft"
   },
   "pattern": [
     " s ",
