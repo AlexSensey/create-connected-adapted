@@ -12,6 +12,6 @@ public class TrackingContraptionWorld extends ContraptionWorld {
     public TrackingContraptionWorld(Level world, Contraption contraption, BlockPos localPos) {
         super(world, contraption);
         this.contraption = contraption;
-        this.localPos = localPos;
+        this.localPos = localPos.immutable();
     }
 }

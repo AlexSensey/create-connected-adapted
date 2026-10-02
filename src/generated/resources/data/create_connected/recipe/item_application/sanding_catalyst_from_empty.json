@@ -20,12 +20,8 @@
   ],
   "type": "create:item_application",
   "ingredients": [
-    {
-      "item": "create_connected:empty_fan_catalyst"
-    },
-    {
-      "item": "minecraft:sand"
-    }
+    "create_connected:empty_fan_catalyst",
+    "minecraft:sand"
   ],
   "results": [
     {

@@ -54,7 +54,7 @@ public class CFeatures extends SyncConfigBase {
     @Override
     protected void readSyncConfig(CompoundTag nbt) {
         synchronizedToggles = new HashMap<>();
-        for (String key : nbt.getAllKeys()) {
+        for (String key : nbt.keySet()) {
             Identifier location = Identifier.parse(key);
             synchronizedToggles.put(location, nbt.getBooleanOr(key, false));
         }

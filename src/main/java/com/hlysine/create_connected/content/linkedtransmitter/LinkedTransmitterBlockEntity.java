@@ -58,8 +58,8 @@ public class LinkedTransmitterBlockEntity extends SmartBlockEntity {
     }
 
     public void transmit(int strength) {
-        transmittedSignal = strength;
-        if (link != null)
+        transmittedSignal = Math.clamp(strength, 0, 15);
+        if (hasLevel() && !level.isClientSide() && link != null)
             link.notifySignalChange();
     }
 
@@ -72,7 +72,7 @@ public class LinkedTransmitterBlockEntity extends SmartBlockEntity {
     @Override
     protected void read(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
         super.read(tag, registries, clientPacket);
-        if (level == null || level.isClientSide() || !link.newPosition)
-            transmittedSignal = tag.getIntOr("Transmit", 0);
+        if (level == null || level.isClientSide() || link == null || !link.newPosition)
+            transmittedSignal = Math.clamp(tag.getIntOr("Transmit", 0), 0, 15);
     }
 }

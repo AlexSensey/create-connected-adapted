@@ -31,9 +31,9 @@ public class BrassChuteBlockEntity extends ChuteBlockEntity {
     @SubscribeEvent
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
-                Capabilities.ItemHandler.BLOCK,
+                Capabilities.Item.BLOCK,
                 CCBlockEntityTypes.BRASS_CHUTE.get(),
-                (be, context) -> be.itemHandler()
+                (be, context) -> be.getItemResourceHandler()
         );
     }
 }

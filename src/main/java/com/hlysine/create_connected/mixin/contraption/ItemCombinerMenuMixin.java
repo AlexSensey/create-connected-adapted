@@ -5,6 +5,7 @@ import com.hlysine.create_connected.content.contraption.menu.TrackingContainerLe
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.ItemCombinerMenu;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,19 +15,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @ModMixin(mods = {"railways"}, applyIfPresent = false)
 @Mixin(ItemCombinerMenu.class)
-public class ItemCombinerMenuMixin {
+public abstract class ItemCombinerMenuMixin {
     @Shadow
     @Final
     protected ContainerLevelAccess access;
 
+    @Shadow
+    protected abstract boolean isValidBlock(BlockState state);
+
     @Inject(
             at = @At("HEAD"),
-            method = "stillValid",
+            method = "stillValid(Lnet/minecraft/world/entity/player/Player;)Z",
             cancellable = true
     )
     private void stillValid(Player pPlayer, CallbackInfoReturnable<Boolean> cir) {
-        if (access instanceof TrackingContainerLevelAccess) {
-            cir.setReturnValue(access.evaluate((level, pos) -> pPlayer.distanceToSqr((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D) <= 64.0D, true));
+        if (access instanceof TrackingContainerLevelAccess tracking) {
+            cir.setReturnValue(tracking.stillValid(pPlayer, this::isValidBlock));
         }
     }
 }

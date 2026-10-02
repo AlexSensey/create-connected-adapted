@@ -7,13 +7,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import java.lang.ref.WeakReference;
 
 public class ContraptionRecordSoundInstance extends AbstractTickableSoundInstance {
     public WeakReference<AbstractContraptionEntity> contraptionEntity;
-    public BlockPos contraptionPos;
+    public final BlockPos contraptionPos;
+    private final WeakReference<Level> originalLevel;
 
     public ContraptionRecordSoundInstance(SoundEvent pSoundEvent,
                                           SoundSource pSource,
@@ -32,7 +34,8 @@ public class ContraptionRecordSoundInstance extends AbstractTickableSoundInstanc
         this.delay = pDelay;
         this.attenuation = pAttenuation;
         this.contraptionEntity = new WeakReference<>(contraptionEntity);
-        this.contraptionPos = contraptionPos;
+        this.contraptionPos = contraptionPos.immutable();
+        this.originalLevel = new WeakReference<>(contraptionEntity.level());
         tick();
     }
 
@@ -44,7 +47,7 @@ public class ContraptionRecordSoundInstance extends AbstractTickableSoundInstanc
     @Override
     public void tick() {
         AbstractContraptionEntity entity = contraptionEntity.get();
-        if (entity == null || entity.isRemoved()) {
+        if (entity == null || entity.isRemoved() || entity.level() != originalLevel.get()) {
             stop();
             return;
         }

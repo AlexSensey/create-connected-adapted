@@ -8,7 +8,6 @@
   "mixins": [
     "ItemUseOverridesMixin",
     "KineticBlockAdvancementMixin",
-    "ManualApplicationRecipeMixin",
     "RotationPropagatorAccessor",
     "RotationPropagatorMixin",
     "brasschute.ChuteBlockEntityAccessor",
@@ -22,7 +21,6 @@
     "copycat.TrackPlacementMixin",
     "copycat.fence.COMPATFenceBlockMixin",
     "copycat.fence.FenceBlockMixin",
-    "copycat.fence.ValueBoxRendererMixin",
     "copycat.fencegate.BlockCanSurviveMixin",
     "copycat.fencegate.COMPATPathNodeDefaultsMixin",
     "copycat.fencegate.FenceGateBlockAccessor",
@@ -46,12 +44,10 @@
     "kineticbattery.KineticNetworkAccessor",
     "linkedtransmitter.AnalogLeverBlockEntityAccessor",
     "linkedtransmitter.AnalogLeverBlockMixin",
-    "linkedtransmitter.ThrottleLeverBlockMixin",
     "nestedschematics.FilesHelperMixin",
     "nestedschematics.SchematicExportMixin",
     "nestedschematics.ServerSchematicLoaderMixin",
     "redstonelinkwildcard.RedstoneLinkNetworkHandlerMixin",
-    "sequencedgearshift.AbstractSimiScreenAccessor",
     "sequencedgearshift.InstructionAccessor",
     "sequencedgearshift.InstructionMixin",
     "sequencedgearshift.InstructionSpeedModifiersAccessor",
@@ -59,8 +55,13 @@
     "sequencedgearshift.SequencerInstructionsMixin"
   ],
   "client": [
+    "linkedtransmitter.LinkRendererMixin",
+    "linkedtransmitter.LinkRendererAccessor",
     "nestedschematics.ClientSchematicLoaderMixin",
-    "sequencedgearshift.SequencedGearshiftScreenMixin"
+    "sequencedgearshift.SequencedGearshiftScreenMixin",
+    "copycat.fence.ValueBoxRendererMixin",
+    "sequencedgearshift.AbstractSimiScreenAccessor",
+    "kineticbattery.BatteryHoverTipMixin"
   ],
   "injectors": {
     "defaultRequire": 1

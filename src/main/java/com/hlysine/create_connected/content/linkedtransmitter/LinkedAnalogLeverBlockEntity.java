@@ -50,7 +50,7 @@ public class LinkedAnalogLeverBlockEntity extends AnalogLeverBlockEntity {
     }
 
     public void transmit() {
-        if (link != null)
+        if (hasLevel() && !level.isClientSide() && link != null)
             link.notifySignalChange();
     }
 
@@ -63,7 +63,7 @@ public class LinkedAnalogLeverBlockEntity extends AnalogLeverBlockEntity {
         int prevTick = lastChange();
         super.tick();
         if (prevTick > 0 && lastChange() == 0) {
-            if (!level.isClientSide()) {
+            if (hasLevel() && !level.isClientSide()) {
                 transmit();
                 level.setBlock(worldPosition, getBlockState().setValue(BlockStateProperties.POWERED, getState() > 0), Block.UPDATE_ALL);
             }

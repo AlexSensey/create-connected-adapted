@@ -12,9 +12,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:fluid_vessel"
-    }
+    "create_connected:fluid_vessel"
   ],
   "result": {
     "count": 1,

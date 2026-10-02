@@ -12,9 +12,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:fan_purifying_catalyst"
-    }
+    "create_connected:fan_purifying_catalyst"
   ],
   "result": {
     "count": 1,

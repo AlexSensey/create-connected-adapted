@@ -93,12 +93,14 @@ public class CCAdvancement implements Awardable {
     }
 
     void save(Consumer<AdvancementHolder> t, HolderLookup.Provider registries) {
+        // Item components are not bound during trigger registration in 26.2.
+        // Resolve display stacks only once the datagen registry provider is ready.
+        if (ccBuilder.func != null)
+            ccBuilder.icon = ccBuilder.func.apply(registries);
+
         deferredCriteria.forEach(criterion -> criterion.accept(registries));
         if (parent != null)
             mcBuilder.parent(parent.datagenResult);
-
-        if (ccBuilder.func != null)
-            ccBuilder.icon(ccBuilder.func.apply(registries));
 
         mcBuilder.display(ItemStackTemplate.fromNonEmptyStack(ccBuilder.icon), Component.translatable(titleKey()),
                 Component.translatable(descriptionKey()).withStyle(s -> s.withColor(0xDBA213)),
@@ -155,15 +157,16 @@ public class CCAdvancement implements Awardable {
         }
 
         CCAdvancement.Builder icon(ItemProviderEntry<?, ?> item) {
-            return icon(item.asStack());
+            return icon(registries -> item.asStack());
         }
 
         CCAdvancement.Builder icon(ItemLike item) {
-            return icon(new ItemStack(item));
+            return icon(registries -> new ItemStack(item));
         }
 
         CCAdvancement.Builder icon(ItemStack stack) {
             icon = stack;
+            func = null;
             return this;
         }
 
@@ -187,12 +190,15 @@ public class CCAdvancement implements Awardable {
         }
 
         CCAdvancement.Builder whenIconCollected() {
-            return externalTrigger(InventoryChangeTrigger.TriggerInstance.hasItems(icon.getItem()));
+            String key = String.valueOf(keyIndex++);
+            externalTrigger = true;
+            deferredCriteria.add(registries -> mcBuilder.addCriterion(key,
+                    InventoryChangeTrigger.TriggerInstance.hasItems(icon.getItem())));
+            return this;
         }
 
         CCAdvancement.Builder whenItemCollected(ItemProviderEntry<?, ?> item) {
-            return whenItemCollected(item.asStack()
-                    .getItem());
+            return whenItemCollected(item.get());
         }
 
         CCAdvancement.Builder whenItemCollected(ItemLike itemProvider) {

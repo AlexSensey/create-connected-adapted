@@ -75,7 +75,7 @@ public class CCBlockEntityTypes {
 
     public static final BlockEntityEntry<OverstressClutchBlockEntity> OVERSTRESS_CLUTCH = REGISTRATE
             .blockEntity("overstress_clutch", OverstressClutchBlockEntity::new)
-            .visual(() -> SplitShaftVisual::new, false)
+            .visual(() -> SplitShaftVisual::new, true) // Keep ClutchRenderer's settings overlay with Flywheel.
             .validBlocks(CCBlocks.OVERSTRESS_CLUTCH)
 
             .register();
@@ -104,28 +104,28 @@ public class CCBlockEntityTypes {
 
     public static final BlockEntityEntry<CentrifugalClutchBlockEntity> CENTRIFUGAL_CLUTCH = REGISTRATE
             .blockEntity("centrifugal_clutch", CentrifugalClutchBlockEntity::new)
-            .visual(() -> SplitShaftVisual::new, false)
+            .visual(() -> SplitShaftVisual::new, true)
             .validBlocks(CCBlocks.CENTRIFUGAL_CLUTCH)
 
             .register();
 
     public static final BlockEntityEntry<FreewheelClutchBlockEntity> FREEWHEEL_CLUTCH = REGISTRATE
             .blockEntity("freewheel_clutch", FreewheelClutchBlockEntity::new)
-            .visual(() -> SplitShaftVisual::new, false)
+            .visual(() -> SplitShaftVisual::new, true)
             .validBlocks(CCBlocks.FREEWHEEL_CLUTCH)
 
             .register();
 
     public static final BlockEntityEntry<KineticBridgeBlockEntity> KINETIC_BRIDGE = REGISTRATE
             .blockEntity("kinetic_bridge", KineticBridgeBlockEntity::new)
-            .visual(() -> (ctx, blockEntity, partialTick) -> new KineticBridgeVisual(ctx, blockEntity, partialTick, false), false)
+            .visual(() -> (ctx, blockEntity, partialTick) -> new KineticBridgeVisual(ctx, blockEntity, partialTick, false), true)
             .validBlocks(CCBlocks.KINETIC_BRIDGE)
 
             .register();
 
     public static final BlockEntityEntry<KineticBridgeDestinationBlockEntity> KINETIC_BRIDGE_DESTINATION = REGISTRATE
             .blockEntity("kinetic_bridge_destination", KineticBridgeDestinationBlockEntity::new)
-            .visual(() -> (ctx, blockEntity, partialTick) -> new KineticBridgeVisual(ctx, blockEntity, partialTick, true), false)
+            .visual(() -> (ctx, blockEntity, partialTick) -> new KineticBridgeVisual(ctx, blockEntity, partialTick, true), true)
             .validBlocks(CCBlocks.KINETIC_BRIDGE_DESTINATION)
 
             .register();

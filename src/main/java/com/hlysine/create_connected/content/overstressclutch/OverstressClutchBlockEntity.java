@@ -83,6 +83,8 @@ public class OverstressClutchBlockEntity extends SplitShaftBlockEntity {
     }
 
     public void onKineticUpdate() {
+        if (level == null || level.isClientSide())
+            return;
         if (getBlockState().getValue(STATE) == ClutchState.UNCOUPLED && getBlockState().getValue(POWERED)) {
             resetClutch();
             return;
@@ -140,6 +142,8 @@ public class OverstressClutchBlockEntity extends SplitShaftBlockEntity {
     }
 
     public void resetClutch() {
+        if (level == null || level.isClientSide())
+            return;
         if (getBlockState().getValue(STATE) == ClutchState.UNCOUPLED && !isOverStressed()) {
             assert level != null;
             level.setBlock(getBlockPos(), getBlockState().setValue(STATE, ClutchState.COUPLED), 3);

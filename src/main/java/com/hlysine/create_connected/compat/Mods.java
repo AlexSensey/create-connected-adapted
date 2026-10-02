@@ -13,6 +13,7 @@ import java.util.function.Supplier;
  */
 public enum Mods {
     JEI("jei"),
+    REI("roughlyenoughitems"),
     COPYCATS("copycats"),
     DIAGONAL_FENCES("diagonalfences"),
     DREAMS_DESIRES("dndesires"),
@@ -26,6 +27,7 @@ public enum Mods {
     NETHER_INDUSTRY("createnetherindustry"),
     TWILIGHT_FOREST("twilightforest"),
     SIMULATED("simulated"),
+    SABLE("sable"),
     DYE_DEPOT("dye_depot");
 
     private final String id;
@@ -46,11 +48,11 @@ public enum Mods {
     }
 
     public Item getItem(String id) {
-        return BuiltInRegistries.ITEM.get(rl(id));
+        return BuiltInRegistries.ITEM.getValue(rl(id));
     }
 
     public Item getItem(Identifier id) {
-        return BuiltInRegistries.ITEM.get(id);
+        return BuiltInRegistries.ITEM.getValue(id);
     }
 
     /**

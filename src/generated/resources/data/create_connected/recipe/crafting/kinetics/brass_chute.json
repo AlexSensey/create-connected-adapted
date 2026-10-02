@@ -8,12 +8,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": {
-      "item": "create:brass_ingot"
-    },
-    "S": {
-      "item": "create:brass_sheet"
-    }
+    "I": "create:brass_ingot",
+    "S": "create:brass_sheet"
   },
   "pattern": [
     "S",

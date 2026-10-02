@@ -17,5 +17,11 @@
       "rolls": 1.0
     }
   ],
-  "random_sequence": "create_connected:blocks/dye_depot_indigo_fan_dyeing_catalyst"
+  "random_sequence": "create_connected:blocks/dye_depot_indigo_fan_dyeing_catalyst",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "dye_depot"
+    }
+  ]
 }

@@ -11,17 +11,8 @@
   ],
   "type": "create:item_application",
   "ingredients": [
-    {
-      "item": "create_connected:empty_fan_catalyst"
-    },
-    {
-      "type": "neoforge:compound",
-      "ingredients": [
-        {
-          "item": "garnished:purple_mastic_resin_bucket"
-        }
-      ]
-    }
+    "create_connected:empty_fan_catalyst",
+    "garnished:purple_mastic_resin_bucket"
   ],
   "results": [
     {

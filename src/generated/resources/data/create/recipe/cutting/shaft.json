@@ -7,9 +7,7 @@
   ],
   "type": "create:cutting",
   "ingredients": [
-    {
-      "item": "create:shaft"
-    }
+    "create:shaft"
   ],
   "processing_time": 200,
   "results": [

@@ -1,7 +1,5 @@
 package com.hlysine.create_connected.content.copycat;
 
-import com.simibubi.create.foundation.model.BakedModelHelper;
-import com.simibubi.create.foundation.model.BakedQuadHelper;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.AABB;
@@ -27,11 +25,10 @@ public interface ISimpleCopycatModel {
         offset.rotate(angle).flipY(flipY);
         cull.rotate(angle).flipY(flipY);
         for (BakedQuad quad : sourceQuads) {
-            if (cull.isCulled(quad.getDirection())) {
+            if (cull.isCulled(quad.direction())) {
                 continue;
             }
-            destQuads.add(BakedQuadHelper.cloneWithCustomGeometry(quad,
-                    BakedModelHelper.cropAndMove(quad.getVertices(), quad.getSprite(), select.toAABB(), offset.toVec3().subtract(select.minX / 16f, select.minY / 16f, select.minZ / 16f))));
+            destQuads.add(CopycatQuadGeometry.cropAndMove(quad, select.toAABB(), offset.toVec3().subtract(select.minX / 16f, select.minY / 16f, select.minZ / 16f)));
         }
     }
 

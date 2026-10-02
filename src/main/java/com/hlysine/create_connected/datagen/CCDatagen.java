@@ -40,6 +40,7 @@ public class CCDatagen {
     public static void gatherClientData(GatherDataEvent.Client event) {
         if (!event.getModContainer().getModId().equals(CreateConnected.MODID)) return;
         event.addProvider(CCSoundEvents.provider(event.getGenerator()));
+        event.addProvider(new CCSimpleModelGen(event.getGenerator().getPackOutput()));
     }
 
     public static void gatherServerData(GatherDataEvent.Server event) {
@@ -47,15 +48,14 @@ public class CCDatagen {
         DataGenerator generator = event.getGenerator();
         PackOutput output = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
+        CCTagGen.addGenerators(event);
+        event.addProvider(new CCDataMapGen(output));
         event.addProvider(new CCAdvancements(output, lookupProvider));
         event.addProvider(CCJukeboxSongs.provider(output, lookupProvider));
         CreateConnectedProcessingRecipeGen.registerAllProcessing(generator, output, lookupProvider);
     }
 
     private static void addExtraRegistrateData() {
-        CCTagGen.addGenerators();
-        CCDataMapGen.addGenerators();
-
         CreateConnected.getRegistrate().addDataGenerator(ProviderType.LANG, provider -> {
             BiConsumer<String, String> langConsumer = provider::add;
 

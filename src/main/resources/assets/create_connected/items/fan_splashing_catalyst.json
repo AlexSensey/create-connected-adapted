@@ -1,0 +1,11 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "create_connected:block/fan_splashing_catalyst/item",
+    "tints": [
+      {
+        "type": "create_connected:water"
+      }
+    ]
+  }
+}

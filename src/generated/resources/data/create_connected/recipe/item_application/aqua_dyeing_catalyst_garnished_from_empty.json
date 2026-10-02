@@ -20,17 +20,8 @@
   ],
   "type": "create:item_application",
   "ingredients": [
-    {
-      "item": "create_connected:empty_fan_catalyst"
-    },
-    {
-      "type": "neoforge:compound",
-      "ingredients": [
-        {
-          "item": "garnished:dye_depot_aqua_mastic_resin_bucket"
-        }
-      ]
-    }
+    "create_connected:empty_fan_catalyst",
+    "garnished:dye_depot_aqua_mastic_resin_bucket"
   ],
   "results": [
     {

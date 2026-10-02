@@ -30,9 +30,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:dye_depot_rose_fan_dyeing_catalyst"
-    }
+    "create_connected:dye_depot_rose_fan_dyeing_catalyst"
   ],
   "result": {
     "count": 1,

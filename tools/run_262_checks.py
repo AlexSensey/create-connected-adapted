@@ -1,4 +1,4 @@
-"""Run focused migration regressions against the ABE dependency snapshot."""
+"""Run focused migration regressions against the current Prism 26.2 dependency snapshot."""
 from pathlib import Path
 import json
 import os
@@ -7,7 +7,7 @@ import sys
 
 root = Path(__file__).resolve().parents[1]
 subprocess.run([sys.executable, str(root / 'tools/check_262.py'), '--prepare-only'], check=True)
-classpath = json.loads((root / 'build/diagnostics-26.2/classpath.json').read_text(encoding='utf-8'))
+classpath = json.loads((root / 'build/diagnostics-core-26.2/classpath.json').read_text(encoding='utf-8'))
 work = root / 'build/migration-checks'
 work.mkdir(parents=True, exist_ok=True)
 jdk = Path('C:/Java/jdk-25.0.2/bin')

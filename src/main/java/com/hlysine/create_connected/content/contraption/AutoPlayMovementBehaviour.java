@@ -19,7 +19,11 @@ public abstract class AutoPlayMovementBehaviour extends SlidingDoorMovementBehav
 
     @Override
     public void tick(MovementContext context) {
+        if (context.world.isClientSide())
+            return;
         Contraption contraption = context.contraption;
+        if (contraption == null || contraption.entity == null || contraption.entity.isRemoved())
+            return;
         StructureBlockInfo structureBlockInfo = contraption.getBlocks()
                 .get(context.localPos);
         if (structureBlockInfo == null)

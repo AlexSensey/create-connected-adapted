@@ -12,9 +12,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create:item_vault"
-    }
+    "create:item_vault"
   ],
   "result": {
     "count": 1,

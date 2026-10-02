@@ -12,9 +12,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:fan_ending_catalyst_dragons_breath"
-    }
+    "create_connected:fan_ending_catalyst_dragons_breath"
   ],
   "result": {
     "count": 1,

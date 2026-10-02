@@ -10,7 +10,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -32,6 +31,29 @@ public interface LinkedTransmitterBlock {
     Block getBase();
 
     void replaceBase(BlockState baseState, Level world, BlockPos pos);
+
+    /** Retains a lever's native data while replacing its block/entity type. */
+    default boolean replacePreservingData(BlockState replacement, Level world, BlockPos pos) {
+        if (world.isClientSide())
+            return false;
+        var previous = world.getBlockEntity(pos);
+        var data = previous == null ? null : previous.saveWithoutMetadata(world.registryAccess());
+        if (!world.setBlockAndUpdate(pos, replacement))
+            return false;
+        var installed = world.getBlockEntity(pos);
+        if (data != null && installed != null) {
+            try (var problems = new net.minecraft.util.ProblemReporter.ScopedCollector(
+                    com.hlysine.create_connected.CreateConnected.LOGGER)) {
+                installed.loadWithComponents(net.minecraft.world.level.storage.TagValueInput.create(
+                        problems, world.registryAccess(), data));
+            }
+            installed.setChanged();
+            if (installed instanceof com.simibubi.create.foundation.blockEntity.SmartBlockEntity smart)
+                smart.sendData();
+            world.updateNeighborsAt(pos, replacement.getBlock());
+        }
+        return true;
+    }
 
     default VoxelShape getTransmitterShape(BlockState state) {
         Direction facing = state.getValue(FaceAttachedHorizontalDirectionalBlock.FACING);
@@ -56,32 +78,45 @@ public interface LinkedTransmitterBlock {
     }
 
     default InteractionResult useWax(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (stack.is(Items.HONEYCOMB) && !state.getValue(BlockStateProperties.LOCKED)) {
+        if (player == null || player.isSpectator())
+            return InteractionResult.PASS;
+        boolean locking = stack.is(Items.HONEYCOMB) && !state.getValue(BlockStateProperties.LOCKED);
+        boolean unlocking = stack.is(ItemTags.AXES) && state.getValue(BlockStateProperties.LOCKED);
+        if ((locking || unlocking) && (!player.mayBuild()
+                || !player.mayUseItemAt(pos, hitResult.getDirection(), stack)))
+            return InteractionResult.PASS;
+        if (locking) {
+            if (level.isClientSide())
+                return InteractionResult.SUCCESS;
+            BlockState newState = state.setValue(BlockStateProperties.LOCKED, true);
+            if (!level.setBlock(pos, newState, Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_ALL))
+                return InteractionResult.FAIL;
             if (player instanceof ServerPlayer serverPlayer) {
                 CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(serverPlayer, pos, stack);
             }
             if (!player.isCreative())
                 stack.shrink(1);
-            BlockState newState = state.setValue(BlockStateProperties.LOCKED, true);
-            level.setBlock(pos, newState, Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_ALL);
             level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState));
             level.levelEvent(player, 3003, pos, 0);
-            return InteractionResult.sidedSuccess(level.isClientSide());
+            return InteractionResult.CONSUME;
         }
-        if (stack.is(ItemTags.AXES) && state.getValue(BlockStateProperties.LOCKED)) {
+        if (unlocking) {
+            if (level.isClientSide())
+                return InteractionResult.SUCCESS;
+            BlockState newState = state.setValue(BlockStateProperties.LOCKED, false);
+            if (!level.setBlock(pos, newState, Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_ALL))
+                return InteractionResult.FAIL;
             level.playSound(player, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0F, 1.0F);
             level.levelEvent(player, 3004, pos, 0);
             if (player instanceof ServerPlayer) {
                 CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger((ServerPlayer) player, pos, stack);
             }
-            BlockState newState = state.setValue(BlockStateProperties.LOCKED, false);
-            level.setBlock(pos, newState, Block.UPDATE_KNOWN_SHAPE | Block.UPDATE_ALL);
             level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState));
-            if (player != null && !player.isCreative()) {
-                stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+            if (!player.isCreative()) {
+                stack.hurtAndBreak(1, player, hand);
             }
 
-            return InteractionResult.sidedSuccess(level.isClientSide());
+            return InteractionResult.CONSUME;
         }
         return InteractionResult.TRY_WITH_EMPTY_HAND;
     }

@@ -12,9 +12,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:inverted_gearshift"
-    }
+    "create_connected:inverted_gearshift"
   ],
   "result": {
     "count": 1,

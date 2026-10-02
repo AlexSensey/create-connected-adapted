@@ -11,12 +11,8 @@
   ],
   "type": "create:item_application",
   "ingredients": [
-    {
-      "item": "create_connected:empty_fan_catalyst"
-    },
-    {
-      "item": "create:blaze_cake"
-    }
+    "create_connected:empty_fan_catalyst",
+    "create:blaze_cake"
   ],
   "results": [
     {

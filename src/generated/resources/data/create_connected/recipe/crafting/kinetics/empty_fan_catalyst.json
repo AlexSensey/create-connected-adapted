@@ -8,12 +8,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "b": {
-      "item": "create:brass_ingot"
-    },
-    "i": {
-      "item": "minecraft:iron_bars"
-    }
+    "b": "create:brass_ingot",
+    "i": "minecraft:iron_bars"
   },
   "pattern": [
     "bib",

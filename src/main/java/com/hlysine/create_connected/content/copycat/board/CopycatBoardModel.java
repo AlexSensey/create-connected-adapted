@@ -1,15 +1,13 @@
 package com.hlysine.create_connected.content.copycat.board;
 
 import com.hlysine.create_connected.content.copycat.ISimpleCopycatModel;
-import com.simibubi.create.content.decoration.copycat.CopycatModel;
+import com.hlysine.create_connected.content.copycat.ConnectedCopycatModel;
+import com.hlysine.create_connected.content.copycat.CopycatQuadGeometry;
 import net.createmod.catnip.api.data.Iterate;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.core.Direction;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.model.data.ModelData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,17 +17,14 @@ import java.util.Map;
 import static com.hlysine.create_connected.content.copycat.ISimpleCopycatModel.MutableCullFace.*;
 import static com.hlysine.create_connected.content.copycat.board.CopycatBoardBlock.byDirection;
 
-public class CopycatBoardModel extends CopycatModel implements ISimpleCopycatModel {
+public class CopycatBoardModel extends ConnectedCopycatModel implements ISimpleCopycatModel {
 
-    public CopycatBoardModel(BakedModel originalModel) {
+    public CopycatBoardModel(BlockStateModel originalModel) {
         super(originalModel);
     }
 
     @Override
-    protected List<BakedQuad> getCroppedQuads(BlockState state, Direction side, RandomSource rand, BlockState material,
-                                              ModelData wrappedData, RenderType renderType) {
-        BakedModel model = getModelOf(material);
-        List<BakedQuad> templateQuads = model.getQuads(material, side, rand, wrappedData, renderType);
+    protected List<BakedQuad> getCroppedQuads(BlockState state, List<BakedQuad> templateQuads) {
 
         List<BakedQuad> quads = new ArrayList<>();
 

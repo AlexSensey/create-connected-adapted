@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Mixin(value = ClientSchematicLoader.class, remap = false)
 public class ClientSchematicLoaderMixin {
@@ -31,11 +32,10 @@ public class ClientSchematicLoaderMixin {
 
     @Unique
     private void cc$searchInSubfolder(String folder, int depth) {
-        try {
+        try (Stream<Path> paths = Files.list(Path.of(folder))) {
             boolean canRecurse = depth < CServer.SchematicsNestingDepth.get();
             Path base = Path.of("schematics/");
-            Files.list(Path.of(folder))
-                    .forEach(path -> {
+            paths.forEach(path -> {
                         if (Files.isDirectory(path)) {
                             if (canRecurse && (depth != 0 || !path.getFileName().toString().equals("uploaded")))
                                 cc$searchInSubfolder(path.toString(), depth + 1);

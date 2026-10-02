@@ -24,12 +24,8 @@
   ],
   "type": "create:item_application",
   "ingredients": [
-    {
-      "item": "create_connected:empty_fan_catalyst"
-    },
-    {
-      "item": "minecraft:powder_snow_bucket"
-    }
+    "create_connected:empty_fan_catalyst",
+    "minecraft:powder_snow_bucket"
   ],
   "results": [
     {

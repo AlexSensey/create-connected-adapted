@@ -58,7 +58,7 @@ public class CFeatureCategories extends SyncConfigBase {
     @Override
     protected void readSyncConfig(CompoundTag nbt) {
         synchronizedToggles = new HashMap<>();
-        for (String key : nbt.getAllKeys()) {
+        for (String key : nbt.keySet()) {
             FeatureCategory category = FeatureCategory.byName(key);
             synchronizedToggles.put(category, nbt.getBooleanOr(key, false));
         }

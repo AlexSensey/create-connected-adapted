@@ -32,18 +32,20 @@ public class LinkedTransmitterItem extends Item {
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext ctx) {
         Player player = ctx.getPlayer();
-        if (player == null)
+        if (player == null || stack.isEmpty())
             return InteractionResult.PASS;
         Level world = ctx.getLevel();
         BlockPos pos = ctx.getClickedPos();
         BlockState hitState = world.getBlockState(pos);
 
-        if (player.mayBuild()) {
+        if (player.mayBuild() && player.mayUseItemAt(pos, ctx.getClickedFace(), stack)) {
             for (LinkedTransmitterBlock moduleBlock : MODULE_BLOCKS) {
                 if (hitState.is(moduleBlock.getBase())) {
                     if (!world.isClientSide()) {
-                        if (!player.isCreative()) stack.shrink(1);
                         moduleBlock.replaceBase(hitState, world, pos);
+                        if (!world.getBlockState(pos).is(moduleBlock.getBlock()))
+                            return InteractionResult.FAIL;
+                        if (!player.isCreative()) stack.shrink(1);
                     }
                     return InteractionResult.SUCCESS;
                 }

@@ -439,7 +439,7 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
 
         if (isController()) {
             window = compound.getBooleanOr("Window", false);
-            windowType = NBTHelper.readEnum(compound, "WindowType", WindowType.class);
+            windowType = StorageSerialization.readEnum(compound, "WindowType", WindowType.SIDE_WIDE);
             width = compound.getIntOr("Size", 0);
             height = compound.getIntOr("Height", 0);
             tankInventory.setCapacity(getTotalTankSize() * getCapacityMultiplier());
@@ -496,7 +496,7 @@ public class FluidVesselBlockEntity extends FluidTankBlockEntity implements IHav
             compound.put("Controller", writeStoredPosition(controller));
         if (isController()) {
             compound.putBoolean("Window", window);
-            NBTHelper.writeEnum(compound, "WindowType", windowType);
+            compound.putString("WindowType", windowType.name());
             StorageSerialization.writeFluid(registries, compound, "TankContent", tankInventory.getFluid());
             compound.putInt("Size", width);
             compound.putInt("Height", height);

@@ -34,3 +34,6 @@ libs
 # Local migration diagnostics
 __pycache__/
 *.pyc
+
+# Local runtime logs
+/logs/

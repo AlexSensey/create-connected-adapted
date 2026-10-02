@@ -12,9 +12,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "create_connected:copycat_wall"
-    }
+    "create_connected:copycat_wall"
   ],
   "result": {
     "count": 1,
