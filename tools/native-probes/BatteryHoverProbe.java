@@ -13,7 +13,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.*;
 
 @Mod("create_world_log_probe")
 public class BatteryHoverProbe {
- int ticks,checks; final BlockPos pos=new BlockPos(425,70,-210);boolean placed;
+ int ticks,checks,guiWait; final BlockPos pos=new BlockPos(425,70,-210);boolean placed;String pendingResult;
  public BatteryHoverProbe(){NeoForge.EVENT_BUS.addListener(this::tick);}
  void check(boolean value,String detail){checks++;if(!value)throw new AssertionError(detail);}
  void tick(ClientTickEvent.Post event){
@@ -21,6 +21,11 @@ public class BatteryHoverProbe {
   if(mc.gui.screen() instanceof net.minecraft.client.gui.screens.BackupConfirmScreen screen){try{var f=screen.getClass().getDeclaredField("onProceed");f.setAccessible(true);((net.minecraft.client.gui.screens.BackupConfirmScreen.Listener)f.get(screen)).proceed(true,false);}catch(Exception e){throw new RuntimeException(e);}return;}
   if(mc.level==null||mc.player==null||mc.gui.overlay()!=null||++ticks<120)return;
   try{
+   if(pendingResult!=null){
+    if(!(mc.gui.screen() instanceof com.hlysine.create_connected.content.sequencedpulsegenerator.SequencedPulseGeneratorScreen)&&++guiWait<40)return;
+    check(mc.gui.screen() instanceof com.hlysine.create_connected.content.sequencedpulsegenerator.SequencedPulseGeneratorScreen,"Pulse generator client GUI missing");
+    Files.writeString(mc.gameDirectory.toPath().resolve("BATTERY-HOVER-PASS.txt"),pendingResult+"PASS Sequenced Pulse Generator GUI opens through separated client helper\n");mc.stop();return;
+   }
    if(!placed){placed=true;mc.getSingleplayerServer().execute(()->{var level=mc.getSingleplayerServer().overworld();level.setBlockAndUpdate(pos,CCBlocks.KINETIC_BATTERY.getDefaultState());var player=level.getPlayerByUUID(mc.player.getUUID());if(player!=null)player.setPos(425.5,70,-206);});return;}
    mc.player.setPos(425.5,70,-206);
    if(!(mc.level.getBlockEntity(pos) instanceof KineticBatteryBlockEntity battery))return;
@@ -38,7 +43,14 @@ public class BatteryHoverProbe {
     mc.hitResult=new BlockHitResult(Vec3.atLowerCornerOf(pos).add(center),side,pos,false);
     ScrollValueRenderer.tick();check((handler.hoverWarmup>0)==(facing.getAxis()!=side.getAxis()),"Settings hint mismatch: "+facing+"/"+side);
    }
-   Files.writeString(mc.gameDirectory.toPath().resolve("BATTERY-HOVER-PASS.txt"),"PASS battery direction hint only over settings area: "+checks+" native assertions, all six facings and six hit faces.\n");mc.stop();
+   String result="PASS battery direction hint only over settings area: "+checks+" native assertions, all six facings and six hit faces.\n";
+   if(Boolean.getBoolean("connected.probe.pulseGui")){
+    mc.level.setBlock(pos,CCBlocks.SEQUENCED_PULSE_GENERATOR.getDefaultState(),2);
+    var generator=(com.hlysine.create_connected.content.sequencedpulsegenerator.SequencedPulseGeneratorBlockEntity)mc.level.getBlockEntity(pos);
+    com.hlysine.create_connected.content.sequencedpulsegenerator.SequencedPulseGeneratorClient.open(generator,mc.player);
+    pendingResult=result;return;
+   }
+   Files.writeString(mc.gameDirectory.toPath().resolve("BATTERY-HOVER-PASS.txt"),result);mc.stop();
   }catch(Throwable e){e.printStackTrace();try{Files.writeString(mc.gameDirectory.toPath().resolve("BATTERY-HOVER-FAIL.txt"),e.toString());}catch(Exception ignored){}mc.stop();}
  }
 }

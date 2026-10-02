@@ -8,9 +8,7 @@ import com.simibubi.create.content.redstone.diodes.AbstractDiodeBlock;
 import com.simibubi.create.content.redstone.diodes.BrassDiodeBlock;
 import com.simibubi.create.content.redstone.diodes.PoweredLatchBlock;
 import com.simibubi.create.foundation.block.IBE;
-import net.createmod.catnip.api.client.gui.ScreenOpener;
 import net.createmod.catnip.platform.CatnipServices;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -31,8 +29,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 public class SequencedPulseGeneratorBlock extends AbstractDiodeBlock implements IBE<SequencedPulseGeneratorBlockEntity> {
@@ -159,10 +155,8 @@ public class SequencedPulseGeneratorBlock extends AbstractDiodeBlock implements 
         return InteractionResult.SUCCESS;
     }
 
-    @OnlyIn(value = Dist.CLIENT)
     protected void displayScreen(SequencedPulseGeneratorBlockEntity be, Player player) {
-        if (player instanceof LocalPlayer)
-            ScreenOpener.open(new SequencedPulseGeneratorScreen(be));
+        SequencedPulseGeneratorClient.open(be, player);
     }
 
     @Override

@@ -1,14 +1,10 @@
 {
   "minecraft": "26.3",
-  "version": "1.3.3-adapted-26.3-0.6",
-  "sha256": "10f03a2d2e7c05dbfec06417b4519f787b781405d7fca1df0168049374072dd0",
-  "changed_entries": [
-    "META-INF/MANIFEST.MF",
-    "com/hlysine/create_connected/mixin/kineticbattery/BatteryHoverTipMixin.class",
-    "create_connected.mixins.json",
-    "META-INF/neoforge.mods.toml"
-  ],
-  "native_runtime_test_minecraft": "26.3",
-  "native_test": "build/cross-version-compat/26.3/tests/absence/20261002-035820",
-  "native_hover_assertions": 72
+  "version": "1.3.3-adapted-26.3-0.7",
+  "sha256": "b78348f8a402e3ea30b190d58e840e3307addc0431792d788fe9106af819f6b6",
+  "dedicated_server_test": "build/connected-dedicated/26.3",
+  "dedicated_server_pass": true,
+  "client_gui_test_minecraft": "26.3",
+  "client_gui_pass": true,
+  "coverage": "Dedicated server with Create and Connected; additional server mods from the reported Linux pack were not available in this test."
 }
