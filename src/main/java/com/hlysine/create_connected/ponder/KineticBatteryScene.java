@@ -8,6 +8,7 @@ import com.hlysine.create_connected.registries.CCDataComponents;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.kinetics.belt.BeltBlock;
+import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import com.simibubi.create.content.kinetics.belt.BeltPart;
 import com.simibubi.create.content.kinetics.chainDrive.ChainDriveBlock;
 import com.simibubi.create.content.kinetics.deployer.DeployerBlockEntity;
@@ -140,8 +141,20 @@ public class KineticBatteryScene {
         scene.world().hideSection(rotation2, Direction.UP);
         scene.world().hideSection(util.select().position(cog1), Direction.UP);
         scene.idle(20);
-        scene.world().setBlock(saw, AllBlocks.BELT.getDefaultState(), false);
-        scene.world().setBlock(saw.relative(Direction.NORTH), AllBlocks.BELT.getDefaultState().setValue(BeltBlock.PART, BeltPart.END), false);
+        scene.world().setBlock(saw, AllBlocks.BELT.getDefaultState().setValue(BeltBlock.HORIZONTAL_FACING, Direction.NORTH), false);
+        scene.world().setBlock(saw.relative(Direction.NORTH), AllBlocks.BELT.getDefaultState().setValue(BeltBlock.HORIZONTAL_FACING, Direction.NORTH).setValue(BeltBlock.PART, BeltPart.END), false);
+        // Belts created by the scene have no saved chain metadata. Virtual worlds
+        // do not run the normal server-side belt initialization.
+        scene.world().modifyBlockEntity(saw, BeltBlockEntity.class, belt -> {
+            belt.setController(saw);
+            belt.beltLength = 2;
+            belt.index = 0;
+        });
+        scene.world().modifyBlockEntity(saw.relative(Direction.NORTH), BeltBlockEntity.class, belt -> {
+            belt.setController(saw);
+            belt.beltLength = 2;
+            belt.index = 1;
+        });
         scene.world().setKineticSpeed(util.select().position(saw).add(util.select().position(saw.relative(Direction.NORTH))), -64);
         scene.world().showSection(util.select().position(saw).add(util.select().position(saw.relative(Direction.NORTH))), Direction.DOWN);
         scene.idle(10);

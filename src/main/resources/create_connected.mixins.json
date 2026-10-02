@@ -60,7 +60,8 @@
     "nestedschematics.ClientSchematicLoaderMixin",
     "sequencedgearshift.SequencedGearshiftScreenMixin",
     "copycat.fence.ValueBoxRendererMixin",
-    "sequencedgearshift.AbstractSimiScreenAccessor"
+    "sequencedgearshift.AbstractSimiScreenAccessor",
+    "kineticbattery.BatteryHoverTipMixin"
   ],
   "injectors": {
     "defaultRequire": 1

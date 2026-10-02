@@ -1,16 +1,14 @@
 {
   "minecraft": "26.3",
-  "version": "1.3.3-adapted-26.3-0.4",
-  "sha256": "fc930fed7c2e61bf7017f1a8c888945f1e3c0394b31708174b4ea605459ffa06",
-  "bridge_assertions": 96,
-  "native_test": "C:\\Users\\alexn\\RiderProjects\\Create\\build\\cross-version-compat\\26.3\\tests\\absence\\20261002-023937",
-  "changed_jar_entries": [
+  "version": "1.3.3-adapted-26.3-0.6",
+  "sha256": "10f03a2d2e7c05dbfec06417b4519f787b781405d7fca1df0168049374072dd0",
+  "changed_entries": [
     "META-INF/MANIFEST.MF",
-    "META-INF/neoforge.mods.toml",
-    "com/hlysine/create_connected/content/kineticbridge/KineticBridgeRenderer$1.class",
-    "com/hlysine/create_connected/content/kineticbridge/KineticBridgeRenderer$2.class",
-    "com/hlysine/create_connected/content/kineticbridge/KineticBridgeRenderer$BridgeRenderState.class",
-    "com/hlysine/create_connected/content/kineticbridge/KineticBridgeRenderer.class",
-    "com/hlysine/create_connected/content/kineticbridge/KineticBridgeValueBox.class"
-  ]
+    "com/hlysine/create_connected/mixin/kineticbattery/BatteryHoverTipMixin.class",
+    "create_connected.mixins.json",
+    "META-INF/neoforge.mods.toml"
+  ],
+  "native_runtime_test_minecraft": "26.3",
+  "native_test": "build/cross-version-compat/26.3/tests/absence/20261002-035820",
+  "native_hover_assertions": 72
 }

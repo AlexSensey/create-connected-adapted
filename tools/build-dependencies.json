@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "minecraft": "26.3",
+  "neoforge": "26.3.0.40-beta",
+  "create_version": "6.0.11-adapted-1.26",
+  "entries": [
+    {
+      "role": "create",
+      "path": "build/dependencies-26.3/create-create-adapted-26.3-1.26-public-external-assets.jar",
+      "sha256": "3464c2b8b9afef631c74045b1f0460fabaadb0e74f4c9ae209161418442d9c94",
+      "runtime": true
+    },
+    {
+      "role": "catnip",
+      "path": "build/dependencies-26.3/catnip-catnip-neoforge-1.0.100046-adapted-fork-early+mc26.3.jar",
+      "sha256": "8beabf4224f406a89e3412f177b65597b2ee047ae4486fabef16b9a954d04a4a",
+      "runtime": false
+    },
+    {
+      "role": "flywheel",
+      "path": "build/dependencies-26.3/flywheel-create_flywheel-neoforge-26.3-1.0.6.jar",
+      "sha256": "4da6888d6cd911ee7102e9cb2c89afdf89c4b948a5ee45591926c5e93f1a29b7",
+      "runtime": false
+    },
+    {
+      "role": "ponder",
+      "path": "build/dependencies-26.3/ponder-net.createmod.ponder.ponder-neoforge-1.0.100046-adapted-fork-early+mc26.3.jar",
+      "sha256": "e0137219de5787307f34a25b1f5fb5edd8d5a01d0ef533017b33c4dbc5387967",
+      "runtime": false
+    },
+    {
+      "role": "registrate",
+      "path": "build/dependencies-26.3/registrate-Registrate-MC1.21-1.3.0+67.jar",
+      "sha256": "babbb53705148e57441cdd8362f4b9031845f77b48346d40909cef037ac59421",
+      "runtime": false
+    },
+    {
+      "role": "jei",
+      "path": "build/dependencies-26.3/jei-jei-26.3-neoforge-31.8.0.53.jar",
+      "sha256": "397d271368807c0a3602a233822c1da08bd1c3cf8a84b16b90d87781ebbdd3d1",
+      "runtime": false
+    },
+    {
+      "role": "rei",
+      "path": "build/dependencies-26.3/rei-RoughlyEnoughItems-26.3.823.jar",
+      "sha256": "d146afecd0f96ba972e3e96eebbf7481666cfb19af02292f1984c4e9e228be45",
+      "runtime": false
+    },
+    {
+      "role": "architectury",
+      "path": "build/dependencies-26.3/architectury-architectury-neoforge-22.0.3.jar",
+      "sha256": "e535d076add1644c63ce39397640d26b360e544f49fa017181f47c4581bb6d04",
+      "runtime": false
+    },
+    {
+      "role": "annotations",
+      "path": "build/dependencies-26.3/annotations-annotations-26.1.0.jar",
+      "sha256": "ebc7aec252ed0c7d2d04c039d7f00e69f7b86b1f493c741d67b3ef31b986b054",
+      "runtime": false
+    }
+  ],
+  "missing_bridge_dependencies": [
+    "simulated"
+  ]
+}
