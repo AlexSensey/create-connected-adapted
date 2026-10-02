@@ -8,15 +8,20 @@ Unofficial NeoForge adaptation of [Create: Connected by Lysine](https://github.c
 
 | Minecraft | JAR | Source branch |
 | --- | --- | --- |
-| 26.1.2 | [Connected 0.6](https://github.com/AlexSensey/create-connected-adapted/releases/download/adapted-0.6/create_connected-1.3.3-adapted-26.1.2-0.6.jar) | [adapted/26.1.2](https://github.com/AlexSensey/create-connected-adapted/tree/adapted/26.1.2) |
-| 26.2 | [Connected 0.6](https://github.com/AlexSensey/create-connected-adapted/releases/download/adapted-0.6/create_connected-1.3.3-adapted-26.2-0.6.jar) | [adapted/26.2](https://github.com/AlexSensey/create-connected-adapted/tree/adapted/26.2) |
-| 26.3 | [Connected 0.6](https://github.com/AlexSensey/create-connected-adapted/releases/download/adapted-0.6/create_connected-1.3.3-adapted-26.3-0.6.jar) | [adapted/26.3](https://github.com/AlexSensey/create-connected-adapted/tree/adapted/26.3) |
+| 26.1.2 | [Connected 0.7](https://github.com/AlexSensey/create-connected-adapted/releases/download/adapted-0.7/create_connected-1.3.3-adapted-26.1.2-0.7.jar) | [adapted/26.1.2](https://github.com/AlexSensey/create-connected-adapted/tree/adapted/26.1.2) |
+| 26.2 | [Connected 0.7](https://github.com/AlexSensey/create-connected-adapted/releases/download/adapted-0.7/create_connected-1.3.3-adapted-26.2-0.7.jar) | [adapted/26.2](https://github.com/AlexSensey/create-connected-adapted/tree/adapted/26.2) |
+| 26.3 | [Connected 0.7](https://github.com/AlexSensey/create-connected-adapted/releases/download/adapted-0.7/create_connected-1.3.3-adapted-26.3-0.7.jar) | [adapted/26.3](https://github.com/AlexSensey/create-connected-adapted/tree/adapted/26.3) |
 
 Use the JAR matching your Minecraft version with NeoForge and [Create: Adapted](https://github.com/AlexSensey/create-adapted). Replace the previous Connected JAR in your `mods` folder; install one Connected JAR per instance.
 
 This branch targets Minecraft **26.1.2**, NeoForge **26.1.2.109** or newer within that Minecraft version, and Create **[6.0.11-adapted-1.27,)**. REI and JEI integrations are optional. Extra fan processing types require their respective optional mods.
 
-## Changes in 0.6
+## Changes in 0.7
+
+- Fixed dedicated-server startup by separating Sequenced Pulse Generator GUI code from common block registration.
+- All three supported Minecraft versions started on native dedicated servers without client Screen classes.
+
+## Changes retained from 0.6
 
 - The Kinetic Battery discharge-direction hint appears only when hovering its settings area.
 - The Kinetic Battery tutorial's dynamically created conveyor belt renders correctly.
