@@ -1,7 +1,7 @@
 modLoader="javafml"
 loaderVersion="${loader_version_range}"
 license="${mod_license}"
-issueTrackerURL="https://github.com/hlysine/create_connected/issues"
+issueTrackerURL="https://github.com/AlexSensey/create-connected-adapted/issues"
 
 [[mods]]
     modId="${mod_id}"

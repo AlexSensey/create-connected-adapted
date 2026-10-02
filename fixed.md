@@ -1,6 +1,6 @@
 # Create Connected: Adapted — Minecraft 26.2
 
-Version: 1.3.3-adapted-26.2-0.6
+Version: 1.3.3-adapted-26.2-0.7
 
 ## Changes in 0.3
 
@@ -77,3 +77,9 @@ Validation of 0.5: all three Minecraft ports compiled. The complete 26.3 modpack
 - The Kinetic Battery discharge-direction hover hint now appears only over its settings area. Looking at the rest of the battery no longer triggers that hint.
 
 Validation of 0.6: all three Minecraft ports compiled. Native hover checks compare the battery body and settings area for all six facings and all six hit faces (72 assertions per tested port). A client-only mixin filters the battery hint; charging and discharge logic are unchanged.
+
+## Changes in 0.7
+
+- Fixed dedicated-server startup: Sequenced Pulse Generator registration no longer loads Minecraft client Screen classes. Its GUI opens through a separate client-only helper.
+
+Validation of 0.7: native dedicated servers started on Minecraft 26.1.2, 26.2 and 26.3 with no client Screen class present. Sequenced Pulse Generator and Kinetic Battery block entities were created. Minecraft 26.2 used the minimum supported Create 1.20, matching the reported server. The client GUI opened successfully on 26.3 and all 72 battery hover assertions still passed.
